@@ -196,7 +196,7 @@ export class DiagramComponent {
         sourcePort: 'port-right',    // Must match port IDs in node template
         targetPort: 'port-left',      // Must match port IDs in node template
         targetArrowhead: 'ng-diagram-arrow',  // Built-in arrowhead
-        routing: 'polyline',          // Line routing algorithm
+        routing: 'bezier',          // Line routing algorithm
         data: { label: 'label' },
 
         // Advanced: Manual routing with custom points
