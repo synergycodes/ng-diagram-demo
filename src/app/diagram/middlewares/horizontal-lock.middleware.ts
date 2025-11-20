@@ -29,19 +29,12 @@ import { BaseNodeEdgeData } from '../../types';
  * 4. State Updates:
  *    - nodesToUpdate: Array of partial node updates with id
  *    - Each update is merged with existing node data
- *
- * Use Cases for Middlewares:
- * - Movement constraints (axis locking, boundaries)
- * - Validation (prevent invalid connections, positions)
- * - Auto-layout (snap to grid, align nodes)
- * - Logging and debugging
- * - Sync with external systems
  */
 export const horizontalLockMiddleware: Middleware = {
   name: 'horizontal-lock',
 
   execute: async (context, next) => {
-    // Get all nodes that were moved and filter for nodes with label 'horizontal'
+    // Get all nodes that were moved
     const movedNodeIds = context.helpers.getAffectedNodeIds(['position']);
 
     const nodesToConstrain = movedNodeIds

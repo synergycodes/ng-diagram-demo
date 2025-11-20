@@ -7,8 +7,6 @@ import { NodeTemplateType } from './node-templates/node-template.types';
 /**
  * Node Template Map - Maps node types to Angular components
  *
- * This is a critical part of ng-diagram's custom node system.
- *
  * How it works:
  * 1. Each node has a 'type' property (e.g., 'trigger', 'custom', 'group')
  * 2. ng-diagram looks up the type in this map to find the component class

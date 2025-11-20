@@ -20,17 +20,10 @@ import { NodeTemplateType } from './node-templates/node-template.types';
  *    d. The node is rendered using the component from node-template-map
  *    e. PaletteItemDroppedEvent is emitted
  *
- * 3. Custom Data (PaletteData):
- *    - label: Display name for the node
- *    - description: Help text shown in palette
- *    - icon: Phosphor icon class
- *    - status: (optional) Custom property for specific node types
- *
  * Usage: Pass this array to the palette component's model input
  */
 export const paletteModel: NgDiagramPaletteItem<PaletteData>[] = [
   {
-    // Trigger Node: Represents a workflow initiator
     type: NodeTemplateType.Trigger,
     data: {
       label: 'Trigger',
@@ -39,7 +32,6 @@ export const paletteModel: NgDiagramPaletteItem<PaletteData>[] = [
     },
   },
   {
-    // Task Status Node: Represents a task with a status
     type: NodeTemplateType.Custom,
     data: {
       label: 'Task Status',
@@ -49,8 +41,6 @@ export const paletteModel: NgDiagramPaletteItem<PaletteData>[] = [
     },
   },
   {
-    // Group Node: Special node that can contain other nodes
-    // isGroup: true enables parent-child relationships
     type: NodeTemplateType.Group,
     data: {
       label: 'Group',

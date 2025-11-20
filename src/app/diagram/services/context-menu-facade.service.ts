@@ -77,7 +77,6 @@ export class ContextMenuFacadeService {
    *
    * NgDiagramSelectionService.deleteSelection() removes all selected items.
    * Edges connected to deleted nodes are automatically removed.
-   * This triggers a SelectionRemovedEvent.
    */
   delete() {
     this.selectionService.deleteSelection();

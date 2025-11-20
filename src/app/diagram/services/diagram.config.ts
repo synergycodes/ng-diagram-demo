@@ -5,14 +5,8 @@ import { BaseNodeEdgeData } from '../../types';
  * Create ng-diagram configuration
  *
  * NgDiagramConfig is the main configuration object for customizing diagram behavior.
- * This function demonstrates how to configure:
- * - Zoom settings and initial view
- * - Background grid appearance
- * - Snap-to-grid behavior (drag, resize, rotate)
- * - Node resizing constraints
- * - Edge creation customization
  *
- * The configuration uses per-node settings stored in node.data, allowing different
+ * This configuration example uses per-node settings stored in node.data, allowing different
  * nodes to have different snapping behavior.
  *
  * @param minNodeSizes Map of node type to minimum size (width, height)
@@ -39,14 +33,10 @@ export function createDiagramConfig(
 
     // Snapping Configuration
     // Controls snap-to-grid behavior during drag and resize operations
-    // Each callback receives the node and returns whether/how to snap
     snapping: {
-      // Callback: Should this node snap when dragged?
-      // Reads per-node setting from node.data.enableSnapDrag
       shouldSnapDragForNode: (node: Node<BaseNodeEdgeData>) =>
         node.data.enableSnapDrag ?? false,
 
-      // Callback: Should this node snap when resized?
       shouldSnapResizeForNode: (node: Node<BaseNodeEdgeData>) =>
         node.data.enableSnapResize ?? false,
 

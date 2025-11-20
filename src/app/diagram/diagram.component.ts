@@ -3,11 +3,6 @@
  * ===================================================
  *
  * This component demonstrates how to integrate ng-diagram into your Angular application.
- * It showcases:
- * - Service injection and usage
- * - Event handling
- * - Model initialization
- * - Configuration setup
  */
 
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
@@ -65,7 +60,6 @@ import {
 } from '../ui-components/context-menu/context-menu.component';
 import { ContextMenuService } from '../ui-components/context-menu/context-menu.service';
 
-// Facade services - Extract business logic from component
 import { PropertiesFacadeService } from './services/properties-facade.service';
 import { DebugEventsService } from './services/debug-events.service';
 import { ContextMenuFacadeService } from './services/context-menu-facade.service';
@@ -97,56 +91,15 @@ import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middlewa
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiagramComponent {
-  // ===================================
-  // ng-diagram Core Services
-  // ===================================
-  // These services provide the main API for interacting with ng-diagram
 
-  /**
-   * NgDiagramService - Main diagram service
-   * - Check initialization status
-   * - Update diagram configuration dynamically
-   */
   private readonly diagramService = inject(NgDiagramService);
-
-  /**
-   * NgDiagramSelectionService - Manage selection
-   * - Get current selection (nodes and edges)
-   * - Programmatically select nodes/edges
-   * - Delete selection
-   */
   private readonly diagramSelectionService = inject(NgDiagramSelectionService);
-
-  /**
-   * NgDiagramModelService - CRUD operations
-   * - Access nodes and edges
-   * - Add, update, remove nodes and edges
-   * - Update node/edge data and properties
-   */
   private readonly diagramModelService = inject(NgDiagramModelService);
-
-  /**
-   * NgDiagramViewportService - Viewport manipulation
-   * - Get/set pan and zoom
-   * - Center on specific nodes
-   * - Convert between screen and diagram coordinates
-   */
   private readonly viewportService = inject(NgDiagramViewportService);
-
-  // ===================================
-  // Application Services
-  // ===================================
 
   private readonly contextMenuService = inject(ContextMenuService);
   private readonly snackBar = inject(MatSnackBar);
 
-  /**
-   * Facade Services - Separation of Concerns
-   * These services extract complex logic from the component:
-   * - PropertiesFacadeService: Handles all properties panel logic
-   * - DebugEventsService: Manages debug event notifications
-   * - ContextMenuFacadeService: Centralizes context menu operations
-   */
   private readonly propertiesFacade = inject(PropertiesFacadeService);
   private readonly debugEvents = inject(DebugEventsService);
   private readonly contextMenuFacade = inject(ContextMenuFacadeService);
@@ -156,7 +109,7 @@ export class DiagramComponent {
   // ===================================
 
   /**
-   * Palette Model - Defines draggable items
+   * Palette Model - Defines draggable items from the palette
    * Each item represents a node type that can be dragged onto the canvas
    * See palette-data.ts for structure
    */
@@ -184,7 +137,7 @@ export class DiagramComponent {
    * - Inspect changes (what nodes/edges are being added/updated/removed)
    * - Transform data (modify positions, properties, etc.)
    * - Validate operations (cancel invalid changes)
-   * - Add supplementary changes (auto-layout, constraints)
+   * - Add supplementary changes
    *
    * Example middleware: horizontal-lock
    * - Restricts nodes with label 'horizontal' to horizontal-only movement
@@ -198,13 +151,10 @@ export class DiagramComponent {
    * See: middlewares/horizontal-lock.middleware.ts for implementation details
    */
   middlewares = createMiddlewares((defaults) => [
-    ...defaults,                    // Include ng-diagram's default middlewares
     horizontalLockMiddleware,       // Custom middleware for horizontal movement lock
+    ...defaults,                    // Include ng-diagram's default middlewares
   ]);
 
-  // ===================================
-  // Component State
-  // ===================================
 
   backgroundType = signal<BackgroundType>('dots');
   debugMode = this.debugEvents.debugMode;
@@ -219,23 +169,7 @@ export class DiagramComponent {
    * Use initializeModel() to create the initial state.
    * The model is a signal that ng-diagram watches for changes.
    *
-   * Node Structure:
-   * - id: Unique identifier (string)
-   * - type: Maps to nodeTemplateMap (optional)
-   * - position: { x, y } coordinates
-   * - size: { width, height } dimensions (optional if autoSize: true)
-   * - data: Your custom data (generic type)
-   * - autoSize: Let template determine size (default: true)
-   *
-   * Edge Structure:
-   * - id: Unique identifier
-   * - source: Source node ID
-   * - target: Target node ID
-   * - sourcePort: Port ID on source node
-   * - targetPort: Port ID on target node
-   * - routing: 'polyline' | 'orthogonal' | 'bezier'
-   * - targetArrowhead: Arrowhead marker ID (optional)
-   * - data: Your custom data
+   * User can provide their own model if it implements correct interface "ModelAdapter"
    */
   model = initializeModel({
     nodes: [
@@ -280,22 +214,8 @@ export class DiagramComponent {
 
   /**
    * Diagram Configuration - Customize diagram behavior
-   *
-   * See services/diagram.config.ts for full configuration options:
-   * - zoom: Min/max zoom, zoom to fit behavior
-   * - background: Dot spacing, grid size
-   * - snapping: Grid snapping for drag/resize
-   * - nodeRotation: Rotation snapping
-   * - resize: Minimum node sizes
-   * - linking: Edge creation behavior
    */
   config = createDiagramConfig(this.initializeMinNodeSizes());
-
-  // ===================================
-  // Properties Panel Bindings
-  // ===================================
-  // These computed signals come from PropertiesFacadeService
-  // They reflect the currently selected node/edge properties
 
   label = this.propertiesFacade.label;
   edgeRouting = this.propertiesFacade.edgeRouting;
@@ -327,7 +247,6 @@ export class DiagramComponent {
 
   /**
    * DiagramInitEvent - Fired once when diagram finishes initialization
-   * Use this to perform actions after diagram is ready
    */
   onDiagramInit(event: DiagramInitEvent) {
     this.debugEvents.onDiagramInit(event);
@@ -412,10 +331,6 @@ export class DiagramComponent {
     this.debugEvents.onPaletteItemDropped(event);
   }
 
-  // ===================================
-  // Properties Panel Event Handlers
-  // ===================================
-  // Delegate to facade service for clean separation of concerns
 
   labelChange(label: string) {
     this.propertiesFacade.updateLabel(label);
@@ -453,11 +368,6 @@ export class DiagramComponent {
     this.propertiesFacade.updateSnapRotateStep(snapRotateStep);
   }
 
-  // ===================================
-  // Context Menu Event Handlers
-  // ===================================
-  // Delegate to facade service for clipboard and z-order operations
-
   onContextMenuCopy() {
     this.contextMenuFacade.copy();
   }
@@ -482,14 +392,6 @@ export class DiagramComponent {
     this.contextMenuFacade.sendToBack();
   }
 
-  // ===================================
-  // Application-Specific Handlers
-  // ===================================
-
-  /**
-   * Handle right-click on diagram
-   * Demonstrates coordinate transformation from screen to diagram space
-   */
   onDiagramRightClick(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
@@ -502,10 +404,6 @@ export class DiagramComponent {
     this.contextMenuService.showDiagramMenu(cursorPosition);
   }
 
-  /**
-   * Search and Center on Node
-   * Demonstrates programmatic selection and viewport manipulation
-   */
   onSearchNode(query: string) {
     // Access all nodes from the model
     const nodes = this.diagramModelService.nodes() as Node<BaseNodeEdgeData>[];

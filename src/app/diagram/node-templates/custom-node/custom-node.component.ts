@@ -73,8 +73,6 @@ export class CustomNodeComponent implements NgDiagramNodeTemplate<CustomNodeData
    * This demonstrates how to update node data in response to UI interactions:
    * 1. Get the current node data
    * 2. Call modelService.updateNode() with new data
-   * 3. Spread existing data to preserve other properties
-   * 4. Update is reactive - UI updates automatically
    *
    * Note: Using updateNode() instead of updateNodeData() to show
    * the full update pattern. updateNodeData() is a convenience method

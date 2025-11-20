@@ -19,9 +19,6 @@ import { BaseNodeEdgeData } from '../../types';
  * DebugEventsService
  *
  * This service demonstrates how to handle all ng-diagram events for debugging purposes.
- * It showcases:
- * - How to access event data for each event type
- * - Using Angular Material Snackbar for user feedback
  *
  * Usage: Wire these methods to ng-diagram event outputs in the template:
  * <ng-diagram

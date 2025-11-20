@@ -27,10 +27,6 @@ export class PropertiesFacadeService {
   /**
    * Computed signal for the label of the currently selected node or edge
    *
-   * This demonstrates:
-   * - Using NgDiagramSelectionService.selection() to get current selection
-   * - Supporting both nodes and edges with the same property
-   * - Returning null when nothing is selected (to hide the property in UI)
    */
   label = computed(() => {
     const selection = this.selectionService.selection();

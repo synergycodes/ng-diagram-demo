@@ -22,12 +22,11 @@ import { ContextMenuService } from '../../../ui-components/context-menu/context-
  * - Created by setting isGroup: true in palette item or node definition
  * - Children can be added by:
  *   1. Dragging nodes onto the group
- *   2. Programmatically setting node.parentId
+ *   2. Programmatically setting node.groupId
  *
  * Group Node Features:
  * - Visual highlighting when dragging nodes over (drop zone feedback)
  * - Children move with the group
- * - Can have ports (for connecting to other nodes)
  * - Can be nested (groups within groups)
  *
  * Key Differences from Regular Nodes:
@@ -36,9 +35,6 @@ import { ContextMenuService } from '../../../ui-components/context-menu/context-
  * 3. Uses NgDiagramGroupHighlightedDirective for drop zone styling
  * 4. Has 'highlighted' property that's true when dragging nodes over
  *
- * Group Membership Events:
- * - GroupMembershipChangedEvent fires when nodes are added/removed
- * - Access via (groupMembershipChanged) output on ng-diagram
  */
 @Component({
   selector: 'app-group-node',

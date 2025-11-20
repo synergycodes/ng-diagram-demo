@@ -17,11 +17,6 @@ import { PaletteData } from '../../../types';
  * The component is wrapped by NgDiagramPaletteItemComponent directive
  * which adds the drag & drop functionality.
  *
- * Responsibilities:
- * - Display icon, label, and description from palette item data
- * - Provide visual feedback (hover states, etc.)
- * - Be visually distinct but similar to the actual node template
- *
  * Note: This component is purely for display in the palette sidebar.
  * When dropped on the diagram, the node is rendered using the component
  * specified in node-template-map.ts based on the item's type.
