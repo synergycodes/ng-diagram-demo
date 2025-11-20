@@ -1,3 +1,11 @@
+# Diagramming Resources
+
+- 🌐 **ngDiagram website**: [ngdiagram.dev](https://www.ngdiagram.dev/)
+- 💻 **ngDiagram GitHub**: [github.com/synergycodes/ng-diagram](https://github.com/synergycodes/ng-diagram)
+- 📚 **ngDiagram Documentation**: [Getting Started](https://www.ngdiagram.dev/docs/intro/quick-start/)
+- 🎤 **Presentation**: [View slides](https://synergiapro-my.sharepoint.com/:p:/g/personal/lukasz_jazwa_synergycodes_com/ESwjUjti0kRGnRpHUWQqcRUB-6RhkzalJoDsEj4DnJXsLg?e=SnBFxV)
+- 📖 **Additional Resources**: [synergycodes.com/diagramming-resources](https://www.synergycodes.com/diagramming-resources)
+
 # NgDiagramMeetupDemo
 
 A showcase demonstrating how to use [ng-diagram](https://www.ngdiagram.dev/) - an Angular library for creating interactive diagrams.
@@ -57,10 +65,6 @@ ng serve
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-## ng-diagram Resources
-
-- 🌐 **Website**: [ngdiagram.dev](https://www.ngdiagram.dev/)
-- 📚 **Documentation**: [quickstart](https://www.ngdiagram.dev/docs/intro/quick-start/)
 
 ## Building
 
@@ -71,27 +75,3 @@ ng build
 ```
 
 This will compile your project and store the build artifacts in the `dist/` directory.
-
----
-
-## Angular CLI Reference
-
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.10.
-
-### Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-### Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

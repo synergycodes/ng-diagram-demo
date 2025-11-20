@@ -60,12 +60,16 @@ export class PropertiesFacadeService {
    * Computed signal for the position of the label on the selected edge
    *
    * Range: 0.0 (at source) to 1.0 (at target), default 0.5 (center)
-   * Only shown when edge has a label
+   * Only shown when edge has a label and a type
+   *
+   * Note: Label positioning is only possible for custom edge templates currently,
+   * not for the default edges. An edge must have a 'type' property to use a custom
+   * edge template (defined in edgeTemplateMap).
    */
   edgeLabelPosition = computed<number | null>(() => {
     const selection = this.selectionService.selection();
     const edge = selection.edges[0] as Edge<BaseNodeEdgeData> | undefined;
-    if (!edge || !edge.data.label) return null;
+    if (!edge || !edge.data.label || !edge.type) return null;
     return edge.data.positionOnEdge ?? 0.5;
   });
 
