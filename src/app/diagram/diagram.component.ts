@@ -512,7 +512,7 @@ export class DiagramComponent {
 
     // Find node by label (case-insensitive substring match)
     const foundNode = nodes.find((node) => {
-      const label = node.data.label || '';
+      const label = node.data.label || node.id;
       return label.toLowerCase().includes(query.toLowerCase());
     });
 
