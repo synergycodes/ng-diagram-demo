@@ -1,0 +1,26 @@
+<button
+  class="button"
+  [type]="type()"
+  [disabled]="disabled()"
+  [class.button--active]="active()"
+  [class.button--xlarge]="size() === 'xlarge'"
+  [class.button--large]="size() === 'large'"
+  [class.button--medium]="size() === 'medium'"
+  [class.button--small]="size() === 'small'"
+  [class.button--xsmall]="size() === 'xsmall'"
+  [class.button--primary]="buttonType() === 'primary'"
+  [class.button--ghost]="buttonType() === 'ghost'"
+  [class.button--gray]="buttonType() === 'gray'"
+  [class.button--red]="buttonType() === 'red'"
+  [class.button--success]="buttonType() === 'success'"
+  [class.button--warning]="buttonType() === 'warning'"
+  [class.button--secondary]="buttonType() === 'secondary'"
+  (click)="clickAction.emit($event)"
+>
+  <span class="button__text">
+    <ng-content></ng-content>
+  </span>
+  @if (icon()) {
+    <i [class]="`button__icon ph ${icon()}`"></i>
+  }
+</button>

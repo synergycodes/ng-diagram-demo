@@ -1,0 +1,84 @@
+:host {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--ngd-token-radius-node-head);
+
+  --ngd-port-background-color: var(--ngd-node-port-fill-default);
+  --ngd-port-border-color: var(--ngd-node-port-stroke-default);
+  --ngd-port-border-size: 2px;
+  --ngd-port-size: 8px;
+
+  &.ng-diagram-group-highlight {
+    .group-node__content {
+      border-top: 1px solid var(--ngd-colors-acc1-500);
+    }
+  }
+}
+
+.group-node {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1 0 0;
+  align-self: stretch;
+  min-width: var(--node-group-min-width);
+  min-height: var(--node-group-min-height);
+
+  --header-height: calc(32px + 2 * 5px);
+
+  border-radius: var(--ngd-token-radius-node-head);
+  border: 1px solid var(--ngd-ui-stroke-primary-focus);
+  background: linear-gradient(
+    to bottom,
+    var(--ngd-node-bg-primary-default) 0%,
+    var(--ngd-node-bg-primary-default) var(--header-height),
+    var(--ngd-ui-bg-tertiary-default) var(--header-height),
+    var(--ngd-ui-bg-tertiary-default) 100%
+  );
+
+  &__header {
+    display: flex;
+    height: var(--header-height);
+    padding: 5px 5px 5px 16px;
+    align-items: center;
+    gap: 12px;
+    align-self: stretch;
+    border-top-left-radius: var(--ngd-token-radius-node-head);
+    border-top-right-radius: var(--ngd-token-radius-node-head);
+    overflow: hidden;
+  }
+
+  &__header-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    flex: 1 0 0;
+    overflow: hidden;
+    color: var(--ngd-txt-primary-default);
+
+    text-overflow: ellipsis;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 130%;
+  }
+
+  &__content {
+    display: flex;
+    padding: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    flex: 1 0 0;
+    align-self: stretch;
+    border-radius: 0 0 var(--ngd-token-radius-node-head)
+      var(--ngd-token-radius-node-head);
+    border-top: 1px solid var(--ngd-txt-tertiary-default);
+    background: transparent;
+  }
+
+  &__port {
+    top: 24px;
+  }
+}

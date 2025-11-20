@@ -1,0 +1,27 @@
+<div
+  class="sidebar"
+  [class.sidebar--collapsed]="isCollapsed()"
+  [class.sidebar--right]="position() === 'right'"
+>
+  <div class="sidebar__header">
+    <ng-content select="[sidebarHeader]" />
+    @if (title()) {
+      @if (!isCollapsed()) {
+        <span class="sidebar__header__text">{{ title() }}</span>
+      }
+      <ngd-nav-button
+        [title]="'Toggle sidebar'"
+        [size]="'small'"
+        (clickAction)="toggleSidebar()"
+      >
+        <i class="ph ph-sidebar-simple"></i>
+      </ngd-nav-button>
+    }
+  </div>
+  @if (!isCollapsed()) {
+    <div class="sidebar__splitter"></div>
+    <div class="sidebar__content">
+      <ng-content />
+    </div>
+  }
+</div>

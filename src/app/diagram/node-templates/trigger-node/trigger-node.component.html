@@ -1,0 +1,14 @@
+<ng-diagram-node-rotate-adornment />
+<ng-diagram-node-resize-adornment>
+  <div class="trigger-node" (contextmenu)="onRightClick($event)">
+    <div class="trigger-node__icon">
+      <i [class]="nodeIcon()"></i>
+    </div>
+    <div>
+      <div class="trigger-node__label">{{ nodeLabel() }}</div>
+      <div class="trigger-node__description">{{ nodeDescription() }}</div>
+    </div>
+  </div>
+  <ng-diagram-port id="port-left" type="target" side="left" />
+  <ng-diagram-port id="port-right" type="source" side="right" />
+</ng-diagram-node-resize-adornment>

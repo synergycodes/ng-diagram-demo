@@ -1,0 +1,112 @@
+<app-sidebar [position]="'right'" [collapsed]="label() === null">
+  <div sidebarHeader>Properties</div>
+  <div class="properties__form">
+    <label for="property-input" class="properties__label">Label:</label>
+    <input
+      id="property-input"
+      type="text"
+      class="properties__input"
+      [ngModel]="label()"
+      (ngModelChange)="onInputChange($event)"
+      placeholder="Enter value"
+    />
+
+    @if (edgeRouting() !== null) {
+      <label for="routing-select" class="properties__label">Routing:</label>
+      <select
+        id="routing-select"
+        class="properties__select"
+        [ngModel]="edgeRouting()"
+        (ngModelChange)="onRoutingChange($event)"
+      >
+        @for (option of routingOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    }
+
+    @if (edgeLabelPosition() !== null) {
+      <label for="label-position-input" class="properties__label">Label Position (0-1):</label>
+      <input
+        id="label-position-input"
+        type="number"
+        class="properties__input"
+        [ngModel]="edgeLabelPosition()"
+        (ngModelChange)="onLabelPositionChange($event)"
+        min="0"
+        max="1"
+        step="0.1"
+        placeholder="0.5"
+      />
+    }
+
+    @if (enableSnapDrag() !== null) {
+      <label class="properties__label">Snapping:</label>
+      <div class="properties__checkbox-group">
+        <div class="properties__snap-row">
+          <label class="properties__checkbox-label">
+            <input
+              type="checkbox"
+              class="properties__checkbox"
+              [ngModel]="enableSnapDrag()"
+              (ngModelChange)="onSnapDragChange($event)"
+            />
+            Drag
+          </label>
+          <input
+            type="number"
+            class="properties__snap-input"
+            [ngModel]="snapDragStep()"
+            (ngModelChange)="onSnapDragStepChange($event)"
+            [disabled]="!enableSnapDrag()"
+            placeholder="10"
+            min="1"
+            step="1"
+          />
+        </div>
+        <div class="properties__snap-row">
+          <label class="properties__checkbox-label">
+            <input
+              type="checkbox"
+              class="properties__checkbox"
+              [ngModel]="enableSnapResize()"
+              (ngModelChange)="onSnapResizeChange($event)"
+            />
+            Resize
+          </label>
+          <input
+            type="number"
+            class="properties__snap-input"
+            [ngModel]="snapResizeStep()"
+            (ngModelChange)="onSnapResizeStepChange($event)"
+            [disabled]="!enableSnapResize()"
+            placeholder="10"
+            min="1"
+            step="1"
+          />
+        </div>
+        <div class="properties__snap-row">
+          <label class="properties__checkbox-label">
+            <input
+              type="checkbox"
+              class="properties__checkbox"
+              [ngModel]="enableSnapRotate()"
+              (ngModelChange)="onSnapRotateChange($event)"
+            />
+            Rotate
+          </label>
+          <input
+            type="number"
+            class="properties__snap-input"
+            [ngModel]="snapRotateStep()"
+            (ngModelChange)="onSnapRotateStepChange($event)"
+            [disabled]="!enableSnapRotate()"
+            placeholder="30"
+            min="1"
+            step="1"
+          />
+        </div>
+      </div>
+    }
+  </div>
+</app-sidebar>

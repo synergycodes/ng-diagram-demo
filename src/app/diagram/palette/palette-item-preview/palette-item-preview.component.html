@@ -1,0 +1,7 @@
+@if (componentType()) {
+  <ng-container
+    *ngComponentOutlet="componentType() || null; inputs: { node: item() }"
+  ></ng-container>
+} @else {
+  <app-palette-item [item]="item()" />
+}

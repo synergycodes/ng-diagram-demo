@@ -1,0 +1,84 @@
+
+@use '@angular/material' as mat;
+
+/* Import ng-diagram styles */
+@import 'ng-diagram/styles.css';
+
+@import './styles/numerals-mode-1.css';
+@import './styles/primitives-mode-1.css';
+@import './styles/tokens.css';
+
+html {
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+}
+/* Global styles */
+
+:root {
+  /* Node minimum size definitions - these CSS variables
+  are read by getMinNodeSize() to ensure consistent sizing */
+  --node-trigger-min-width: 241px;
+  --node-trigger-min-height: 60px;
+
+  --node-custom-min-width: 241px;
+  --node-custom-min-height: 120px;
+
+  --node-group-min-width: 300px;
+  --node-group-min-height: 200px;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+* {
+  font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Custom snackbar styles */
+.mat-mdc-snack-bar-container {
+  .mdc-snackbar__surface {
+    background-color: var(--ngd-button-primary-bg-default) !important;
+  }
+}
+
+.mat-mdc-simple-snack-bar {
+  justify-content: center;
+}
+
+.mat-mdc-snack-bar-label,
+.mdc-snackbar__label {
+  color: var(--ngd-txt-primary-white) !important;
+  text-align: center;
+  font-weight: 500;
+}

@@ -1,0 +1,60 @@
+<div class="diagram-container" (contextmenu)="onDiagramRightClick($event)">
+  <ng-diagram
+    [model]="model"
+    [config]="config"
+    [nodeTemplateMap]="nodeTemplateMap"
+    [edgeTemplateMap]="edgeTemplateMap"
+    [middlewares]="middlewares"
+    (diagramInit)="onDiagramInit($event)"
+    (edgeDrawn)="onEdgeDrawn($event)"
+    (selectionMoved)="onSelectionMoved($event)"
+    (selectionChanged)="onSelectionChanged($event)"
+    (selectionRemoved)="onSelectionRemoved($event)"
+    (groupMembershipChanged)="onGroupMembershipChanged($event)"
+    (selectionRotated)="onSelectionRotated($event)"
+    (viewportChanged)="onViewportChanged($event)"
+    (clipboardPasted)="onClipboardPasted($event)"
+    (nodeResized)="onNodeResized($event)"
+    (paletteItemDropped)="onPaletteItemDropped($event)"
+  >
+    @if (backgroundType() !== 'solid') {
+      <ng-diagram-background [type]="backgroundType() === 'grid' ? 'grid' : 'dots'"></ng-diagram-background>
+    }
+  </ng-diagram>
+  <app-navbar
+    (toggleDebugModeClick)="debugMode.set(!debugMode())"
+    (backgroundTypeChange)="backgroundType.set($event)"
+    (searchNodeClick)="onSearchNode($event)"
+    [isDebugMode]="debugMode()"
+    [backgroundType]="backgroundType()"
+  />
+  <app-palette [model]="paletteModel" />
+  <app-properties
+    [label]="label()"
+    [edgeRouting]="edgeRouting()"
+    [edgeLabelPosition]="edgeLabelPosition()"
+    [enableSnapDrag]="enableSnapDrag()"
+    [enableSnapResize]="enableSnapResize()"
+    [enableSnapRotate]="enableSnapRotate()"
+    [snapDragStep]="snapDragStep()"
+    [snapResizeStep]="snapResizeStep()"
+    [snapRotateStep]="snapRotateStep()"
+    (labelChange)="labelChange($event)"
+    (routingChange)="routingChange($event)"
+    (labelPositionChange)="labelPositionChange($event)"
+    (snapDragChange)="snapDragChange($event)"
+    (snapResizeChange)="snapResizeChange($event)"
+    (snapRotateChange)="snapRotateChange($event)"
+    (snapDragStepChange)="snapDragStepChange($event)"
+    (snapResizeStepChange)="snapResizeStepChange($event)"
+    (snapRotateStepChange)="snapRotateStepChange($event)"
+  />
+  <app-context-menu
+    (copyClick)="onContextMenuCopy()"
+    (cutClick)="onContextMenuCut()"
+    (pasteClick)="onContextMenuPaste($event)"
+    (deleteClick)="onContextMenuDelete()"
+    (bringToFrontClick)="onContextMenuBringToFront()"
+    (sendToBackClick)="onContextMenuSendToBack()"
+  />
+</div>

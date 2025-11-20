@@ -1,0 +1,26 @@
+<ng-diagram-node-resize-adornment>
+  <div
+    class="group-node"
+    ngDiagramNodeSelected
+    ngDiagramGroupHighlighted
+    [node]="node()"
+    (contextmenu)="onRightClick($event)"
+  >
+    <div class="group-node__header">
+      <div class="group-node__header-title">{{ groupTitle() }}</div>
+    </div>
+    <div class="group-node__content"><ng-content></ng-content></div>
+  </div>
+  <ng-diagram-port
+    id="port-left"
+    class="group-node__port"
+    type="target"
+    side="left"
+  />
+  <ng-diagram-port
+    id="port-right"
+    class="group-node__port"
+    type="source"
+    side="right"
+  />
+</ng-diagram-node-resize-adornment>

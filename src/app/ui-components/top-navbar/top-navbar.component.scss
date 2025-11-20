@@ -1,0 +1,42 @@
+:host {
+  width: 100%;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: calc(
+    34px + var(--ngd-token-spacing-top-navbar-v-pad) +
+      var(--ngd-token-spacing-top-navbar-v-pad)
+  );
+  padding: var(--ngd-token-spacing-top-navbar-v-pad)
+    var(--ngd-token-spacing-top-navbar-h-pad);
+  align-items: center;
+
+  border-radius: var(--ngd-token-radius-shell);
+  border: 1px solid var(--ngd-ui-stroke-primary-default);
+  background: var(--ngd-ui-bg-primary-default);
+
+  ::ng-deep {
+    .navbar__left-wrap [left] {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .navbar__name-wrap [name] {
+      display: inline-flex;
+      padding: 0 16px;
+      align-items: center;
+      gap: var(--ngd-token-spacing-top-navbar-gap);
+    }
+
+    .navbar__right-wrap [right] {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 24px;
+    }
+  }
+}

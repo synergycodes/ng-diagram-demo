@@ -1,0 +1,22 @@
+<ng-diagram-node-rotate-adornment />
+<ng-diagram-node-resize-adornment>
+  <div class="custom-node" (contextmenu)="onRightClick($event)">
+    <div class="custom-node__header">
+      <div class="custom-node__icon">
+        <i [class]="nodeIcon()"></i>
+      </div>
+      <div>
+        <div class="custom-node__label">{{ nodeLabel() }}</div>
+        <div class="custom-node__description">{{ nodeDescription() }}</div>
+      </div>
+    </div>
+    <div class="custom-node__content">
+      <app-status-dropdown
+        [status]="nodeStatus()"
+        (statusChange)="onStatusChange($event)"
+      />
+    </div>
+  </div>
+  <ng-diagram-port id="port-left" type="target" side="left" />
+  <ng-diagram-port id="port-right" type="source" side="right" />
+</ng-diagram-node-resize-adornment>

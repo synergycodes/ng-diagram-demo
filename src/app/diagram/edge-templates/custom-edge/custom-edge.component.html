@@ -1,0 +1,13 @@
+<ng-diagram-base-edge class="custom-edge" [edge]="edge()">
+  @if (edge().data.label) {
+    <ng-diagram-base-edge-label
+      class="custom-edge-label"
+      [id]="edge().id + '-label'"
+      [positionOnEdge]="edge().data.positionOnEdge ?? 0.5"
+    >
+      <div class="custom-edge-label__content" [class.selected]="edge().selected">
+        {{ edge().data.label }}
+      </div>
+    </ng-diagram-base-edge-label>
+  }
+</ng-diagram-base-edge>

@@ -1,0 +1,17 @@
+.toolbar {
+  display: inline-flex;
+  padding: var(--ngd-token-spacing-toolbar-hor-pad, 4px);
+  align-items: center;
+  gap: var(--ngd-token-spacing-toolbar-hor-gap, 6px);
+
+  border-radius: var(--ngd-token-radius-toolbar-hor-l, 12px);
+  border: 1px solid var(--ngd-ui-stroke-secondary-default, #d5d8e0);
+  background: var(--ngd-ui-bg-primary-default, #fff);
+
+  /* Shadows/shadow-s */
+  box-shadow: var(--ngd-token-shadow-shadow-s-x, 0)
+    var(--ngd-token-shadow-shadow-s-y, 8px)
+    var(--ngd-token-shadow-shadow-s-blur, 16px)
+    var(--ngd-token-shadow-shadow-s-spread, -4px)
+    var(--ngd-shadow, rgba(7, 7, 8, 0.2));
+}

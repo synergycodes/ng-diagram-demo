@@ -1,0 +1,58 @@
+<ngd-top-navbar>
+  <div left>
+    <a href="https://www.ngdiagram.dev/" target="_blank" rel="noopener noreferrer" class="logo-link">
+      <img [src]="logoSrc()" alt="ngDiagram" />
+    </a>
+  </div>
+  <div name>
+    <div class="search-container">
+      <i class="ph ph-magnifying-glass search-icon"></i>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search nodes..."
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+      />
+      <button class="search-button" (click)="onSearch()" [disabled]="!searchQuery().trim()">
+        Search
+      </button>
+    </div>
+  </div>
+  <div right>
+    <div class="button-group">
+      <ngd-nav-button
+        [active]="backgroundType() === 'solid'"
+        (clickAction)="setBackgroundType('solid')"
+        title="Solid Background"
+        size="small"
+        ><i class="ph ph-square"></i
+      ></ngd-nav-button>
+      <ngd-nav-button
+        [active]="backgroundType() === 'dots'"
+        (clickAction)="setBackgroundType('dots')"
+        title="Dots Background"
+        size="small"
+        ><i class="ph ph-dots-nine"></i
+      ></ngd-nav-button>
+      <ngd-nav-button
+        [active]="backgroundType() === 'grid'"
+        (clickAction)="setBackgroundType('grid')"
+        title="Grid Background"
+        size="small"
+        ><i class="ph ph-grid-four"></i
+      ></ngd-nav-button>
+    </div>
+    <ngd-nav-button
+      [active]="isDebugMode()"
+      (clickAction)="toggleDebugModeClick.emit()"
+      title="Toggle debug mode"
+      ><i class="ph ph-bug"></i
+    ></ngd-nav-button>
+    <ngd-segment-picker
+      [buttons]="themeButtons"
+      [activeButton]="currentTheme()"
+      (toggleSwitch)="toggleTheme()"
+    ></ngd-segment-picker>
+  </div>
+</ngd-top-navbar>

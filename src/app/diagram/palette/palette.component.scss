@@ -1,0 +1,21 @@
+:host {
+  display: contents;
+}
+
+.palette__item-container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+
+  ::ng-deep {
+    > * {
+      width: 100%;
+    }
+
+    .draggable {
+      width: 100%;
+    }
+  }
+}

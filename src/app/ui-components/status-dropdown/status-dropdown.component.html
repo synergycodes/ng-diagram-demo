@@ -1,0 +1,17 @@
+<div class="status-dropdown">
+  <div class="status-badge" [ngClass]="status()">
+    <span class="status-label">{{ getStatusLabel() }}</span>
+    <i class="ph ph-caret-down"></i>
+  </div>
+  <select
+    data-no-drag="true"
+    data-no-pan="true"
+    class="status-select"
+    [value]="status()"
+    (change)="onStatusChange($event)"
+  >
+    @for (statusOption of statuses; track statusOption.value) {
+      <option [value]="statusOption.value">{{ statusOption.label }}</option>
+    }
+  </select>
+</div>

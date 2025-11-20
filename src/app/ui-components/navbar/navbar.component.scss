@@ -1,0 +1,121 @@
+:host {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 12px;
+  background: var(--ngd-ui-surface-secondary-default);
+  border: 1.5px solid var(--ngd-ui-stroke-primary-default);
+  border-radius: 8px;
+  min-width: 300px;
+  transition: border-color 0.2s ease;
+
+  &:focus-within {
+    border-color: var(--ngd-node-stroke-primary-hover);
+  }
+
+  .search-icon {
+    color: var(--ngd-txt-primary-default);
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--ngd-txt-primary-default);
+    font-size: 14px;
+    font-family: inherit;
+    font-weight: 600;
+    line-height: 140%;
+    padding: 4px 0;
+    min-width: 0;
+
+    &::placeholder {
+      color: var(--ngd-txt-secondary-default);
+      font-weight: 400;
+    }
+  }
+
+  .search-button {
+    padding: 6px 12px;
+    background: var(--ngd-ui-surface-brand-default);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    line-height: 140%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &:hover:not(:disabled) {
+      background: var(--ngd-ui-surface-brand-hover);
+    }
+
+    &:active:not(:disabled) {
+      background: var(--ngd-ui-surface-brand-pressed);
+      transform: scale(0.98);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--ngd-ui-stroke-primary-default);
+  border-radius: 8px;
+  overflow: hidden;
+
+  ::ng-deep ngd-nav-button {
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--ngd-ui-separator-primary-default);
+      pointer-events: none;
+    }
+
+    &:not(:last-child) {
+      position: relative;
+    }
+
+    .button {
+      border: none !important;
+      border-radius: 0 !important;
+    }
+  }
+}

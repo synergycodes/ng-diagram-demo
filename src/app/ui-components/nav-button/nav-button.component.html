@@ -1,0 +1,15 @@
+<button
+  class="button"
+  [type]="type()"
+  [disabled]="disabled()"
+  [title]="title()"
+  [class.button--round]="round()"
+  [class.button--active]="active()"
+  [class.button--xlarge]="size() === 'xlarge'"
+  [class.button--large]="size() === 'large'"
+  [class.button--medium]="size() === 'medium'"
+  [class.button--small]="size() === 'small'"
+  (click)="clickAction.emit($event)"
+>
+  <ng-content></ng-content>
+</button>

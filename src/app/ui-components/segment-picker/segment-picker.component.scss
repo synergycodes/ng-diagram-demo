@@ -1,0 +1,9 @@
+.segment {
+  display: inline-flex;
+  padding: var(--ngd-token-spacing-seg-picker-pad);
+  align-items: center;
+  gap: var(--ngd-token-spacing-seg-picker-gap);
+
+  border-radius: var(--ngd-token-radius-button-round);
+  background: var(--ngd-ui-bg-tertiary-default);
+}

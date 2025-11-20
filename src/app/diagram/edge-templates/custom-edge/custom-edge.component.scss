@@ -1,0 +1,30 @@
+ng-diagram-base-edge.custom-edge {
+  --edge-stroke: var(--ngd-default-edge-stroke);
+  --edge-stroke-transition: stroke 0.1s ease-in-out;
+}
+
+ng-diagram-base-edge.custom-edge:hover:not(.selected):not(.temporary) {
+  --edge-stroke: var(--ngd-default-edge-stroke-hover);
+  --edge-label-border-color: var(--ngd-default-edge-stroke-hover);
+}
+
+ng-diagram-base-edge.custom-edge.selected {
+  --edge-stroke: var(--ngd-default-edge-stroke-selected);
+  --edge-label-border-color: var(--ngd-default-edge-stroke-selected);
+}
+
+ng-diagram-base-edge.custom-edge.temporary {
+  --edge-stroke-opacity: 0.5;
+}
+
+.custom-edge-label__content {
+  display: flex;
+  padding: var(--edge-label-padding, 4px 8px);
+  border-radius: var(--edge-label-border-radius, 4px);
+  font-size: var(--edge-label-font-size, 12px);
+  background: var(--edge-label-background-color, var(--ngd-default-edge-label-background-color));
+  color: var(--edge-label-text-color, var(--ngd-default-edge-label-color));
+  border: var(--edge-label-border-width, 1px) solid
+    var(--edge-label-border-color, var(--ngd-default-edge-label-border-color));
+  transition: var(--edge-label-border-transition, border-color 0.1s ease-in-out);
+}

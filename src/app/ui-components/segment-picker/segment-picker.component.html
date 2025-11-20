@@ -1,0 +1,13 @@
+<div class="segment">
+  @for (btn of buttons(); track btn.id) {
+    <ngd-nav-button
+      [active]="btn.id === activeButton()"
+      [title]="btn.title"
+      [round]="true"
+      [size]="'small'"
+      (clickAction)="toggleSwitch.emit()"
+    >
+      <i [class]="`ph ${btn.icon}`"></i>
+    </ngd-nav-button>
+  }
+</div>

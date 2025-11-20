@@ -1,0 +1,19 @@
+<div
+  class="context-menu"
+  [style.top.px]="menuPosition().y"
+  [style.left.px]="menuPosition().x"
+  [class.show]="showMenu()"
+>
+  <ul>
+    @if (nodeContext()) {
+      <li (click)="onCopy()">Copy</li>
+      <li (click)="onCut()">Cut</li>
+      <li (click)="onDelete()">Delete</li>
+      <li class="separator"></li>
+      <li (click)="onBringToFront()">Bring to Front</li>
+      <li (click)="onSendToBack()">Send to Back</li>
+    } @else {
+      <li (click)="onPaste($event)">Paste</li>
+    }
+  </ul>
+</div>
