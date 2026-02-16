@@ -21,7 +21,8 @@ export function createDiagramConfig(
     zoom: {
       max: 2, // Maximum zoom level (2.0 = 200%)
       zoomToFit: {
-        onInit: true // Automatically fit all content in view on diagram init
+        onInit: true, // Automatically fit all content in view on diagram init
+        padding: [100, 50, 50, 300] // Padding around content when fitting to view [top, right, bottom, left] in pixels
       }
     },
 

@@ -12,38 +12,39 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 // ng-diagram imports - Core library components and services
 import {
   // Components
-  NgDiagramComponent,               // Main diagram canvas component
-  NgDiagramBackgroundComponent,     // Background patterns (dots, grid, solid)
+  NgDiagramComponent, // Main diagram canvas component
+  NgDiagramBackgroundComponent, // Background patterns (dots, grid, solid)
+  NgDiagramMinimapComponent, // Minimap overview of the diagram
 
   // Types and interfaces
-  NgDiagramNodeTemplateMap,         // Map of node type -> component template
-  NgDiagramPaletteItem,             // Type for palette items (drag & drop)
-  Node,                             // Node interface
-  EdgeRoutingName,                  // Edge routing types ('orthogonal', 'polyline', 'bezier')
+  NgDiagramNodeTemplateMap, // Map of node type -> component template
+  NgDiagramPaletteItem, // Type for palette items (drag & drop)
+  Node, // Node interface
+  EdgeRoutingName, // Edge routing types ('orthogonal', 'polyline', 'bezier')
 
   // Services - Key ng-diagram services for diagram manipulation
-  NgDiagramService,                 // Main service - initialization, config updates
-  NgDiagramSelectionService,        // Manage node/edge selection
-  NgDiagramModelService,            // CRUD operations on nodes and edges
-  NgDiagramViewportService,         // Pan, zoom, coordinate transformations
+  NgDiagramService, // Main service - initialization, config updates
+  NgDiagramSelectionService, // Manage node/edge selection
+  NgDiagramModelService, // CRUD operations on nodes and edges
+  NgDiagramViewportService, // Pan, zoom, coordinate transformations
 
   // Functions
-  initializeModel,                  // Helper to create initial diagram model
-  provideNgDiagram,                 // Provider function for ng-diagram (required!)
-  createMiddlewares,                // Create middlewares configuration
+  initializeModel, // Helper to create initial diagram model
+  provideNgDiagram, // Provider function for ng-diagram (required!)
+  createMiddlewares, // Create middlewares configuration
 
   // Event types - All available diagram events
-  DiagramInitEvent,                 // Fired when diagram is initialized
-  EdgeDrawnEvent,                   // Fired when edge is drawn between nodes
-  SelectionMovedEvent,              // Fired when nodes are dragged
-  SelectionChangedEvent,            // Fired when selection changes
-  SelectionRemovedEvent,            // Fired when nodes/edges are deleted
-  GroupMembershipChangedEvent,      // Fired when node group membership changes
-  SelectionRotatedEvent,            // Fired when nodes are rotated
-  ViewportChangedEvent,             // Fired when pan/zoom changes
-  ClipboardPastedEvent,             // Fired when clipboard content is pasted
-  NodeResizedEvent,                 // Fired when node is resized
-  PaletteItemDroppedEvent,          // Fired when palette item is dropped
+  DiagramInitEvent, // Fired when diagram is initialized
+  EdgeDrawnEvent, // Fired when edge is drawn between nodes
+  SelectionMovedEvent, // Fired when nodes are dragged
+  SelectionChangedEvent, // Fired when selection changes
+  SelectionRemovedEvent, // Fired when nodes/edges are deleted
+  GroupMembershipChangedEvent, // Fired when node group membership changes
+  SelectionRotatedEvent, // Fired when nodes are rotated
+  ViewportChangedEvent, // Fired when pan/zoom changes
+  ClipboardPastedEvent, // Fired when clipboard content is pasted
+  NodeResizedEvent, // Fired when node is resized
+  PaletteItemDroppedEvent, // Fired when palette item is dropped
 } from 'ng-diagram';
 
 import { PaletteComponent } from './palette/palette.component';
@@ -74,8 +75,9 @@ import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middlewa
     CommonModule,
     PaletteComponent,
     PropertiesComponent,
-    NgDiagramComponent,           // Required: Main diagram component
+    NgDiagramComponent, // Required: Main diagram component
     NgDiagramBackgroundComponent, // Optional: Add background patterns
+    NgDiagramMinimapComponent, // Optional: Minimap overview
     NavbarComponent,
     ContextMenuComponent,
   ],
@@ -84,14 +86,13 @@ import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middlewa
     PropertiesFacadeService,
     DebugEventsService,
     ContextMenuFacadeService,
-    provideNgDiagram(),           // REQUIRED: Must include ng-diagram provider!
+    provideNgDiagram(), // REQUIRED: Must include ng-diagram provider!
   ],
   templateUrl: './diagram.component.html',
   styleUrl: './diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiagramComponent {
-
   private readonly diagramService = inject(NgDiagramService);
   private readonly diagramSelectionService = inject(NgDiagramSelectionService);
   private readonly diagramModelService = inject(NgDiagramModelService);
@@ -151,10 +152,9 @@ export class DiagramComponent {
    * See: middlewares/horizontal-lock.middleware.ts for implementation details
    */
   middlewares = createMiddlewares((defaults) => [
-    horizontalLockMiddleware,       // Custom middleware for horizontal movement lock
-    ...defaults,                    // Include ng-diagram's default middlewares
+    horizontalLockMiddleware, // Custom middleware for horizontal movement lock
+    ...defaults, // Include ng-diagram's default middlewares
   ]);
-
 
   backgroundType = signal<BackgroundType>('dots');
   debugMode = this.debugEvents.debugMode;
@@ -187,16 +187,29 @@ export class DiagramComponent {
         autoSize: false,
         size: { width: 150, height: 50 },
       },
+      {
+        id: '3',
+        type: NodeTemplateType.Group,
+        isGroup: true,
+        data: {},
+        position: { x: 300, y: 400 },
+      },
+      {
+        id: '4',
+        data: {},
+        position: { x: 360, y: 500 },
+        groupId: '3',
+      },
     ],
     edges: [
       {
         id: '1',
         source: '1',
         target: '2',
-        sourcePort: 'port-right',    // Must match port IDs in node template
-        targetPort: 'port-left',      // Must match port IDs in node template
-        targetArrowhead: 'ng-diagram-arrow',  // Built-in arrowhead
-        routing: 'bezier',          // Line routing algorithm
+        sourcePort: 'port-right', // Must match port IDs in node template
+        targetPort: 'port-left', // Must match port IDs in node template
+        targetArrowhead: 'ng-diagram-arrow', // Built-in arrowhead
+        routing: 'bezier', // Line routing algorithm
         data: { label: 'label' },
 
         // Advanced: Manual routing with custom points
@@ -331,7 +344,6 @@ export class DiagramComponent {
     this.debugEvents.onPaletteItemDropped(event);
   }
 
-
   labelChange(label: string) {
     this.propertiesFacade.updateLabel(label);
   }
@@ -443,7 +455,7 @@ export class DiagramComponent {
           width: parseInt(style.getPropertyValue(`--node-${type}-min-width`)),
           height: parseInt(style.getPropertyValue(`--node-${type}-min-height`)),
         },
-      ])
+      ]),
     );
 
     return map;

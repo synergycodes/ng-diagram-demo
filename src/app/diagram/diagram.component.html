@@ -21,6 +21,7 @@
       <ng-diagram-background [type]="backgroundType() === 'grid' ? 'grid' : 'dots'"></ng-diagram-background>
     }
   </ng-diagram>
+  <ng-diagram-minimap />
   <app-navbar
     (toggleDebugModeClick)="debugMode.set(!debugMode())"
     (backgroundTypeChange)="backgroundType.set($event)"
