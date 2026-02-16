@@ -4,8 +4,9 @@ import {
   Component,
   computed,
   input,
+  Type,
 } from '@angular/core';
-import { NgDiagramPaletteItem } from 'ng-diagram';
+import { NgDiagramNodeTemplate, NgDiagramPaletteItem } from 'ng-diagram';
 import { PaletteItemComponent } from '../palette-item/palette-item.component';
 import { PaletteData } from '../../../types';
 import { nodeTemplateMap } from '../../node-template-map';
@@ -53,5 +54,7 @@ export class PaletteItemPreviewComponent {
    *
    * See node-template-map.ts for the mapping configuration
    */
-  componentType = computed(() => nodeTemplateMap.get(this.item().type || ''));
+  componentType = computed(
+    () => nodeTemplateMap.get(this.item().type || '') as Type<NgDiagramNodeTemplate> | undefined,
+  );
 }
