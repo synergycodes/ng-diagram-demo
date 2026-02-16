@@ -8,6 +8,8 @@
 
 # NgDiagramMeetupDemo
 
+[Live Demo](https://synergycodes.github.io/ng-diagram-demo/)
+
 A showcase demonstrating how to use [ng-diagram](https://www.ngdiagram.dev/) - an Angular library for creating interactive diagrams.
 
 ## Project Structure

@@ -39,8 +39,8 @@ export class NavbarComponent {
 
   readonly logoSrc = computed(() =>
     this.themeService.currentTheme() === 'dark'
-      ? '/ng-diagram-logo-white.svg'
-      : '/ng-diagram-logo-black.svg',
+      ? 'ng-diagram-logo-white.svg'
+      : 'ng-diagram-logo-black.svg',
   );
 
   readonly currentTheme = this.themeService.currentTheme;
