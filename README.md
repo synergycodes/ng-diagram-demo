@@ -9,8 +9,12 @@ This branch contains the built output of the ng-diagram demo app, served via Git
 2. **Build the app** with the GitHub Pages base href:
 
    ```bash
-   ng build --base-href /ng-diagram-demo/
+   MSYS_NO_PATHCONV=1 npx ng build --base-href /ng-diagram-demo/
    ```
+
+   > **Important:** The `MSYS_NO_PATHCONV=1` prefix is required when using Git Bash on Windows.
+   > Without it, Git Bash converts `/ng-diagram-demo/` to an absolute Windows path
+   > (e.g. `C:/Program Files/Git/ng-diagram-demo/`), which breaks the deployment.
 
    The output will be in `dist/ng-diagram-meetup-demo/browser/`.
 
