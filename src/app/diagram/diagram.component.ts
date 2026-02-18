@@ -210,6 +210,7 @@ export class DiagramComponent {
         targetPort: 'port-left', // Must match port IDs in node template
         targetArrowhead: 'ng-diagram-arrow', // Built-in arrowhead
         routing: 'bezier', // Line routing algorithm
+        type: 'custom-edge', // Must match edgeTemplateMap key for custom label rendering
         data: { label: 'label' },
 
         // Advanced: Manual routing with custom points
