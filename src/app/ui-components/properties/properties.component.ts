@@ -16,6 +16,7 @@ import { EdgeRoutingName } from 'ng-diagram';
   imports: [SidebarComponent, FormsModule],
 })
 export class PropertiesComponent {
+  collapsed = input(true);
   label = input<string | null>('');
   edgeRouting = input<EdgeRoutingName | null>(null);
   edgeLabelPosition = input<number | null>(null);

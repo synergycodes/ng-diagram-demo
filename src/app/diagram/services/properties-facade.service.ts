@@ -1,4 +1,4 @@
-import { Injectable, inject, computed } from '@angular/core';
+import { Injectable, inject, computed, signal } from '@angular/core';
 import {
   NgDiagramSelectionService, // Service for managing node and edge selection
   NgDiagramModelService, // Service for updating diagram model (nodes, edges, data)
@@ -6,6 +6,7 @@ import {
   Node,
   Edge,
   EdgeRoutingName, // Type for edge routing algorithms: 'orthogonal', 'polyline', 'bezier'
+  SelectionGestureEndedEvent,
 } from 'ng-diagram';
 import { BaseNodeEdgeData } from '../../types';
 

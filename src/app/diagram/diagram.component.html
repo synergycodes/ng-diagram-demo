@@ -6,9 +6,9 @@
     [edgeTemplateMap]="edgeTemplateMap"
     [middlewares]="middlewares"
     (diagramInit)="onDiagramInit($event)"
-    (edgeDrawn)="onEdgeDrawn($event)"
+    (edgeDrawEnded)="onEdgeDrawEnded($event)"
     (selectionMoved)="onSelectionMoved($event)"
-    (selectionChanged)="onSelectionChanged($event)"
+    (selectionGestureEnded)="onSelectionGestureEnded($event)"
     (selectionRemoved)="onSelectionRemoved($event)"
     (groupMembershipChanged)="onGroupMembershipChanged($event)"
     (selectionRotated)="onSelectionRotated($event)"
@@ -31,6 +31,7 @@
   />
   <app-palette [model]="paletteModel" />
   <app-properties
+    [collapsed]="propertiesCollapsed()"
     [label]="label()"
     [edgeRouting]="edgeRouting()"
     [edgeLabelPosition]="edgeLabelPosition()"

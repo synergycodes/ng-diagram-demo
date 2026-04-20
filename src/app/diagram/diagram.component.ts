@@ -35,9 +35,9 @@ import {
 
   // Event types - All available diagram events
   DiagramInitEvent, // Fired when diagram is initialized
-  EdgeDrawnEvent, // Fired when edge is drawn between nodes
+  EdgeDrawEndedEvent, // Fired when edge draw gesture ends (success or cancel)
   SelectionMovedEvent, // Fired when nodes are dragged
-  SelectionChangedEvent, // Fired when selection changes
+  SelectionGestureEndedEvent, // Fired when a selection gesture completes (on pointerup)
   SelectionRemovedEvent, // Fired when nodes/edges are deleted
   GroupMembershipChangedEvent, // Fired when node group membership changes
   SelectionRotatedEvent, // Fired when nodes are rotated
@@ -158,6 +158,7 @@ export class DiagramComponent {
 
   backgroundType = signal<BackgroundType>('dots');
   debugMode = this.debugEvents.debugMode;
+  propertiesCollapsed = signal(true);
 
   // ===================================
   // Diagram Model Initialization
@@ -267,11 +268,12 @@ export class DiagramComponent {
   }
 
   /**
-   * EdgeDrawnEvent - Fired when user draws a new edge
-   * event.edge contains the newly created edge
+   * EdgeDrawEndedEvent - Fired when an edge draw gesture ends (success or cancel)
+   * event.success indicates whether an edge was created
+   * event.edge contains the newly created edge (when successful)
    */
-  onEdgeDrawn(event: EdgeDrawnEvent) {
-    this.debugEvents.onEdgeDrawn(event);
+  onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
+    this.debugEvents.onEdgeDrawEnded(event);
   }
 
   /**
@@ -283,11 +285,12 @@ export class DiagramComponent {
   }
 
   /**
-   * SelectionChangedEvent - Fired when selection changes
-   * event.selectedNodes and event.selectedEdges contain current selection
+   * SelectionGestureEndedEvent - Fired when a selection gesture completes (on pointerup)
+   * event.nodes and event.edges contain the current selection
    */
-  onSelectionChanged(event: SelectionChangedEvent) {
-    this.debugEvents.onSelectionChanged(event);
+  onSelectionGestureEnded(event: SelectionGestureEndedEvent) {
+    this.propertiesCollapsed.set(event.nodes.length === 0 && event.edges.length === 0);
+    this.debugEvents.onSelectionGestureEnded(event);
   }
 
   /**

@@ -2,9 +2,9 @@ import { Injectable, inject, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   DiagramInitEvent, // Emitted when diagram is initialized and ready
-  EdgeDrawnEvent, // Emitted when user draws a new edge between nodes
+  EdgeDrawEndedEvent, // Emitted when an edge draw gesture ends (success or cancel)
   SelectionMovedEvent, // Emitted when selected nodes are dragged
-  SelectionChangedEvent, // Emitted when selection changes (nodes/edges added or removed)
+  SelectionGestureEndedEvent, // Emitted when a selection gesture completes (on pointerup)
   SelectionRemovedEvent, // Emitted when selected items are deleted
   GroupMembershipChangedEvent, // Emitted when nodes are added/removed from groups
   SelectionRotatedEvent, // Emitted when a node is rotated
@@ -23,7 +23,7 @@ import { BaseNodeEdgeData } from '../../types';
  * Usage: Wire these methods to ng-diagram event outputs in the template:
  * <ng-diagram
  *   (diagramInit)="debugService.onDiagramInit($event)"
- *   (edgeDrawn)="debugService.onEdgeDrawn($event)"
+ *   (edgeDrawEnded)="debugService.onEdgeDrawEnded($event)"
  *   ...
  * />
  */
@@ -51,25 +51,34 @@ export class DebugEventsService {
   }
 
   /**
-   * Drawing Event: Edge Created
+   * Drawing Event: Edge Draw Ended
    *
-   * Emitted when a user draws a new edge by dragging from one node to another.
-   * This happens after the edge is created in the model.
+   * Emitted when an edge draw gesture ends, regardless of outcome.
+   * Fires for both successful and cancelled draws.
    *
    * Event data:
-   * - edge: The newly created edge object
+   * - success: Whether the edge was created
+   * - edge: The newly created edge object (when successful)
    * - source: Source node
-   * - target: Target node
-   * - sourcePort: specific connection point on source
-   * - targetPort: specific connection point on target
+   * - target: Target node (when successful)
+   * - reason: Cancellation reason (when cancelled)
+   * - dropPosition: Where the gesture ended
    */
-  onEdgeDrawn(event: EdgeDrawnEvent) {
+  onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
     if (!this.debugMode()) return;
-    this.snackBar.open(
-      `Edge drawn from ${event.edge.source} to ${event.edge.target}`,
-      '',
-      { duration: 4000 }
-    );
+    if (event.success) {
+      this.snackBar.open(
+        `Edge drawn from ${event.edge!.source} to ${event.edge!.target}`,
+        '',
+        { duration: 4000 }
+      );
+    } else {
+      this.snackBar.open(
+        `Edge draw cancelled: ${event.reason}`,
+        '',
+        { duration: 4000 }
+      );
+    }
   }
 
   /**
@@ -88,20 +97,21 @@ export class DebugEventsService {
   }
 
   /**
-   * Selection Event: Selection Changed
+   * Selection Event: Selection Gesture Ended
    *
-   * Emitted when the selection changes (nodes/edges selected or deselected).
+   * Emitted when a selection gesture completes (on pointerup after clicking
+   * a node/edge, box selection, or select-all).
+   * Use this to trigger actions after the user finishes selecting,
+   * such as showing toolbars or updating panels.
    *
    * Event data:
-   * - selectedNodes: Array of currently selected nodes
-   * - selectedEdges: Array of currently selected edges
-   * - previousNodes: Array of previously selected nodes
-   * - previousEdges: Array of previously selected edges
+   * - nodes: Array of currently selected nodes
+   * - edges: Array of currently selected edges
    */
-  onSelectionChanged(event: SelectionChangedEvent) {
+  onSelectionGestureEnded(event: SelectionGestureEndedEvent) {
     if (!this.debugMode()) return;
-    const nodeCount = event.selectedNodes.length;
-    const edgeCount = event.selectedEdges.length;
+    const nodeCount = event.nodes.length;
+    const edgeCount = event.edges.length;
     this.snackBar.open(
       `Selection: ${nodeCount} node(s), ${edgeCount} edge(s)`,
       '',
