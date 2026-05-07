@@ -49,6 +49,10 @@ Angular components that provide the UI around the diagram (navbar, sidebars, pro
 ### 📁 `src/app/types.ts` - **Type Definitions**
 Shared TypeScript interfaces used across the application.
 
+### 📁 `src/app/diagram/middlewares/` - **Custom Middleware**
+
+- **`horizontal-lock.middleware.ts`** - Demonstrates how to constrain node movement using the middleware pipeline. Nodes with the name **"horizontal"** are restricted to X-axis movement only (their Y position stays locked). Try it out by renaming any node to "horizontal" and dragging it around.
+
 ## Quick Start
 
 ### Installation
