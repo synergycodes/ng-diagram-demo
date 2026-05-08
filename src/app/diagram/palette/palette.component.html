@@ -14,6 +14,19 @@
   </div>
 
   <div class="palette__sections">
+    @if (filteredTemplates().length > 0) {
+      <section class="palette-section">
+        <h3 class="palette-section__title">Templates</h3>
+        <div class="palette-section__items">
+          @for (t of filteredTemplates(); track t.id) {
+            <button type="button" class="template-chip" (click)="onTemplateClick(t.id)">
+              <span class="template-chip__name">{{ t.name }}</span>
+              <span class="template-chip__subtitle">{{ t.subtitle }}</span>
+            </button>
+          }
+        </div>
+      </section>
+    }
     @for (section of sections(); track section.category) {
       <section class="palette-section">
         <h3 class="palette-section__title">{{ section.title }}</h3>

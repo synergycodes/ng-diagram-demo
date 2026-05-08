@@ -9,6 +9,8 @@ import { PaletteItemPreviewComponent } from './palette-item-preview/palette-item
 import { PaletteItemComponent } from './palette-item/palette-item.component';
 import { SidebarComponent } from '../../ui-components/sidebar/sidebar.component';
 import { CircuitPaletteEntry, PALETTE_ENTRIES, groupBySection } from '../../circuit/palette-data';
+import { TemplateService } from '../services/template.service';
+import { ReferenceCounterService } from '../services/reference-counter.service';
 
 @Component({
   selector: 'app-palette',
@@ -25,7 +27,11 @@ import { CircuitPaletteEntry, PALETTE_ENTRIES, groupBySection } from '../../circ
   ],
 })
 export class PaletteComponent {
-  scale = inject(NgDiagramViewportService).scale;
+  private readonly viewportService = inject(NgDiagramViewportService);
+  private readonly templateService = inject(TemplateService);
+  private readonly referenceCounter = inject(ReferenceCounterService);
+
+  scale = this.viewportService.scale;
 
   query = signal('');
 
@@ -43,4 +49,26 @@ export class PaletteComponent {
   });
 
   sections = computed(() => groupBySection(this.filtered()));
+
+  // Templates section (placeholder UI — throwaway, click-to-insert at viewport center).
+  templates = this.templateService.describe;
+
+  filteredTemplates = computed(() => {
+    const q = this.query().trim().toLowerCase();
+    const list = this.templates();
+    if (!q) return list;
+    return list.filter((t) => t.name.toLowerCase().includes(q));
+  });
+
+  onTemplateClick(templateId: string) {
+    const center = this.computeViewportCenter();
+    const { nodeIds } = this.templateService.expand(templateId, center);
+    this.referenceCounter.renumber(nodeIds);
+  }
+
+  private computeViewportCenter(): { x: number; y: number } {
+    const w = window.innerWidth / 2;
+    const h = window.innerHeight / 2;
+    return this.viewportService.clientToFlowPosition({ x: w, y: h });
+  }
 }

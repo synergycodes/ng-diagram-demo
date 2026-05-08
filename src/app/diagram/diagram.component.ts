@@ -3,8 +3,9 @@
  * canvas, palette, properties sidebar, navbar, and context menu.
  */
 
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import {
@@ -54,6 +55,9 @@ import { PropertiesFacadeService } from './services/properties-facade.service';
 import { DebugEventsService } from './services/debug-events.service';
 import { ContextMenuFacadeService } from './services/context-menu-facade.service';
 import { createDiagramConfig } from './services/diagram.config';
+import { ReferenceCounterService } from './services/reference-counter.service';
+import { TemplateService } from './services/template.service';
+import { SaveTemplateDialogComponent } from './services/save-template-dialog.component';
 
 import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middleware';
 
@@ -74,6 +78,8 @@ import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middlewa
     PropertiesFacadeService,
     DebugEventsService,
     ContextMenuFacadeService,
+    ReferenceCounterService,
+    TemplateService,
     provideNgDiagram(),
   ],
   templateUrl: './diagram.component.html',
@@ -88,9 +94,12 @@ export class DiagramComponent {
 
   private readonly contextMenuService = inject(ContextMenuService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
 
   private readonly debugEvents = inject(DebugEventsService);
   private readonly contextMenuFacade = inject(ContextMenuFacadeService);
+  private readonly referenceCounter = inject(ReferenceCounterService);
+  private readonly templateService = inject(TemplateService);
 
   nodeTemplateMap: NgDiagramNodeTemplateMap = nodeTemplateMap;
   edgeTemplateMap = edgeTemplateMap;
@@ -100,6 +109,9 @@ export class DiagramComponent {
   backgroundType = signal<BackgroundType>('dots');
   debugMode = this.debugEvents.debugMode;
   propertiesCollapsed = signal(true);
+
+  /** Save-template button is meaningful only when 2+ nodes are selected. */
+  canSaveTemplate = computed(() => this.diagramSelectionService.selection().nodes.length >= 2);
 
   /**
    * Initial demo schematic — VCC → resistor → LED → GND, plus an NE555 next
@@ -200,9 +212,6 @@ export class DiagramComponent {
 
   config = createDiagramConfig(new Map());
 
-  /** Counter per reference prefix used to auto-name dropped components. */
-  private referenceCounters = new Map<string, number>();
-
   constructor() {
     effect(() => {
       if (this.diagramService.isInitialized()) {
@@ -211,43 +220,26 @@ export class DiagramComponent {
     });
 
     // Seed counters from initial model so we don't collide with R1, LED1, U1, etc.
-    this.seedReferenceCountersFromModel();
+    this.referenceCounter.seedFrom(this.diagramModelService.nodes() as Node<AnyCircuitData>[]);
   }
 
   /** ng-diagram fires this after a palette item is dropped onto the canvas. */
   onPaletteItemDropped(event: PaletteItemDroppedEvent) {
     this.debugEvents.onPaletteItemDropped(event);
-    this.assignAutoReference(event.node as Node<AnyCircuitData>);
+    this.referenceCounter.assignReference(event.node as Node<AnyCircuitData>);
   }
 
-  private assignAutoReference(node: Node<AnyCircuitData>) {
-    const data = node.data as AnyCircuitData & { reference?: string };
-    if (!data || !data.reference) return;
-
-    // Reference value from palette is "R?", "C?", "U?", etc. Replace ? with a counter.
-    const match = data.reference.match(/^([A-Za-z]+)\??$/);
-    if (!match) return;
-
-    const prefix = match[1];
-    const next = (this.referenceCounters.get(prefix) ?? 0) + 1;
-    this.referenceCounters.set(prefix, next);
-
-    const newReference = `${prefix}${next}`;
-    this.diagramModelService.updateNodeData(node.id, { ...data, reference: newReference });
-  }
-
-  private seedReferenceCountersFromModel() {
-    const nodes = this.diagramModelService.nodes() as Node<AnyCircuitData>[];
-    for (const n of nodes) {
-      const ref = (n.data as AnyCircuitData)?.reference;
-      if (!ref) continue;
-      const m = ref.match(/^([A-Za-z]+)(\d+)$/);
-      if (!m) continue;
-      const [, prefix, numStr] = m;
-      const num = Number(numStr);
-      const cur = this.referenceCounters.get(prefix) ?? 0;
-      if (num > cur) this.referenceCounters.set(prefix, num);
-    }
+  onSaveAsTemplate() {
+    const ref = this.dialog.open<SaveTemplateDialogComponent, void, string>(
+      SaveTemplateDialogComponent,
+      { width: '420px' },
+    );
+    ref.afterClosed().subscribe((name) => {
+      if (!name) return;
+      const selection = this.diagramSelectionService.selection();
+      const tpl = this.templateService.saveFromSelection(name, selection);
+      this.snackBar.open(`Saved template "${tpl.name}"`, '', { duration: 2000 });
+    });
   }
 
   // ===================================
@@ -256,7 +248,7 @@ export class DiagramComponent {
 
   onDiagramInit(event: DiagramInitEvent) {
     this.debugEvents.onDiagramInit(event);
-    this.seedReferenceCountersFromModel();
+    this.referenceCounter.seedFrom(this.diagramModelService.nodes() as Node<AnyCircuitData>[]);
   }
   onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
     this.debugEvents.onEdgeDrawEnded(event);

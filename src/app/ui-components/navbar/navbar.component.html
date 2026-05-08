@@ -44,6 +44,12 @@
       ></ngd-nav-button>
     </div>
     <ngd-nav-button
+      [disabled]="!canSaveTemplate()"
+      (clickAction)="saveTemplateClick.emit()"
+      title="Save selection as template"
+      ><i class="ph ph-bookmark-simple"></i
+    ></ngd-nav-button>
+    <ngd-nav-button
       [active]="isDebugMode()"
       (clickAction)="toggleDebugModeClick.emit()"
       title="Toggle debug mode"

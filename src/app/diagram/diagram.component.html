@@ -26,8 +26,10 @@
     (toggleDebugModeClick)="debugMode.set(!debugMode())"
     (backgroundTypeChange)="backgroundType.set($event)"
     (searchNodeClick)="onSearchNode($event)"
+    (saveTemplateClick)="onSaveAsTemplate()"
     [isDebugMode]="debugMode()"
     [backgroundType]="backgroundType()"
+    [canSaveTemplate]="canSaveTemplate()"
   />
   <app-palette />
   <app-properties [collapsed]="propertiesCollapsed()" />
