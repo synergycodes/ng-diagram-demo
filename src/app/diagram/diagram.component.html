@@ -16,6 +16,8 @@
     (clipboardPasted)="onClipboardPasted($event)"
     (nodeResized)="onNodeResized($event)"
     (paletteItemDropped)="onPaletteItemDropped($event)"
+    (dragover)="onTemplateDragOver($event)"
+    (drop)="onTemplateDrop($event)"
   >
     @if (backgroundType() !== 'solid') {
       <ng-diagram-background [type]="backgroundType() === 'grid' ? 'grid' : 'dots'"></ng-diagram-background>
@@ -26,8 +28,10 @@
     (toggleDebugModeClick)="debugMode.set(!debugMode())"
     (backgroundTypeChange)="backgroundType.set($event)"
     (searchNodeClick)="onSearchNode($event)"
+    (saveTemplateClick)="onSaveAsTemplate()"
     [isDebugMode]="debugMode()"
     [backgroundType]="backgroundType()"
+    [canSaveTemplate]="canSaveTemplate()"
   />
   <app-palette />
   <app-properties [collapsed]="propertiesCollapsed()" />

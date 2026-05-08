@@ -3,8 +3,9 @@
  * canvas, palette, properties sidebar, navbar, and context menu.
  */
 
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import {
@@ -54,6 +55,10 @@ import { PropertiesFacadeService } from './services/properties-facade.service';
 import { DebugEventsService } from './services/debug-events.service';
 import { ContextMenuFacadeService } from './services/context-menu-facade.service';
 import { createDiagramConfig } from './services/diagram.config';
+import { ReferenceCounterService } from './services/reference-counter.service';
+import { TemplateService } from './services/template.service';
+import { SaveTemplateDialogComponent } from './services/save-template-dialog.component';
+import { TEMPLATE_DRAG_MIME } from './services/template-drag.constants';
 import { CustomIcLauncherService } from '../circuit/custom-ic-launcher.service';
 import { AiAgentService } from '../ai/services/ai-agent.service';
 import { DiagramAgentToolsService } from '../ai/services/diagram-agent-tools.service';
@@ -79,6 +84,8 @@ import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middlewa
     PropertiesFacadeService,
     DebugEventsService,
     ContextMenuFacadeService,
+    ReferenceCounterService,
+    TemplateService,
     CustomIcLauncherService,
     DiagramAgentToolsService,
     AiAgentService,
@@ -96,9 +103,12 @@ export class DiagramComponent {
 
   private readonly contextMenuService = inject(ContextMenuService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
 
   private readonly debugEvents = inject(DebugEventsService);
   private readonly contextMenuFacade = inject(ContextMenuFacadeService);
+  private readonly referenceCounter = inject(ReferenceCounterService);
+  private readonly templateService = inject(TemplateService);
 
   nodeTemplateMap: NgDiagramNodeTemplateMap = nodeTemplateMap;
   edgeTemplateMap = edgeTemplateMap;
@@ -108,6 +118,9 @@ export class DiagramComponent {
   backgroundType = signal<BackgroundType>('dots');
   debugMode = this.debugEvents.debugMode;
   propertiesCollapsed = signal(true);
+
+  /** Save-template button is meaningful only when 2+ nodes are selected. */
+  canSaveTemplate = computed(() => this.diagramSelectionService.selection().nodes.length >= 2);
 
   /**
    * Initial demo schematic — VCC → resistor → LED → GND, plus an NE555 next
@@ -216,37 +229,48 @@ export class DiagramComponent {
         this.diagramService.updateConfig({ debugMode: this.debugMode() });
       }
     });
+
+    // Seed counters from initial model so we don't collide with R1, LED1, U1, etc.
+    this.referenceCounter.seedFrom(this.diagramModelService.nodes() as Node<AnyCircuitData>[]);
   }
 
   /** ng-diagram fires this after a palette item is dropped onto the canvas. */
   onPaletteItemDropped(event: PaletteItemDroppedEvent) {
     this.debugEvents.onPaletteItemDropped(event);
-    this.assignAutoReference(event.node as Node<AnyCircuitData>);
+    this.referenceCounter.assignReference(event.node as Node<AnyCircuitData>);
   }
 
-  private assignAutoReference(node: Node<AnyCircuitData>) {
-    const data = node.data as AnyCircuitData & { reference?: string };
-    if (!data?.reference) return;
-
-    const match = data.reference.match(/^([A-Za-z]+)\??$/);
-    if (!match) return;
-
-    const prefix = match[1];
-    const newReference = this.nextReference(prefix, node.id);
-    this.diagramModelService.updateNodeData(node.id, { ...data, reference: newReference });
+  /** Allow drop only when the dragged payload is a template. */
+  onTemplateDragOver(event: DragEvent) {
+    if (!event.dataTransfer?.types.includes(TEMPLATE_DRAG_MIME)) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
   }
 
-  /** Returns the next free `Prefix<N>` not already used by another node. */
-  private nextReference(prefix: string, excludeNodeId?: string): string {
-    const re = new RegExp(`^${prefix}(\\d+)$`);
-    let max = 0;
-    for (const n of this.diagramModelService.nodes() as Node<AnyCircuitData>[]) {
-      if (n.id === excludeNodeId) continue;
-      const ref = (n.data as AnyCircuitData)?.reference;
-      const m = ref?.match(re);
-      if (m) max = Math.max(max, Number(m[1]));
-    }
-    return `${prefix}${max + 1}`;
+  /** Expand the dragged template centered on the cursor's position in flow coords. */
+  onTemplateDrop(event: DragEvent) {
+    const id = event.dataTransfer?.getData(TEMPLATE_DRAG_MIME);
+    if (!id) return;
+    event.preventDefault();
+    const dropPoint = this.viewportService.clientToFlowPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
+    const { nodeIds } = this.templateService.expand(id, dropPoint);
+    this.referenceCounter.renumber(nodeIds);
+  }
+
+  onSaveAsTemplate() {
+    const ref = this.dialog.open<SaveTemplateDialogComponent, void, string>(
+      SaveTemplateDialogComponent,
+      { width: '420px' },
+    );
+    ref.afterClosed().subscribe((name) => {
+      if (!name) return;
+      const selection = this.diagramSelectionService.selection();
+      const tpl = this.templateService.saveFromSelection(name, selection);
+      this.snackBar.open(`Saved template "${tpl.name}"`, '', { duration: 2000 });
+    });
   }
 
   // ===================================
@@ -255,6 +279,7 @@ export class DiagramComponent {
 
   onDiagramInit(event: DiagramInitEvent) {
     this.debugEvents.onDiagramInit(event);
+    this.referenceCounter.seedFrom(this.diagramModelService.nodes() as Node<AnyCircuitData>[]);
     // Ports use data-driven `@for` lists and `[style.top.px]` bindings (for
     // ICs), and class bindings (for connected-port hiding). Per the
     // ng-diagram docs these can race the initial ResizeObserver measurement,

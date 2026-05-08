@@ -9,6 +9,8 @@ import { PaletteItemPreviewComponent } from './palette-item-preview/palette-item
 import { PaletteItemComponent } from './palette-item/palette-item.component';
 import { SidebarComponent } from '../../ui-components/sidebar/sidebar.component';
 import { CircuitPaletteEntry, PALETTE_ENTRIES, groupBySection } from '../../circuit/palette-data';
+import { TemplateService } from '../services/template.service';
+import { TEMPLATE_DRAG_MIME } from '../services/template-drag.constants';
 import { CustomIcLauncherService } from '../../circuit/custom-ic-launcher.service';
 
 @Component({
@@ -37,6 +39,7 @@ export class PaletteComponent {
   }
 
   private readonly entries: CircuitPaletteEntry[] = PALETTE_ENTRIES;
+  private readonly templateService = inject(TemplateService);
 
   filtered = computed(() => {
     const q = this.query().trim().toLowerCase();
@@ -50,4 +53,20 @@ export class PaletteComponent {
   });
 
   sections = computed(() => groupBySection(this.filtered()));
+
+  // Templates section (placeholder UI; throwaway).
+  templates = this.templateService.describe;
+
+  filteredTemplates = computed(() => {
+    const q = this.query().trim().toLowerCase();
+    const list = this.templates();
+    if (!q) return list;
+    return list.filter((t) => t.name.toLowerCase().includes(q));
+  });
+
+  onTemplateDragStart(event: DragEvent, templateId: string) {
+    if (!event.dataTransfer) return;
+    event.dataTransfer.setData(TEMPLATE_DRAG_MIME, templateId);
+    event.dataTransfer.effectAllowed = 'copy';
+  }
 }
