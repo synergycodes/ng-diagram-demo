@@ -7,4 +7,11 @@
 .diagram-container {
   width: 100%;
   height: 100%;
+
+  // Properties panel is anchored to the right edge (300px wide + 12px outer
+  // padding). Shift the minimap left by that amount so it sits to the LEFT
+  // of the panel instead of being covered by it.
+  ::ng-deep ng-diagram-minimap {
+    transform: translateX(-312px);
+  }
 }
