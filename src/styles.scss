@@ -55,6 +55,12 @@ body {
   height: 100%;
   width: 100%;
   margin: 0;
+  overflow: hidden;
+}
+
+app-root {
+  display: block;
+  height: 100%;
 }
 
 * {
@@ -62,7 +68,6 @@ body {
   box-sizing: border-box;
 }
 
-html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 /* Custom snackbar styles */
