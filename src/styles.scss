@@ -76,6 +76,16 @@ html[data-theme='dark'] {
   /* Default-edge stroke / selection — matches the blue selection outline used
    * around components in the v2 design. */
   --ngd-default-edge-stroke-selected: var(--ngd-sem-color-accent-electric-strong);
+
+  /* Ports — when a wire is being drawn near them, ng-diagram swaps the port
+   * fill/stroke to the "active" color. We want the port itself to stay white
+   * (the inner circle) but get a blue ring around it (the box-shadow uses
+   * the border-color variable; the background and outline both use the
+   * background-color variable). */
+  --ngd-node-port-fill-active: #ffffff;
+  --ngd-node-port-stroke-active: var(--ngd-sem-color-accent-electric-strong);
+  --ngd-port-background-color-hover: #ffffff;
+  --ngd-port-border-color-hover: var(--ngd-sem-color-accent-electric-strong);
 }
 
 html,

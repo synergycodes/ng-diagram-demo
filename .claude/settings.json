@@ -46,7 +46,22 @@
       "Bash(grep -oE \"position\\\\\\([^\\)]{0,50}\\\\\\)\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
       "Bash(grep -rn *)",
       "Bash(grep -n *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(awk 'BEGIN{RS=\";\"} /NgDiagramDefaultNodeTemplate/' node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
+      "Bash(awk 'BEGIN{RS=\";\"} /NgDiagramBaseNodeTemplate/' node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
+      "Bash(awk 'BEGIN{RS=\";\"} /NgDiagramDefaultNodeTemplateComponent\\\\{/' node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
+      "Bash(grep -oE \"label=computed\\\\\\([^}]{0,200}\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
+      "Bash(awk 'BEGIN{RS=\";\"} /class NgDiagramNodeTemplateMap/' node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
+      "Bash(grep -oE \"nodeTemplateMap[^,;]{0,150}\\\\.get\\\\\\([^\\)]{0,80}\\\\\\)\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
+      "Bash(grep -oE \"nodeTemplateMap[a-zA-Z\\(\\)\\\\.\\\\?: ]{0,80}\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
+      "Bash(grep -oE \"nodeTemplateMap\\\\.get\\\\\\([^\\)]{0,80}\\\\\\)[^,;]{0,80}\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
+      "Bash(grep -oE \".{200}nodeTemplateMap\\\\.get\\\\\\([^\\)]{0,80}\\\\\\)[^,;]{0,150}\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
+      "Bash(grep -oE \".{100}getNodeTemplate\\\\\\(e\\\\\\)[^,;]{0,300}\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
+      "Bash(grep -oE \"getNodeTemplate\\\\\\([^\\)]{0,80}\\\\\\)[^,;]{0,200}\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
+      "Bash(grep -oE \"@if \\\\\\(getNodeTemplate\\\\\\(node\\\\.type\\\\\\)\\\\\\)[^@]{0,400}\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
+      "Bash(grep -oE \"getNodeTemplate\\\\\\(node\\\\.type\\\\\\)\\\\\\) \\\\{[^}]{0,300}\\\\} @else[^@}]{0,400}\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
+      "Bash(grep -oE \"isGroup[^@]{0,50}@if[^@]{0,500}@else[^@]{0,300}\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
+      "Bash(grep -oE \"ng-diagram-default-node-template[^@}]{0,300}\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)"
     ]
   }
 }
