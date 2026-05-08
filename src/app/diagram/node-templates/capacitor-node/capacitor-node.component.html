@@ -9,5 +9,5 @@
   </svg>
   <div class="component-card__value">{{ value() }}</div>
 </div>
-<ng-diagram-port id="port-a" type="both" side="left" />
-<ng-diagram-port id="port-b" type="both" side="right" />
+<ng-diagram-port id="port-a" type="both" side="left" originPoint="center" [class.is-connected]="isConnected('port-a')" />
+<ng-diagram-port id="port-b" type="both" side="right" originPoint="center" [class.is-connected]="isConnected('port-b')" />

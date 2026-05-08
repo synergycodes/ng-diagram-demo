@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import {
+  NgDiagramModelService,
   NgDiagramNodeRotateAdornmentComponent,
   NgDiagramNodeSelectedDirective,
   NgDiagramNodeTemplate,
@@ -9,6 +10,7 @@ import {
   Node,
 } from 'ng-diagram';
 import { PowerNetData } from '../../../circuit/circuit-types';
+import { connectedPortIdsSignal } from '../../../circuit/connected-ports';
 import { ContextMenuService } from '../../../ui-components/context-menu/context-menu.service';
 
 @Component({
@@ -24,8 +26,12 @@ export class VccNodeComponent implements NgDiagramNodeTemplate<PowerNetData> {
   private readonly contextMenuService = inject(ContextMenuService);
   private readonly viewportService = inject(NgDiagramViewportService);
   private readonly selectionService = inject(NgDiagramSelectionService);
+  private readonly modelService = inject(NgDiagramModelService);
 
   node = input.required<Node<PowerNetData>>();
+
+  connectedPortIds = connectedPortIdsSignal(this.modelService, computed(() => this.node()?.id));
+  isConnected(portId: string): boolean { return this.connectedPortIds().has(portId); }
 
   netName = computed(() => this.node()?.data?.netName ?? '+5V');
 

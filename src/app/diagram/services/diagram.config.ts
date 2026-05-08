@@ -77,16 +77,35 @@ export function createDiagramConfig(
         minNodeSizes.get(node.type ?? '') ?? { width: 100, height: 50 },
     },
 
-    // Linking Configuration
-    // Customizes edge creation when user draws connections
+    // Linking Configuration — schematic wires are direction-agnostic, so
+    // strip the default arrowhead off both the live preview edge (during the
+    // drag) and the committed edge. Polarity is encoded in the symbols
+    // themselves (diode triangle, battery plates, VCC arrow), not the wire.
     linking: {
-      // Callback: Modify edge properties before it's added to the model
-      // Here we set all newly drawn edges to use 'custom-edge' type
-      // This allows using a custom edge component template
       finalEdgeDataBuilder: (edge: Edge) => ({
         ...edge,
         type: 'custom-edge',
+        sourceArrowhead: undefined,
+        targetArrowhead: undefined,
       }),
+      temporaryEdgeDataBuilder: (edge: Edge) => ({
+        ...edge,
+        sourceArrowhead: undefined,
+        targetArrowhead: undefined,
+      }),
+    },
+
+    // Default routing — orthogonal looks the most schematic-like.
+    // - firstLastSegmentLength: 0 makes the line meet the port exactly. The
+    //   default reserves a minimum stub at each end which manifests as a
+    //   visible gap when the port sits right on the host edge.
+    // - maxCornerRadius: 0 gives sharp 90° corners, the schematic convention.
+    edgeRouting: {
+      defaultRouting: 'orthogonal',
+      orthogonal: {
+        firstLastSegmentLength: 0,
+        maxCornerRadius: 0,
+      },
     },
   };
 }

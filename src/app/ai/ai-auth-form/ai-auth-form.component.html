@@ -1,0 +1,33 @@
+<div class="ai-auth">
+  <h3 class="ai-auth__title">Sign in with your OpenRouter API key</h3>
+  <p class="ai-auth__subtitle">
+    The agent uses your own OpenRouter API key for usage. The key is stored
+    only in this browser (localStorage) and is sent directly to openrouter.ai.
+  </p>
+
+  <label class="ai-auth__label" for="ai-auth-key">OpenRouter API key</label>
+  <input
+    id="ai-auth-key"
+    class="ai-auth__input"
+    type="password"
+    placeholder="sk-or-…"
+    autocomplete="off"
+    [ngModel]="apiKey()"
+    (ngModelChange)="apiKey.set($event)"
+    (keydown.enter)="submit()"
+  />
+
+  <button class="ai-auth__submit" type="button" (click)="submit()">
+    Continue
+  </button>
+
+  <p class="ai-auth__help">
+    Don't have one? Create a key at
+    <a
+      href="https://openrouter.ai/keys"
+      target="_blank"
+      rel="noopener noreferrer"
+      >openrouter.ai/keys</a
+    >.
+  </p>
+</div>

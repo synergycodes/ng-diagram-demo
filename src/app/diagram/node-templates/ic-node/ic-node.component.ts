@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import {
+  NgDiagramModelService,
   NgDiagramNodeRotateAdornmentComponent,
   NgDiagramNodeSelectedDirective,
   NgDiagramNodeTemplate,
@@ -9,6 +10,7 @@ import {
   Node,
 } from 'ng-diagram';
 import { IcData, IcPin } from '../../../circuit/circuit-types';
+import { connectedPortIdsSignal } from '../../../circuit/connected-ports';
 import { ContextMenuService } from '../../../ui-components/context-menu/context-menu.service';
 
 interface PositionedPin {
@@ -35,8 +37,19 @@ export class IcNodeComponent implements NgDiagramNodeTemplate<IcData> {
   private readonly contextMenuService = inject(ContextMenuService);
   private readonly viewportService = inject(NgDiagramViewportService);
   private readonly selectionService = inject(NgDiagramSelectionService);
+  private readonly modelService = inject(NgDiagramModelService);
 
   node = input.required<Node<IcData>>();
+
+  /** Set of port IDs with an attached edge — used to fade them out. */
+  connectedPortIds = connectedPortIdsSignal(
+    this.modelService,
+    computed(() => this.node()?.id),
+  );
+
+  isConnected(portId: string): boolean {
+    return this.connectedPortIds().has(portId);
+  }
 
   data = computed(() => this.node()?.data);
   isBoard = computed(() => this.data()?.variant === 'board');

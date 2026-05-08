@@ -34,6 +34,13 @@
             ],
             "styles": [
               "src/styles.scss"
+            ],
+            "externalDependencies": [
+              "node:fs",
+              "node:path",
+              "node:os",
+              "node:crypto",
+              "node:url"
             ]
           },
           "configurations": {

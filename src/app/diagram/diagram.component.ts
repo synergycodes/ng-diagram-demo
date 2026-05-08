@@ -54,6 +54,10 @@ import { PropertiesFacadeService } from './services/properties-facade.service';
 import { DebugEventsService } from './services/debug-events.service';
 import { ContextMenuFacadeService } from './services/context-menu-facade.service';
 import { createDiagramConfig } from './services/diagram.config';
+import { CustomIcLauncherService } from '../circuit/custom-ic-launcher.service';
+import { AiAgentService } from '../ai/services/ai-agent.service';
+import { DiagramAgentToolsService } from '../ai/services/diagram-agent-tools.service';
+import { AiWidgetComponent } from '../ai/ai-widget/ai-widget.component';
 
 import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middleware';
 
@@ -68,12 +72,16 @@ import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middlewa
     NgDiagramMinimapComponent,
     NavbarComponent,
     ContextMenuComponent,
+    AiWidgetComponent,
   ],
   providers: [
     ContextMenuService,
     PropertiesFacadeService,
     DebugEventsService,
     ContextMenuFacadeService,
+    CustomIcLauncherService,
+    DiagramAgentToolsService,
+    AiAgentService,
     provideNgDiagram(),
   ],
   templateUrl: './diagram.component.html',
@@ -193,6 +201,8 @@ export class DiagramComponent {
         sourcePort: 'port-b',
         target: 'led1',
         targetPort: 'port-anode',
+        sourceArrowhead: undefined,
+        targetArrowhead: undefined,
         data: {},
       },
     ],
@@ -200,18 +210,12 @@ export class DiagramComponent {
 
   config = createDiagramConfig(new Map());
 
-  /** Counter per reference prefix used to auto-name dropped components. */
-  private referenceCounters = new Map<string, number>();
-
   constructor() {
     effect(() => {
       if (this.diagramService.isInitialized()) {
         this.diagramService.updateConfig({ debugMode: this.debugMode() });
       }
     });
-
-    // Seed counters from initial model so we don't collide with R1, LED1, U1, etc.
-    this.seedReferenceCountersFromModel();
   }
 
   /** ng-diagram fires this after a palette item is dropped onto the canvas. */
@@ -222,32 +226,27 @@ export class DiagramComponent {
 
   private assignAutoReference(node: Node<AnyCircuitData>) {
     const data = node.data as AnyCircuitData & { reference?: string };
-    if (!data || !data.reference) return;
+    if (!data?.reference) return;
 
-    // Reference value from palette is "R?", "C?", "U?", etc. Replace ? with a counter.
     const match = data.reference.match(/^([A-Za-z]+)\??$/);
     if (!match) return;
 
     const prefix = match[1];
-    const next = (this.referenceCounters.get(prefix) ?? 0) + 1;
-    this.referenceCounters.set(prefix, next);
-
-    const newReference = `${prefix}${next}`;
+    const newReference = this.nextReference(prefix, node.id);
     this.diagramModelService.updateNodeData(node.id, { ...data, reference: newReference });
   }
 
-  private seedReferenceCountersFromModel() {
-    const nodes = this.diagramModelService.nodes() as Node<AnyCircuitData>[];
-    for (const n of nodes) {
+  /** Returns the next free `Prefix<N>` not already used by another node. */
+  private nextReference(prefix: string, excludeNodeId?: string): string {
+    const re = new RegExp(`^${prefix}(\\d+)$`);
+    let max = 0;
+    for (const n of this.diagramModelService.nodes() as Node<AnyCircuitData>[]) {
+      if (n.id === excludeNodeId) continue;
       const ref = (n.data as AnyCircuitData)?.reference;
-      if (!ref) continue;
-      const m = ref.match(/^([A-Za-z]+)(\d+)$/);
-      if (!m) continue;
-      const [, prefix, numStr] = m;
-      const num = Number(numStr);
-      const cur = this.referenceCounters.get(prefix) ?? 0;
-      if (num > cur) this.referenceCounters.set(prefix, num);
+      const m = ref?.match(re);
+      if (m) max = Math.max(max, Number(m[1]));
     }
+    return `${prefix}${max + 1}`;
   }
 
   // ===================================
@@ -256,7 +255,12 @@ export class DiagramComponent {
 
   onDiagramInit(event: DiagramInitEvent) {
     this.debugEvents.onDiagramInit(event);
-    this.seedReferenceCountersFromModel();
+    // Ports use data-driven `@for` lists and `[style.top.px]` bindings (for
+    // ICs), and class bindings (for connected-port hiding). Per the
+    // ng-diagram docs these can race the initial ResizeObserver measurement,
+    // producing the "ports unmeasured" warning. A single explicit re-measure
+    // after the templates have settled clears it.
+    queueMicrotask(() => this.diagramService.invalidateMeasurements());
   }
   onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
     this.debugEvents.onEdgeDrawEnded(event);

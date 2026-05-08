@@ -1,0 +1,59 @@
+<h2 mat-dialog-title>Create custom IC</h2>
+<mat-dialog-content class="custom-ic-dialog">
+  <label class="field">
+    <span class="field__label">Package</span>
+    <select
+      class="field__input"
+      [ngModel]="presetId()"
+      (ngModelChange)="onPresetChange($event)"
+    >
+      @for (p of presets; track p.id) {
+        <option [value]="p.id">{{ p.label }}</option>
+      }
+    </select>
+  </label>
+
+  <label class="field">
+    <span class="field__label">Number of pins</span>
+    <input
+      class="field__input"
+      type="number"
+      min="2"
+      max="80"
+      [ngModel]="totalPins()"
+      (ngModelChange)="onPinCountChange($event)"
+      [disabled]="!isCustomPinCount()"
+    />
+    <small class="field__hint">{{ pinsLeft() }} on the left, {{ pinsRight() }} on the right</small>
+  </label>
+
+  <label class="field">
+    <span class="field__label">Model / part name</span>
+    <input
+      class="field__input"
+      type="text"
+      [ngModel]="modelName()"
+      (ngModelChange)="modelName.set($event)"
+      placeholder="e.g. MY-CHIP"
+    />
+  </label>
+
+  <label class="field">
+    <span class="field__label">Pin names (optional, one per line)</span>
+    <textarea
+      class="field__input field__input--textarea"
+      rows="6"
+      [ngModel]="pinNamesText()"
+      (ngModelChange)="pinNamesText.set($event)"
+      placeholder="VCC&#10;GND&#10;IN1&#10;OUT1"
+    ></textarea>
+    <small class="field__hint">
+      Order: top-to-bottom on the left side, then top-to-bottom on the right side.
+      Missing names default to P1, P2, …
+    </small>
+  </label>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" (click)="create()">Create</button>
+</mat-dialog-actions>

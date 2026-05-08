@@ -8,4 +8,4 @@
   </svg>
   <div class="power-card__label">{{ netName() }}</div>
 </div>
-<ng-diagram-port id="port-net" type="target" side="top" />
+<ng-diagram-port id="port-net" type="target" side="top" originPoint="center" [class.is-connected]="isConnected('port-net')" />
