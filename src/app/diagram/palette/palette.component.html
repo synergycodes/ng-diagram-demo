@@ -38,6 +38,23 @@
   </div>
 
   <div class="palette__sections">
+    @if (filteredTemplates().length > 0) {
+      <section class="palette-section">
+        <h3 class="palette-section__title">Templates</h3>
+        <div class="palette-section__items">
+          @for (t of filteredTemplates(); track t.id) {
+            <div
+              class="template-chip"
+              draggable="true"
+              (dragstart)="onTemplateDragStart($event, t.id)"
+            >
+              <span class="template-chip__name">{{ t.name }}</span>
+              <span class="template-chip__subtitle">{{ t.subtitle }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    }
     @for (section of sections(); track section.category) {
       <section class="palette-section">
         <header class="palette-section__header">
@@ -62,8 +79,11 @@
               class="palette-section__action"
               (click)="openCustomIc()"
             >
-              <span class="palette-section__action-plus">+</span>
-              <span class="palette-section__action-label">Custom IC…</span>
+              <span class="palette-section__action-icon">+</span>
+              <span class="palette-section__action-text">
+                <span class="palette-section__action-label">Custom IC…</span>
+                <span class="palette-section__action-sub">Pick package & pin count</span>
+              </span>
             </button>
           }
         </div>

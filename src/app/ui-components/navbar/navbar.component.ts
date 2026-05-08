@@ -48,9 +48,11 @@ export class NavbarComponent {
   toggleDebugModeClick = output<void>();
   backgroundTypeChange = output<BackgroundType>();
   searchNodeClick = output<string>();
+  saveTemplateClick = output<void>();
 
   isDebugMode = input.required<boolean>();
   backgroundType = input<BackgroundType>('dots');
+  canSaveTemplate = input<boolean>(false);
 
   searchQuery = signal('');
 

@@ -14,6 +14,8 @@ import {
   TABS,
 } from '../../circuit/palette-data';
 import { SidebarComponent } from '../../ui-components/sidebar/sidebar.component';
+import { TEMPLATE_DRAG_MIME } from '../services/template-drag.constants';
+import { TemplateService } from '../services/template.service';
 import { PaletteItemPreviewComponent } from './palette-item-preview/palette-item-preview.component';
 import { PaletteItemComponent } from './palette-item/palette-item.component';
 
@@ -33,6 +35,7 @@ import { PaletteItemComponent } from './palette-item/palette-item.component';
 })
 export class PaletteComponent {
   private readonly customIc = inject(CustomIcLauncherService);
+  private readonly templateService = inject(TemplateService);
 
   scale = inject(NgDiagramViewportService).scale;
 
@@ -57,11 +60,28 @@ export class PaletteComponent {
 
   sections = computed(() => groupBySection(this.filtered()));
 
+  // User-saved circuit templates — exposed in the palette so they can be
+  // dragged onto the canvas like any other component.
+  templates = this.templateService.describe;
+
+  filteredTemplates = computed(() => {
+    const q = this.query().trim().toLowerCase();
+    const list = this.templates();
+    if (!q) return list;
+    return list.filter((t) => t.name.toLowerCase().includes(q));
+  });
+
   selectTab(tab: PaletteTab) {
     this.activeTab.set(tab);
   }
 
   openCustomIc() {
     this.customIc.open();
+  }
+
+  onTemplateDragStart(event: DragEvent, templateId: string) {
+    if (!event.dataTransfer) return;
+    event.dataTransfer.setData(TEMPLATE_DRAG_MIME, templateId);
+    event.dataTransfer.effectAllowed = 'copy';
   }
 }

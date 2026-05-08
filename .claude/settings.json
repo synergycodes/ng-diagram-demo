@@ -43,7 +43,10 @@
       "Bash(grep -oE \"ng-diagram-minimap[^{}]{0,300}\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
       "Bash(grep -oE \"ng-diagram-panel[^{}]{0,200}\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
       "Bash(grep -oE \"position[^,;{}]{0,100}bottom[^,;{}]{0,100}\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
-      "Bash(grep -oE \"position\\\\\\([^\\)]{0,50}\\\\\\)\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)"
+      "Bash(grep -oE \"position\\\\\\([^\\)]{0,50}\\\\\\)\" node_modules/ng-diagram/fesm2022/ng-diagram.mjs)",
+      "Bash(grep -rn *)",
+      "Bash(grep -n *)",
+      "Bash(git add *)"
     ]
   }
 }
