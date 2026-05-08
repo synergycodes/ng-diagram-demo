@@ -1,0 +1,8 @@
+{
+  "enabledMcpjsonServers": [
+    "ng-diagram-docs",
+    "angular-cli",
+    "figma"
+  ],
+  "enableAllProjectMcpServers": true
+}
