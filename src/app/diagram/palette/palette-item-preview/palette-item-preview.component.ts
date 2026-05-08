@@ -1,40 +1,13 @@
 import { NgComponentOutlet } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-  Type,
-} from '@angular/core';
-import { NgDiagramNodeTemplate, NgDiagramPaletteItem } from 'ng-diagram';
+import { ChangeDetectionStrategy, Component, computed, input, Type } from '@angular/core';
+import { NgDiagramNodeTemplate } from 'ng-diagram';
+import { CircuitPaletteEntry } from '../../../circuit/palette-data';
 import { PaletteItemComponent } from '../palette-item/palette-item.component';
-import { PaletteData } from '../../../types';
 import { nodeTemplateMap } from '../../node-template-map';
 
 /**
- * PaletteItemPreviewComponent - Custom drag preview shown while dragging
- *
- * This demonstrates how to create a custom drag preview for ng-diagram palette items.
- *
- * Drag Preview Concepts:
- *
- * 1. Default Behavior (without custom preview):
- *    - Browser shows a ghosted copy of the dragged element
- *    - Limited styling control
- *
- * 2. Custom Preview (with NgDiagramPaletteItemPreviewComponent):
- *    - Full control over preview appearance
- *    - Can show actual node template during drag
- *    - Can scale preview to match diagram zoom
- *    - Better user experience
- *
- * Shows the actual node template using NgComponentOutlet
- * (renders the same component that will appear on the diagram)
- *
- * Template mapping:
- * - Uses nodeTemplateMap to look up the component for each node type
- * - NgComponentOutlet dynamically renders that component
- * - Component receives the item as input (via template)
+ * Drag preview that renders the actual node template, falling back to the
+ * palette card if the type is not registered (shouldn't happen in practice).
  */
 @Component({
   selector: 'app-palette-item-preview',
@@ -43,18 +16,18 @@ import { nodeTemplateMap } from '../../node-template-map';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaletteItemPreviewComponent {
-  /** The palette item being dragged */
-  item = input.required<NgDiagramPaletteItem<PaletteData>>();
+  entry = input.required<CircuitPaletteEntry>();
 
-  /**
-   * Computed: Component type for rendering the actual node template
-   *
-   * Looks up the component from nodeTemplateMap based on item.type
-   * Returns undefined if type is not found (fallback to palette item UI)
-   *
-   * See node-template-map.ts for the mapping configuration
-   */
-  componentType = computed(
-    () => nodeTemplateMap.get(this.item().type || '') as Type<NgDiagramNodeTemplate> | undefined,
-  );
+  componentType = computed(() => {
+    const type = this.entry().ngItem.type;
+    return nodeTemplateMap.get(type ?? '') as Type<NgDiagramNodeTemplate> | undefined;
+  });
+
+  /** Fake node passed as input to the rendered template. */
+  previewNode = computed(() => ({
+    id: '__preview',
+    type: this.entry().ngItem.type,
+    position: { x: 0, y: 0 },
+    data: this.entry().ngItem.data,
+  }));
 }

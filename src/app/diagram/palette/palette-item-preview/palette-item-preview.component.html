@@ -1,7 +1,5 @@
 @if (componentType()) {
-  <ng-container
-    *ngComponentOutlet="componentType() || null; inputs: { node: item() }"
-  ></ng-container>
+  <ng-container *ngComponentOutlet="componentType() || null; inputs: { node: previewNode() }" />
 } @else {
-  <app-palette-item [item]="item()" />
+  <app-palette-item [entry]="entry()" />
 }

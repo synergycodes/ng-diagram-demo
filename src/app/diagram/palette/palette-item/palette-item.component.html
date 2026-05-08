@@ -1,9 +1,9 @@
 <div class="palette-item">
   <div class="palette-item__icon">
-    <i [class]="nodeIcon()"></i>
+    <app-palette-item-icon [iconType]="entry().iconType" />
   </div>
-  <div>
-    <div class="palette-item__label">{{ nodeLabel() }}</div>
-    <div class="palette-item__description">{{ nodeDescription() }}</div>
+  <div class="palette-item__text">
+    <div class="palette-item__label">{{ entry().label }}</div>
+    <div class="palette-item__subtitle">{{ entry().subtitle }}</div>
   </div>
 </div>

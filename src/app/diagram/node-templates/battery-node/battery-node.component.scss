@@ -1,0 +1,10 @@
+@use '../component-card.scss';
+
+.component-card__pin-row {
+  top: 28px;
+  padding: 0;
+  justify-content: center;
+  gap: 26px;
+  font-weight: 600;
+  font-size: 9px;
+}

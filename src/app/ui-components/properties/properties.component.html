@@ -1,112 +1,209 @@
 <app-sidebar [position]="'right'" [collapsed]="collapsed()">
   <div sidebarHeader>Properties</div>
-  <div class="properties__form">
-    <label for="property-input" class="properties__label">Label:</label>
-    <input
-      id="property-input"
-      type="text"
-      class="properties__input"
-      [ngModel]="label()"
-      (ngModelChange)="onInputChange($event)"
-      placeholder="Enter value"
-    />
 
-    @if (edgeRouting() !== null) {
-      <label for="routing-select" class="properties__label">Routing:</label>
-      <select
-        id="routing-select"
-        class="properties__select"
-        [ngModel]="edgeRouting()"
-        (ngModelChange)="onRoutingChange($event)"
-      >
-        @for (option of routingOptions; track option.value) {
-          <option [value]="option.value">{{ option.label }}</option>
+  <!-- Node selected: type-aware properties -->
+  @if (selectedNode() && selectedNodeType()) {
+    <div class="properties-header">
+      <div class="properties-header__icon">
+        @if (iconType(); as it) {
+          <app-palette-item-icon [iconType]="it" />
         }
-      </select>
-    }
-
-    @if (edgeLabelPosition() !== null) {
-      <label for="label-position-input" class="properties__label">Label Position (0-1):</label>
-      <input
-        id="label-position-input"
-        type="number"
-        class="properties__input"
-        [ngModel]="edgeLabelPosition()"
-        (ngModelChange)="onLabelPositionChange($event)"
-        min="0"
-        max="1"
-        step="0.1"
-        placeholder="0.5"
-      />
-    }
-
-    @if (enableSnapDrag() !== null) {
-      <label class="properties__label">Snapping:</label>
-      <div class="properties__checkbox-group">
-        <div class="properties__snap-row">
-          <label class="properties__checkbox-label">
-            <input
-              type="checkbox"
-              class="properties__checkbox"
-              [ngModel]="enableSnapDrag()"
-              (ngModelChange)="onSnapDragChange($event)"
-            />
-            Drag
-          </label>
-          <input
-            type="number"
-            class="properties__snap-input"
-            [ngModel]="snapDragStep()"
-            (ngModelChange)="onSnapDragStepChange($event)"
-            [disabled]="!enableSnapDrag()"
-            placeholder="10"
-            min="1"
-            step="1"
-          />
-        </div>
-        <div class="properties__snap-row">
-          <label class="properties__checkbox-label">
-            <input
-              type="checkbox"
-              class="properties__checkbox"
-              [ngModel]="enableSnapResize()"
-              (ngModelChange)="onSnapResizeChange($event)"
-            />
-            Resize
-          </label>
-          <input
-            type="number"
-            class="properties__snap-input"
-            [ngModel]="snapResizeStep()"
-            (ngModelChange)="onSnapResizeStepChange($event)"
-            [disabled]="!enableSnapResize()"
-            placeholder="10"
-            min="1"
-            step="1"
-          />
-        </div>
-        <div class="properties__snap-row">
-          <label class="properties__checkbox-label">
-            <input
-              type="checkbox"
-              class="properties__checkbox"
-              [ngModel]="enableSnapRotate()"
-              (ngModelChange)="onSnapRotateChange($event)"
-            />
-            Rotate
-          </label>
-          <input
-            type="number"
-            class="properties__snap-input"
-            [ngModel]="snapRotateStep()"
-            (ngModelChange)="onSnapRotateStepChange($event)"
-            [disabled]="!enableSnapRotate()"
-            placeholder="30"
-            min="1"
-            step="1"
-          />
-        </div>
       </div>
-    }
-  </div>
+      <div class="properties-header__text">
+        <div class="properties-header__title">{{ data()?.reference || selectedNode()?.id }}</div>
+        <div class="properties-header__subtitle">{{ componentTypeName() }}</div>
+      </div>
+    </div>
+
+    <div class="properties__form">
+      <!-- General section -->
+      <h4 class="properties__section">General</h4>
+
+      <div class="properties__field">
+        <label class="properties__label">Reference</label>
+        <input
+          class="properties__input"
+          type="text"
+          [ngModel]="data()?.reference"
+          (ngModelChange)="update('reference', $event)"
+        />
+      </div>
+
+      <div class="properties__field">
+        <label class="properties__label">Description</label>
+        <textarea
+          class="properties__input properties__textarea"
+          [ngModel]="data()?.description ?? ''"
+          (ngModelChange)="update('description', $event)"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <!-- Resistor specs -->
+      @if (resistorData(); as r) {
+        <h4 class="properties__section">Specifications</h4>
+        <div class="properties__field">
+          <label class="properties__label">Value</label>
+          <input class="properties__input" type="text" [ngModel]="r.value"
+            (ngModelChange)="update('value', $event)" />
+        </div>
+        <div class="properties__field">
+          <label class="properties__label">Tolerance</label>
+          <input class="properties__input" type="text" [ngModel]="r.tolerance ?? ''"
+            (ngModelChange)="update('tolerance', $event)" />
+        </div>
+        <div class="properties__field">
+          <label class="properties__label">Power rating</label>
+          <input class="properties__input" type="text" [ngModel]="r.powerRating ?? ''"
+            (ngModelChange)="update('powerRating', $event)" />
+        </div>
+        <div class="properties__field">
+          <label class="properties__label">Footprint</label>
+          <input class="properties__input" type="text" [ngModel]="r.footprint ?? ''"
+            (ngModelChange)="update('footprint', $event)" />
+        </div>
+      }
+
+      <!-- Capacitor specs -->
+      @if (capacitorData(); as c) {
+        <h4 class="properties__section">Specifications</h4>
+        <div class="properties__field">
+          <label class="properties__label">Value</label>
+          <input class="properties__input" type="text" [ngModel]="c.value"
+            (ngModelChange)="update('value', $event)" />
+        </div>
+        <div class="properties__field">
+          <label class="properties__label">Voltage rating</label>
+          <input class="properties__input" type="text" [ngModel]="c.voltageRating ?? ''"
+            (ngModelChange)="update('voltageRating', $event)" />
+        </div>
+        <div class="properties__field">
+          <label class="properties__label">Footprint</label>
+          <input class="properties__input" type="text" [ngModel]="c.footprint ?? ''"
+            (ngModelChange)="update('footprint', $event)" />
+        </div>
+      }
+
+      <!-- Diode specs -->
+      @if (diodeData(); as d) {
+        <h4 class="properties__section">Specifications</h4>
+        <div class="properties__field">
+          <label class="properties__label">Model</label>
+          <input class="properties__input" type="text" [ngModel]="d.model"
+            (ngModelChange)="update('model', $event)" />
+        </div>
+        <div class="properties__field">
+          <label class="properties__label">Forward voltage</label>
+          <input class="properties__input" type="text" [ngModel]="d.forwardVoltage ?? ''"
+            (ngModelChange)="update('forwardVoltage', $event)" />
+        </div>
+      }
+
+      <!-- LED specs -->
+      @if (ledData(); as l) {
+        <h4 class="properties__section">Specifications</h4>
+        <div class="properties__field">
+          <label class="properties__label">Color</label>
+          <input class="properties__input" type="text" [ngModel]="l.color"
+            (ngModelChange)="update('color', $event)" />
+        </div>
+        <div class="properties__field">
+          <label class="properties__label">Forward voltage</label>
+          <input class="properties__input" type="text" [ngModel]="l.forwardVoltage ?? ''"
+            (ngModelChange)="update('forwardVoltage', $event)" />
+        </div>
+      }
+
+      <!-- Battery specs -->
+      @if (batteryData(); as b) {
+        <h4 class="properties__section">Specifications</h4>
+        <div class="properties__field">
+          <label class="properties__label">Voltage</label>
+          <input class="properties__input" type="text" [ngModel]="b.voltage"
+            (ngModelChange)="update('voltage', $event)" />
+        </div>
+      }
+
+      <!-- Power net (GND / VCC) -->
+      @if (powerData(); as p) {
+        <h4 class="properties__section">Net</h4>
+        <div class="properties__field">
+          <label class="properties__label">Net name</label>
+          <input class="properties__input" type="text" [ngModel]="p.netName"
+            (ngModelChange)="update('netName', $event)" />
+        </div>
+        @if (selectedNodeType() === Type.Vcc) {
+          <div class="properties__field">
+            <label class="properties__label">Voltage</label>
+            <input class="properties__input" type="text" [ngModel]="p.voltage ?? ''"
+              (ngModelChange)="update('voltage', $event)" />
+          </div>
+        }
+        @if (selectedNodeType() === Type.Gnd) {
+          <div class="properties__info">
+            0V reference point. Required in every schematic.
+          </div>
+        }
+      }
+
+      <!-- IC / Board specs + pinout -->
+      @if (icData(); as ic) {
+        <h4 class="properties__section">Specifications</h4>
+        <div class="properties__field">
+          <label class="properties__label">Model</label>
+          <input class="properties__input" type="text" [ngModel]="ic.model"
+            (ngModelChange)="update('model', $event)" />
+        </div>
+        <div class="properties__field">
+          <label class="properties__label">Package</label>
+          <input class="properties__input" type="text" [ngModel]="ic.packageType"
+            (ngModelChange)="update('packageType', $event)" />
+        </div>
+        <div class="properties__field">
+          <label class="properties__label">Supply voltage</label>
+          <input class="properties__input" type="text" [ngModel]="ic.supplyVoltage ?? ''"
+            (ngModelChange)="update('supplyVoltage', $event)" />
+        </div>
+        <div class="properties__field">
+          <label class="properties__label">Pin count</label>
+          <input class="properties__input" type="text" [value]="ic.pins.length" readonly />
+        </div>
+
+        @if (pinoutBuckets().length) {
+          <h4 class="properties__section">Pinout</h4>
+          @for (bucket of pinoutBuckets(); track bucket.title) {
+            <div class="properties__pin-bucket">
+              <div class="properties__pin-bucket-title">{{ bucket.title }}</div>
+              <div class="properties__pin-list">
+                @for (pin of bucket.pins; track pin.number) {
+                  <span class="properties__pin">
+                    <strong>{{ pin.number }}</strong> · {{ pin.name }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        }
+      }
+    </div>
+  }
+
+  <!-- Edge selected: just routing -->
+  @if (!selectedNode() && selectedEdge()) {
+    <div class="properties__form">
+      <h4 class="properties__section">Edge</h4>
+      <div class="properties__field">
+        <label class="properties__label">Routing</label>
+        <select
+          class="properties__select"
+          [ngModel]="edgeRouting()"
+          (ngModelChange)="onRoutingChange($event)"
+        >
+          @for (option of routingOptions; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  }
 </app-sidebar>

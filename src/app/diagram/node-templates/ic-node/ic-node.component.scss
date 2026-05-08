@@ -1,0 +1,101 @@
+:host {
+  display: block;
+  position: relative;
+
+  --ngd-port-background-color: var(--ngd-node-port-fill-default);
+  --ngd-port-border-color: var(--ngd-node-port-stroke-default);
+  --ngd-port-border-size: 2px;
+  --ngd-port-size: 8px;
+}
+
+.ic-node {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+
+  &__reference {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    color: var(--ngd-txt-primary-default);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    z-index: 2;
+  }
+
+  &__svg {
+    position: absolute;
+    inset: 0;
+    overflow: visible;
+  }
+
+  &__body {
+    fill: var(--ngd-node-bg-primary-default);
+    stroke: var(--ngd-txt-primary-default);
+    stroke-width: 1.5;
+  }
+
+  &__pin1-marker {
+    fill: var(--ngd-txt-primary-default);
+  }
+
+  &__pin-line {
+    stroke: var(--ngd-txt-primary-default);
+    stroke-width: 1.5;
+  }
+
+  &__pin-num {
+    fill: var(--ngd-txt-secondary-default);
+    font-size: 8px;
+    text-anchor: start;
+    font-family: 'Poppins', system-ui, sans-serif;
+
+    &--right {
+      text-anchor: end;
+    }
+  }
+
+  &__pin-name {
+    fill: var(--ngd-txt-secondary-default);
+    font-size: 8px;
+    text-anchor: start;
+    font-family: 'Poppins', system-ui, sans-serif;
+
+    &--right {
+      text-anchor: end;
+    }
+  }
+
+  &__model {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    color: var(--ngd-txt-secondary-default);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+}
+
+:host.is-board {
+  .ic-node__reference {
+    font-size: 12px;
+  }
+
+  .ic-node__model {
+    font-size: 13px;
+  }
+
+  .ic-node__pin-name {
+    font-size: 9px;
+  }
+}
+
+:host(:hover) .ic-node__body {
+  stroke: var(--ngd-node-stroke-primary-hover, #c08bff);
+}

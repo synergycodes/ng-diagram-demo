@@ -1,41 +1,46 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  output,
-  input,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SidebarComponent } from '../sidebar/sidebar.component';
 import { EdgeRoutingName } from 'ng-diagram';
+import { SidebarComponent } from '../sidebar/sidebar.component';
+import { PaletteItemIconComponent } from '../../diagram/palette/palette-item-icon/palette-item-icon.component';
+import {
+  AnyCircuitData,
+  BatteryData,
+  CapacitorData,
+  CircuitNodeType,
+  DiodeData,
+  IcData,
+  IcPin,
+  LedData,
+  PowerNetData,
+  ResistorData,
+} from '../../circuit/circuit-types';
+import { defaultIconForType } from '../../circuit/palette-icon';
+import { PropertiesFacadeService } from '../../diagram/services/properties-facade.service';
+
+interface PinoutBucket {
+  title: string;
+  pins: IcPin[];
+}
 
 @Component({
   selector: 'app-properties',
   templateUrl: './properties.component.html',
   styleUrls: ['./properties.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SidebarComponent, FormsModule],
+  imports: [SidebarComponent, FormsModule, PaletteItemIconComponent],
 })
 export class PropertiesComponent {
-  collapsed = input(true);
-  label = input<string | null>('');
-  edgeRouting = input<EdgeRoutingName | null>(null);
-  edgeLabelPosition = input<number | null>(null);
-  enableSnapDrag = input<boolean | null>(null);
-  enableSnapResize = input<boolean | null>(null);
-  enableSnapRotate = input<boolean | null>(null);
-  snapDragStep = input<number | null>(null);
-  snapResizeStep = input<number | null>(null);
-  snapRotateStep = input<number | null>(null);
+  private readonly facade = inject(PropertiesFacadeService);
 
-  labelChange = output<string>();
-  routingChange = output<EdgeRoutingName>();
-  labelPositionChange = output<number>();
-  snapDragChange = output<boolean>();
-  snapResizeChange = output<boolean>();
-  snapRotateChange = output<boolean>();
-  snapDragStepChange = output<number>();
-  snapResizeStepChange = output<number>();
-  snapRotateStepChange = output<number>();
+  collapsed = input(true);
+
+  selectedNode = this.facade.selectedNode;
+  selectedEdge = this.facade.selectedEdge;
+  selectedNodeType = this.facade.selectedNodeType;
+  edgeRouting = this.facade.edgeRouting;
+
+  readonly Type = CircuitNodeType;
 
   routingOptions: { value: EdgeRoutingName; label: string }[] = [
     { value: 'polyline', label: 'Polyline' },
@@ -43,50 +48,112 @@ export class PropertiesComponent {
     { value: 'bezier', label: 'Bezier' },
   ];
 
-  onInputChange(value: string) {
-    this.labelChange.emit(value);
+  iconType = computed(() => {
+    const t = this.selectedNodeType();
+    return t ? defaultIconForType(t) : null;
+  });
+
+  componentTypeName = computed(() => {
+    const t = this.selectedNodeType();
+    if (!t) return '';
+    switch (t) {
+      case CircuitNodeType.Resistor:
+        return 'Resistor';
+      case CircuitNodeType.Capacitor:
+        return 'Capacitor';
+      case CircuitNodeType.Diode:
+        return 'Diode';
+      case CircuitNodeType.Led:
+        return 'LED';
+      case CircuitNodeType.Battery:
+        return 'Battery';
+      case CircuitNodeType.Gnd:
+        return 'Ground';
+      case CircuitNodeType.Vcc:
+        return 'Power Source';
+      case CircuitNodeType.Ic:
+        return 'Integrated Circuit';
+      case CircuitNodeType.Board:
+        return 'Development Board';
+    }
+  });
+
+  data = computed<AnyCircuitData | null>(() => {
+    const node = this.selectedNode();
+    return node ? (node.data as AnyCircuitData) : null;
+  });
+
+  resistorData = computed(() =>
+    this.selectedNodeType() === CircuitNodeType.Resistor ? (this.data() as ResistorData | null) : null,
+  );
+  capacitorData = computed(() =>
+    this.selectedNodeType() === CircuitNodeType.Capacitor ? (this.data() as CapacitorData | null) : null,
+  );
+  diodeData = computed(() =>
+    this.selectedNodeType() === CircuitNodeType.Diode ? (this.data() as DiodeData | null) : null,
+  );
+  ledData = computed(() =>
+    this.selectedNodeType() === CircuitNodeType.Led ? (this.data() as LedData | null) : null,
+  );
+  batteryData = computed(() =>
+    this.selectedNodeType() === CircuitNodeType.Battery ? (this.data() as BatteryData | null) : null,
+  );
+  powerData = computed(() => {
+    const t = this.selectedNodeType();
+    return t === CircuitNodeType.Gnd || t === CircuitNodeType.Vcc
+      ? (this.data() as PowerNetData | null)
+      : null;
+  });
+  icData = computed(() => {
+    const t = this.selectedNodeType();
+    return t === CircuitNodeType.Ic || t === CircuitNodeType.Board
+      ? (this.data() as IcData | null)
+      : null;
+  });
+
+  pinoutBuckets = computed<PinoutBucket[]>(() => {
+    const ic = this.icData();
+    if (!ic) return [];
+    const groups: Record<string, IcPin[]> = {};
+    const push = (title: string, pin: IcPin) => {
+      (groups[title] ??= []).push(pin);
+    };
+    for (const pin of ic.pins) {
+      switch (pin.type) {
+        case 'power':
+          push('Power', pin);
+          break;
+        case 'ground':
+          push('Ground', pin);
+          break;
+        case 'analog':
+          push('Analog', pin);
+          break;
+        case 'pwm':
+          push('Digital / PWM', pin);
+          break;
+        case 'io':
+          push('Digital I/O', pin);
+          break;
+        case 'input':
+        case 'output':
+          push('Signal', pin);
+          break;
+        default:
+          push('Other', pin);
+      }
+    }
+    return Object.entries(groups).map(([title, pins]) => ({
+      title,
+      pins: pins.sort((a, b) => a.number - b.number),
+    }));
+  });
+
+  update(key: string, value: unknown) {
+    this.facade.updateNodeField(key, value);
   }
 
-  onRoutingChange(value: EdgeRoutingName) {
-    this.routingChange.emit(value);
-  }
-
-  onLabelPositionChange(value: string) {
-    const numValue = parseFloat(value);
-    if (isNaN(numValue)) return;
-
-    // Normalize to 0-1 range
-    const normalized = Math.max(0, Math.min(1, numValue));
-    this.labelPositionChange.emit(normalized);
-  }
-
-  onSnapDragChange(value: boolean) {
-    this.snapDragChange.emit(value);
-  }
-
-  onSnapResizeChange(value: boolean) {
-    this.snapResizeChange.emit(value);
-  }
-
-  onSnapRotateChange(value: boolean) {
-    this.snapRotateChange.emit(value);
-  }
-
-  onSnapDragStepChange(value: string) {
-    const numValue = parseFloat(value);
-    if (isNaN(numValue) || numValue <= 0) return;
-    this.snapDragStepChange.emit(numValue);
-  }
-
-  onSnapResizeStepChange(value: string) {
-    const numValue = parseFloat(value);
-    if (isNaN(numValue) || numValue <= 0) return;
-    this.snapResizeStepChange.emit(numValue);
-  }
-
-  onSnapRotateStepChange(value: string) {
-    const numValue = parseFloat(value);
-    if (isNaN(numValue) || numValue <= 0) return;
-    this.snapRotateStepChange.emit(numValue);
+  onRoutingChange(routing: EdgeRoutingName) {
+    this.facade.updateEdgeRouting(routing);
   }
 }

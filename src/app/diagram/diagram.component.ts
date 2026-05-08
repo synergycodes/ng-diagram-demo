@@ -1,60 +1,49 @@
 /**
- * DIAGRAM COMPONENT - Main container for ng-diagram
- * ===================================================
- *
- * This component demonstrates how to integrate ng-diagram into your Angular application.
+ * Main diagram surface for the schematics builder. Hosts the ng-diagram
+ * canvas, palette, properties sidebar, navbar, and context menu.
  */
 
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-// ng-diagram imports - Core library components and services
 import {
-  // Components
-  NgDiagramComponent, // Main diagram canvas component
-  NgDiagramBackgroundComponent, // Background patterns (dots, grid, solid)
-  NgDiagramMinimapComponent, // Minimap overview of the diagram
+  NgDiagramComponent,
+  NgDiagramBackgroundComponent,
+  NgDiagramMinimapComponent,
 
-  // Types and interfaces
-  NgDiagramNodeTemplateMap, // Map of node type -> component template
-  NgDiagramPaletteItem, // Type for palette items (drag & drop)
-  Node, // Node interface
-  EdgeRoutingName, // Edge routing types ('orthogonal', 'polyline', 'bezier')
+  NgDiagramNodeTemplateMap,
+  Node,
 
-  // Services - Key ng-diagram services for diagram manipulation
-  NgDiagramService, // Main service - initialization, config updates
-  NgDiagramSelectionService, // Manage node/edge selection
-  NgDiagramModelService, // CRUD operations on nodes and edges
-  NgDiagramViewportService, // Pan, zoom, coordinate transformations
+  NgDiagramService,
+  NgDiagramSelectionService,
+  NgDiagramModelService,
+  NgDiagramViewportService,
 
-  // Functions
-  initializeModel, // Helper to create initial diagram model
-  provideNgDiagram, // Provider function for ng-diagram (required!)
-  createMiddlewares, // Create middlewares configuration
+  initializeModel,
+  provideNgDiagram,
+  createMiddlewares,
 
-  // Event types - All available diagram events
-  DiagramInitEvent, // Fired when diagram is initialized
-  EdgeDrawEndedEvent, // Fired when edge draw gesture ends (success or cancel)
-  SelectionMovedEvent, // Fired when nodes are dragged
-  SelectionGestureEndedEvent, // Fired when a selection gesture completes (on pointerup)
-  SelectionRemovedEvent, // Fired when nodes/edges are deleted
-  GroupMembershipChangedEvent, // Fired when node group membership changes
-  SelectionRotatedEvent, // Fired when nodes are rotated
-  ViewportChangedEvent, // Fired when pan/zoom changes
-  ClipboardPastedEvent, // Fired when clipboard content is pasted
-  NodeResizedEvent, // Fired when node is resized
-  PaletteItemDroppedEvent, // Fired when palette item is dropped
+  DiagramInitEvent,
+  EdgeDrawEndedEvent,
+  SelectionMovedEvent,
+  SelectionGestureEndedEvent,
+  SelectionRemovedEvent,
+  GroupMembershipChangedEvent,
+  SelectionRotatedEvent,
+  ViewportChangedEvent,
+  ClipboardPastedEvent,
+  NodeResizedEvent,
+  PaletteItemDroppedEvent,
 } from 'ng-diagram';
 
 import { PaletteComponent } from './palette/palette.component';
 import { PropertiesComponent } from '../ui-components/properties/properties.component';
 import { NavbarComponent, BackgroundType } from '../ui-components/navbar/navbar.component';
-import { BaseNodeEdgeData, PaletteData } from '../types';
-import { paletteModel } from './palette-data';
+import { BaseNodeEdgeData } from '../types';
+import { AnyCircuitData, CircuitNodeBaseData, CircuitNodeType } from '../circuit/circuit-types';
 import { nodeTemplateMap } from './node-template-map';
 import { edgeTemplateMap } from './edge-template-map';
-import { NodeTemplateType } from './node-templates/node-template.types';
 import {
   ContextMenuComponent,
   PasteEvent,
@@ -66,7 +55,6 @@ import { DebugEventsService } from './services/debug-events.service';
 import { ContextMenuFacadeService } from './services/context-menu-facade.service';
 import { createDiagramConfig } from './services/diagram.config';
 
-// Middlewares - Plugin system for intercepting diagram state changes
 import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middleware';
 
 @Component({
@@ -75,9 +63,9 @@ import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middlewa
     CommonModule,
     PaletteComponent,
     PropertiesComponent,
-    NgDiagramComponent, // Required: Main diagram component
-    NgDiagramBackgroundComponent, // Optional: Add background patterns
-    NgDiagramMinimapComponent, // Optional: Minimap overview
+    NgDiagramComponent,
+    NgDiagramBackgroundComponent,
+    NgDiagramMinimapComponent,
     NavbarComponent,
     ContextMenuComponent,
   ],
@@ -86,7 +74,7 @@ import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middlewa
     PropertiesFacadeService,
     DebugEventsService,
     ContextMenuFacadeService,
-    provideNgDiagram(), // REQUIRED: Must include ng-diagram provider!
+    provideNgDiagram(),
   ],
   templateUrl: './diagram.component.html',
   styleUrl: './diagram.component.scss',
@@ -101,318 +89,214 @@ export class DiagramComponent {
   private readonly contextMenuService = inject(ContextMenuService);
   private readonly snackBar = inject(MatSnackBar);
 
-  private readonly propertiesFacade = inject(PropertiesFacadeService);
   private readonly debugEvents = inject(DebugEventsService);
   private readonly contextMenuFacade = inject(ContextMenuFacadeService);
 
-  // ===================================
-  // Diagram Data and Configuration
-  // ===================================
-
-  /**
-   * Palette Model - Defines draggable items from the palette
-   * Each item represents a node type that can be dragged onto the canvas
-   * See palette-data.ts for structure
-   */
-  paletteModel: NgDiagramPaletteItem<PaletteData>[] = paletteModel;
-
-  /**
-   * Node Template Map - Maps node types to Angular components
-   * When a node is rendered, ng-diagram looks up its type in this map
-   * and renders the corresponding component
-   * Example: { 'trigger': TriggerNodeComponent, 'custom': CustomNodeComponent }
-   */
   nodeTemplateMap: NgDiagramNodeTemplateMap = nodeTemplateMap;
-
-  /**
-   * Edge Template Map - Maps edge types to Angular components
-   * Similar to nodeTemplateMap but for edges
-   */
   edgeTemplateMap = edgeTemplateMap;
 
-  /**
-   * Middlewares - Plugin system for diagram state changes
-   *
-   * Middlewares intercept and can modify state changes before they reach the model.
-   * They form a pipeline where each middleware can:
-   * - Inspect changes (what nodes/edges are being added/updated/removed)
-   * - Transform data (modify positions, properties, etc.)
-   * - Validate operations (cancel invalid changes)
-   * - Add supplementary changes
-   *
-   * Example middleware: horizontal-lock
-   * - Restricts nodes with label 'horizontal' to horizontal-only movement
-   * - Demonstrates axis-locked movement constraint
-   *
-   * Middleware registration:
-   * - createMiddlewares() accepts defaults and custom middlewares
-   * - Spread ...defaults to include ng-diagram's built-in middlewares
-   * - Add custom middlewares to the array
-   *
-   * See: middlewares/horizontal-lock.middleware.ts for implementation details
-   */
-  middlewares = createMiddlewares((defaults) => [
-    horizontalLockMiddleware, // Custom middleware for horizontal movement lock
-    ...defaults, // Include ng-diagram's default middlewares
-  ]);
+  middlewares = createMiddlewares((defaults) => [horizontalLockMiddleware, ...defaults]);
 
   backgroundType = signal<BackgroundType>('dots');
   debugMode = this.debugEvents.debugMode;
   propertiesCollapsed = signal(true);
 
-  // ===================================
-  // Diagram Model Initialization
-  // ===================================
-
   /**
-   * Diagram Model - The source of truth for all nodes and edges
-   *
-   * Use initializeModel() to create the initial state.
-   * The model is a signal that ng-diagram watches for changes.
-   *
-   * User can provide their own model if it implements correct interface "ModelAdapter"
+   * Initial demo schematic — VCC → resistor → LED → GND, plus an NE555 next
+   * to it so users can see what an IC looks like.
    */
   model = initializeModel({
     nodes: [
       {
-        id: '1',
-        data: {},
-        position: { x: 100, y: 100 },
+        id: 'vcc1',
+        type: CircuitNodeType.Vcc,
+        position: { x: 80, y: 80 },
         autoSize: false,
-        size: { width: 150, height: 50 },
+        size: { width: 60, height: 80 },
+        data: {
+          label: 'VCC',
+          reference: 'PWR1',
+          netName: '+5V',
+          voltage: '5V',
+        },
       },
       {
-        id: '2',
-        data: {},
-        position: { x: 400, y: 200 },
+        id: 'r1',
+        type: CircuitNodeType.Resistor,
+        position: { x: 250, y: 240 },
         autoSize: false,
-        size: { width: 150, height: 50 },
+        size: { width: 140, height: 60 },
+        data: {
+          label: 'Resistor',
+          reference: 'R1',
+          value: '220Ω',
+          tolerance: '5%',
+          powerRating: '0.25W',
+          footprint: '0805 (SMD)',
+        },
       },
       {
-        id: '3',
-        type: NodeTemplateType.Group,
-        isGroup: true,
-        data: {},
-        position: { x: 300, y: 400 },
+        id: 'led1',
+        type: CircuitNodeType.Led,
+        position: { x: 460, y: 234 },
+        autoSize: false,
+        size: { width: 140, height: 72 },
+        data: {
+          label: 'LED',
+          reference: 'LED1',
+          color: 'Red',
+          forwardVoltage: '2.0V',
+        },
       },
       {
-        id: '4',
-        data: {},
-        position: { x: 360, y: 500 },
-        groupId: '3',
+        id: 'gnd1',
+        type: CircuitNodeType.Gnd,
+        position: { x: 690, y: 380 },
+        autoSize: false,
+        size: { width: 60, height: 80 },
+        data: {
+          label: 'GND',
+          reference: 'GND1',
+          netName: 'GND',
+        },
+      },
+      {
+        id: 'u1',
+        type: CircuitNodeType.Ic,
+        position: { x: 850, y: 100 },
+        autoSize: false,
+        size: { width: 120, height: 120 },
+        data: {
+          label: 'NE555',
+          reference: 'U1',
+          model: 'NE555',
+          packageType: 'DIP-8',
+          supplyVoltage: '4.5V – 16V',
+          variant: 'dip',
+          pins: [
+            { number: 1, name: 'GND', side: 'left', type: 'ground' },
+            { number: 2, name: 'TRIG', side: 'left', type: 'input' },
+            { number: 3, name: 'OUT', side: 'left', type: 'output' },
+            { number: 4, name: 'RST', side: 'left', type: 'input' },
+            { number: 5, name: 'CTRL', side: 'right', type: 'input' },
+            { number: 6, name: 'THR', side: 'right', type: 'input' },
+            { number: 7, name: 'DIS', side: 'right', type: 'output' },
+            { number: 8, name: 'VCC', side: 'right', type: 'power' },
+          ],
+        },
       },
     ],
     edges: [
       {
-        id: '1',
-        source: '1',
-        target: '2',
-        sourcePort: 'port-right', // Must match port IDs in node template
-        targetPort: 'port-left', // Must match port IDs in node template
-        targetArrowhead: 'ng-diagram-arrow', // Built-in arrowhead
-        routing: 'bezier', // Line routing algorithm
-        type: 'custom-edge', // Must match edgeTemplateMap key for custom label rendering
-        data: { label: 'label' },
-
-        // Advanced: Manual routing with custom points
-        // Uncomment to override automatic routing:
-        // routingMode: 'manual',
-        // points: [
-        //   { x: 250, y: 125 },
-        //   { x: 300, y: 50 },
-        //   { x: 350, y: 250 },
-        //   { x: 400, y: 225 },
-        // ],
+        id: 'e1',
+        source: 'r1',
+        sourcePort: 'port-b',
+        target: 'led1',
+        targetPort: 'port-anode',
+        data: {},
       },
     ],
   });
 
-  /**
-   * Diagram Configuration - Customize diagram behavior
-   */
-  config = createDiagramConfig(this.initializeMinNodeSizes());
+  config = createDiagramConfig(new Map());
 
-  label = this.propertiesFacade.label;
-  edgeRouting = this.propertiesFacade.edgeRouting;
-  edgeLabelPosition = this.propertiesFacade.edgeLabelPosition;
-  enableSnapDrag = this.propertiesFacade.enableSnapDrag;
-  enableSnapResize = this.propertiesFacade.enableSnapResize;
-  enableSnapRotate = this.propertiesFacade.enableSnapRotate;
-  snapDragStep = this.propertiesFacade.snapDragStep;
-  snapResizeStep = this.propertiesFacade.snapResizeStep;
-  snapRotateStep = this.propertiesFacade.snapRotateStep;
+  /** Counter per reference prefix used to auto-name dropped components. */
+  private referenceCounters = new Map<string, number>();
 
   constructor() {
-    /**
-     * Reactive Configuration Updates
-     * When debugMode changes, update the diagram config automatically
-     */
     effect(() => {
       if (this.diagramService.isInitialized()) {
         this.diagramService.updateConfig({ debugMode: this.debugMode() });
       }
     });
+
+    // Seed counters from initial model so we don't collide with R1, LED1, U1, etc.
+    this.seedReferenceCountersFromModel();
+  }
+
+  /** ng-diagram fires this after a palette item is dropped onto the canvas. */
+  onPaletteItemDropped(event: PaletteItemDroppedEvent) {
+    this.debugEvents.onPaletteItemDropped(event);
+    this.assignAutoReference(event.node as Node<AnyCircuitData>);
+  }
+
+  private assignAutoReference(node: Node<AnyCircuitData>) {
+    const data = node.data as AnyCircuitData & { reference?: string };
+    if (!data || !data.reference) return;
+
+    // Reference value from palette is "R?", "C?", "U?", etc. Replace ? with a counter.
+    const match = data.reference.match(/^([A-Za-z]+)\??$/);
+    if (!match) return;
+
+    const prefix = match[1];
+    const next = (this.referenceCounters.get(prefix) ?? 0) + 1;
+    this.referenceCounters.set(prefix, next);
+
+    const newReference = `${prefix}${next}`;
+    this.diagramModelService.updateNodeData(node.id, { ...data, reference: newReference });
+  }
+
+  private seedReferenceCountersFromModel() {
+    const nodes = this.diagramModelService.nodes() as Node<AnyCircuitData>[];
+    for (const n of nodes) {
+      const ref = (n.data as AnyCircuitData)?.reference;
+      if (!ref) continue;
+      const m = ref.match(/^([A-Za-z]+)(\d+)$/);
+      if (!m) continue;
+      const [, prefix, numStr] = m;
+      const num = Number(numStr);
+      const cur = this.referenceCounters.get(prefix) ?? 0;
+      if (num > cur) this.referenceCounters.set(prefix, num);
+    }
   }
 
   // ===================================
-  // ng-diagram Event Handlers
+  // ng-diagram event handlers (debug logging only — main app reacts via services)
   // ===================================
-  // These events allow you to react to diagram interactions
-  // All events are optional - only implement what you need
 
-  /**
-   * DiagramInitEvent - Fired once when diagram finishes initialization
-   */
   onDiagramInit(event: DiagramInitEvent) {
     this.debugEvents.onDiagramInit(event);
+    this.seedReferenceCountersFromModel();
   }
-
-  /**
-   * EdgeDrawEndedEvent - Fired when an edge draw gesture ends (success or cancel)
-   * event.success indicates whether an edge was created
-   * event.edge contains the newly created edge (when successful)
-   */
   onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
     this.debugEvents.onEdgeDrawEnded(event);
   }
-
-  /**
-   * SelectionMovedEvent - Fired when nodes are dragged
-   * event.nodes contains all moved nodes with new positions
-   */
   onSelectionMoved(event: SelectionMovedEvent) {
     this.debugEvents.onSelectionMoved(event);
   }
-
-  /**
-   * SelectionGestureEndedEvent - Fired when a selection gesture completes (on pointerup)
-   * event.nodes and event.edges contain the current selection
-   */
   onSelectionGestureEnded(event: SelectionGestureEndedEvent) {
     this.propertiesCollapsed.set(event.nodes.length === 0 && event.edges.length === 0);
     this.debugEvents.onSelectionGestureEnded(event);
   }
-
-  /**
-   * SelectionRemovedEvent - Fired when nodes/edges are deleted
-   * event.deletedNodes and event.deletedEdges contain deleted items
-   */
   onSelectionRemoved(event: SelectionRemovedEvent) {
     this.debugEvents.onSelectionRemoved(event);
   }
-
-  /**
-   * GroupMembershipChangedEvent - Fired when nodes join/leave groups
-   */
   onGroupMembershipChanged(event: GroupMembershipChangedEvent) {
     this.debugEvents.onGroupMembershipChanged(event);
   }
-
-  /**
-   * SelectionRotatedEvent - Fired when nodes are rotated
-   * event.angle contains the new rotation angle
-   */
   onSelectionRotated(event: SelectionRotatedEvent) {
     this.debugEvents.onSelectionRotated(event);
   }
-
-  /**
-   * ViewportChangedEvent - Fired when pan or zoom changes
-   * event.viewport contains { x, y, scale }
-   */
   onViewportChanged(event: ViewportChangedEvent) {
     this.debugEvents.onViewportChanged(event);
   }
-
-  /**
-   * ClipboardPastedEvent - Fired when content is pasted
-   * event.nodes and event.edges contain pasted items
-   */
   onClipboardPasted(event: ClipboardPastedEvent) {
     this.debugEvents.onClipboardPasted(event);
   }
-
-  /**
-   * NodeResizedEvent - Fired when a node is resized
-   * event.node.size contains new dimensions
-   */
   onNodeResized(event: NodeResizedEvent) {
     this.debugEvents.onNodeResized(event);
   }
 
-  /**
-   * PaletteItemDroppedEvent - Fired when palette item is dropped
-   * event.node contains the newly created node from palette
-   */
-  onPaletteItemDropped(event: PaletteItemDroppedEvent) {
-    this.debugEvents.onPaletteItemDropped(event);
-  }
-
-  labelChange(label: string) {
-    this.propertiesFacade.updateLabel(label);
-  }
-
-  routingChange(routing: EdgeRoutingName) {
-    this.propertiesFacade.updateRouting(routing);
-  }
-
-  labelPositionChange(positionOnEdge: number) {
-    this.propertiesFacade.updateLabelPosition(positionOnEdge);
-  }
-
-  snapDragChange(enableSnapDrag: boolean) {
-    this.propertiesFacade.updateSnapDrag(enableSnapDrag);
-  }
-
-  snapResizeChange(enableSnapResize: boolean) {
-    this.propertiesFacade.updateSnapResize(enableSnapResize);
-  }
-
-  snapRotateChange(enableSnapRotate: boolean) {
-    this.propertiesFacade.updateSnapRotate(enableSnapRotate);
-  }
-
-  snapDragStepChange(snapDragStep: number) {
-    this.propertiesFacade.updateSnapDragStep(snapDragStep);
-  }
-
-  snapResizeStepChange(snapResizeStep: number) {
-    this.propertiesFacade.updateSnapResizeStep(snapResizeStep);
-  }
-
-  snapRotateStepChange(snapRotateStep: number) {
-    this.propertiesFacade.updateSnapRotateStep(snapRotateStep);
-  }
-
-  onContextMenuCopy() {
-    this.contextMenuFacade.copy();
-  }
-
-  onContextMenuCut() {
-    this.contextMenuFacade.cut();
-  }
-
-  onContextMenuPaste(event: PasteEvent) {
-    this.contextMenuFacade.paste(event);
-  }
-
-  onContextMenuDelete() {
-    this.contextMenuFacade.delete();
-  }
-
-  onContextMenuBringToFront() {
-    this.contextMenuFacade.bringToFront();
-  }
-
-  onContextMenuSendToBack() {
-    this.contextMenuFacade.sendToBack();
-  }
+  onContextMenuCopy() { this.contextMenuFacade.copy(); }
+  onContextMenuCut() { this.contextMenuFacade.cut(); }
+  onContextMenuPaste(event: PasteEvent) { this.contextMenuFacade.paste(event); }
+  onContextMenuDelete() { this.contextMenuFacade.delete(); }
+  onContextMenuBringToFront() { this.contextMenuFacade.bringToFront(); }
+  onContextMenuSendToBack() { this.contextMenuFacade.sendToBack(); }
 
   onDiagramRightClick(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
-
-    // Transform screen coordinates to diagram coordinates
     const cursorPosition = this.viewportService.clientToFlowViewportPosition({
       x: event.clientX,
       y: event.clientY,
@@ -420,48 +304,20 @@ export class DiagramComponent {
     this.contextMenuService.showDiagramMenu(cursorPosition);
   }
 
+  /** Search a node by reference designator (e.g. "R1") or label, then center on it. */
   onSearchNode(query: string) {
-    // Access all nodes from the model
-    const nodes = this.diagramModelService.nodes() as Node<BaseNodeEdgeData>[];
-
-    // Find node by label (case-insensitive substring match)
-    const foundNode = nodes.find((node) => {
-      const label = node.data.label || node.id;
-      return label.toLowerCase().includes(query.toLowerCase());
+    const nodes = this.diagramModelService.nodes() as Node<CircuitNodeBaseData & BaseNodeEdgeData>[];
+    const q = query.toLowerCase();
+    const found = nodes.find((n) => {
+      const ref = n.data.reference?.toLowerCase() ?? '';
+      const label = n.data.label?.toLowerCase() ?? '';
+      return ref.includes(q) || label.includes(q);
     });
-
-    if (foundNode) {
-      // Programmatically select the node
-      this.diagramSelectionService.select([foundNode.id]);
-
-      // Center viewport on the node
-      this.viewportService.centerOnNode(foundNode.id);
+    if (found) {
+      this.diagramSelectionService.select([found.id]);
+      this.viewportService.centerOnNode(found.id);
     } else {
-      this.snackBar.open(`No node found matching "${query}"`, '', {
-        duration: 3000,
-      });
+      this.snackBar.open(`No component found matching "${query}"`, '', { duration: 3000 });
     }
-  }
-
-  /**
-   * Initialize Minimum Node Sizes
-   * Reads CSS custom properties to set minimum sizes per node type
-   * This ensures nodes can't be resized smaller than their content
-   */
-  private initializeMinNodeSizes(): Map<string, { width: number; height: number }> {
-    const style = getComputedStyle(document.documentElement);
-    const nodeTypes = [NodeTemplateType.Trigger, NodeTemplateType.Custom, NodeTemplateType.Group];
-
-    const map = new Map(
-      nodeTypes.map((type) => [
-        type,
-        {
-          width: parseInt(style.getPropertyValue(`--node-${type}-min-width`)),
-          height: parseInt(style.getPropertyValue(`--node-${type}-min-height`)),
-        },
-      ]),
-    );
-
-    return map;
   }
 }

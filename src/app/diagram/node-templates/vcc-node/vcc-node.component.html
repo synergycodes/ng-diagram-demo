@@ -1,0 +1,9 @@
+<ng-diagram-node-rotate-adornment />
+<div class="power-card" (contextmenu)="onRightClick($event)">
+  <div class="power-card__label">{{ netName() }}</div>
+  <svg class="power-card__symbol" viewBox="0 0 60 64" preserveAspectRatio="xMidYMin meet">
+    <polygon points="30,4 18,22 42,22" fill="currentColor" />
+    <line x1="30" y1="22" x2="30" y2="64" />
+  </svg>
+</div>
+<ng-diagram-port id="port-net" type="source" side="bottom" />

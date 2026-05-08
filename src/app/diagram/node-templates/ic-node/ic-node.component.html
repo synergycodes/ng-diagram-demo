@@ -1,0 +1,106 @@
+<ng-diagram-node-rotate-adornment />
+<div class="ic-node" (contextmenu)="onRightClick($event)">
+  <span class="ic-node__reference">{{ reference() }}</span>
+
+  <svg
+    class="ic-node__svg"
+    [attr.width]="nodeWidth()"
+    [attr.height]="nodeHeight()"
+    [attr.viewBox]="'0 0 ' + nodeWidth() + ' ' + nodeHeight()"
+  >
+    <!-- Body -->
+    <rect
+      class="ic-node__body"
+      [class.ic-node__body--board]="isBoard()"
+      [attr.x]="bodyOffsetX()"
+      [attr.y]="bodyOffsetY()"
+      [attr.width]="bodyWidth()"
+      [attr.height]="bodyHeight()"
+      [attr.rx]="bodyRadius()"
+    />
+
+    <!-- Pin 1 marker (DIP only) -->
+    @if (showPin1Marker()) {
+      <circle
+        class="ic-node__pin1-marker"
+        [attr.cx]="bodyOffsetX() + 6"
+        [attr.cy]="bodyOffsetY() + 6"
+        r="2"
+      />
+    }
+
+    <!-- Left pin lines + numbers + names -->
+    @for (lp of leftPositions(); track lp.pin.number) {
+      <line
+        class="ic-node__pin-line"
+        [attr.x1]="0"
+        [attr.y1]="lp.y"
+        [attr.x2]="bodyOffsetX()"
+        [attr.y2]="lp.y"
+      />
+      @if (showPin1Marker()) {
+        <text
+          class="ic-node__pin-num"
+          [attr.x]="bodyOffsetX() + 5"
+          [attr.y]="lp.y - 1"
+        >{{ lp.pin.number }}</text>
+      }
+      <text
+        class="ic-node__pin-name"
+        [attr.x]="bodyOffsetX() + (showPin1Marker() ? 5 : 6)"
+        [attr.y]="lp.y + (showPin1Marker() ? 9 : 3)"
+      >{{ lp.pin.name }}</text>
+    }
+
+    <!-- Right pin lines + numbers + names -->
+    @for (rp of rightPositions(); track rp.pin.number) {
+      <line
+        class="ic-node__pin-line"
+        [attr.x1]="bodyOffsetX() + bodyWidth()"
+        [attr.y1]="rp.y"
+        [attr.x2]="nodeWidth()"
+        [attr.y2]="rp.y"
+      />
+      @if (showPin1Marker()) {
+        <text
+          class="ic-node__pin-num ic-node__pin-num--right"
+          [attr.x]="bodyOffsetX() + bodyWidth() - 5"
+          [attr.y]="rp.y - 1"
+        >{{ rp.pin.number }}</text>
+      }
+      <text
+        class="ic-node__pin-name ic-node__pin-name--right"
+        [attr.x]="bodyOffsetX() + bodyWidth() - (showPin1Marker() ? 5 : 6)"
+        [attr.y]="rp.y + (showPin1Marker() ? 9 : 3)"
+      >{{ rp.pin.name }}</text>
+    }
+  </svg>
+
+  <!-- Model name centered inside body -->
+  <span
+    class="ic-node__model"
+    [style.top.px]="modelLabelTop()"
+  >{{ model() }}</span>
+
+  <!-- Ports — left side -->
+  @for (lp of leftPositions(); track lp.pin.number) {
+    <ng-diagram-port
+      [id]="portId(lp.pin)"
+      type="both"
+      side="left"
+      originPoint="centerLeft"
+      [style.top.px]="lp.y"
+    />
+  }
+
+  <!-- Ports — right side -->
+  @for (rp of rightPositions(); track rp.pin.number) {
+    <ng-diagram-port
+      [id]="portId(rp.pin)"
+      type="both"
+      side="right"
+      originPoint="centerRight"
+      [style.top.px]="rp.y"
+    />
+  }
+</div>

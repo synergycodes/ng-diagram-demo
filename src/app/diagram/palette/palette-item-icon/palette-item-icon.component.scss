@@ -1,0 +1,16 @@
+:host {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  color: var(--ngd-txt-primary-default);
+  stroke: var(--ngd-txt-primary-default);
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

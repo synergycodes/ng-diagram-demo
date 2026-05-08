@@ -1,0 +1,17 @@
+<ng-diagram-node-rotate-adornment />
+<div class="component-card" (contextmenu)="onRightClick($event)">
+  <div class="component-card__reference">{{ reference() }}</div>
+  <svg class="component-card__symbol" viewBox="0 0 140 24" preserveAspectRatio="none">
+    <line x1="0" y1="12" x2="60" y2="12" />
+    <polygon points="60,2 60,22 80,12" fill="currentColor" />
+    <line x1="80" y1="2" x2="80" y2="22" />
+    <line x1="80" y1="12" x2="140" y2="12" />
+  </svg>
+  <div class="component-card__pin-row">
+    <span>A</span>
+    <span>K</span>
+  </div>
+  <div class="component-card__value">{{ model() }}</div>
+</div>
+<ng-diagram-port id="port-anode" type="both" side="left" />
+<ng-diagram-port id="port-cathode" type="both" side="right" />

@@ -29,28 +29,8 @@
     [isDebugMode]="debugMode()"
     [backgroundType]="backgroundType()"
   />
-  <app-palette [model]="paletteModel" />
-  <app-properties
-    [collapsed]="propertiesCollapsed()"
-    [label]="label()"
-    [edgeRouting]="edgeRouting()"
-    [edgeLabelPosition]="edgeLabelPosition()"
-    [enableSnapDrag]="enableSnapDrag()"
-    [enableSnapResize]="enableSnapResize()"
-    [enableSnapRotate]="enableSnapRotate()"
-    [snapDragStep]="snapDragStep()"
-    [snapResizeStep]="snapResizeStep()"
-    [snapRotateStep]="snapRotateStep()"
-    (labelChange)="labelChange($event)"
-    (routingChange)="routingChange($event)"
-    (labelPositionChange)="labelPositionChange($event)"
-    (snapDragChange)="snapDragChange($event)"
-    (snapResizeChange)="snapResizeChange($event)"
-    (snapRotateChange)="snapRotateChange($event)"
-    (snapDragStepChange)="snapDragStepChange($event)"
-    (snapResizeStepChange)="snapResizeStepChange($event)"
-    (snapRotateStepChange)="snapRotateStepChange($event)"
-  />
+  <app-palette />
+  <app-properties [collapsed]="propertiesCollapsed()" />
   <app-context-menu
     (copyClick)="onContextMenuCopy()"
     (cutClick)="onContextMenuCut()"

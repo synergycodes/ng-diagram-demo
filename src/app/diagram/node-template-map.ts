@@ -1,36 +1,26 @@
 import { NgDiagramNodeTemplateMap } from 'ng-diagram';
-import { GroupNodeComponent } from './node-templates/group-node/group-node.component';
-import { CustomNodeComponent } from './node-templates/custom-node/custom-node.component';
-import { TriggerNodeComponent } from './node-templates/trigger-node/trigger-node.component';
-import { NodeTemplateType } from './node-templates/node-template.types';
+import { CircuitNodeType } from '../circuit/circuit-types';
+import { ResistorNodeComponent } from './node-templates/resistor-node/resistor-node.component';
+import { CapacitorNodeComponent } from './node-templates/capacitor-node/capacitor-node.component';
+import { DiodeNodeComponent } from './node-templates/diode-node/diode-node.component';
+import { LedNodeComponent } from './node-templates/led-node/led-node.component';
+import { BatteryNodeComponent } from './node-templates/battery-node/battery-node.component';
+import { GndNodeComponent } from './node-templates/gnd-node/gnd-node.component';
+import { VccNodeComponent } from './node-templates/vcc-node/vcc-node.component';
+import { IcNodeComponent } from './node-templates/ic-node/ic-node.component';
 
 /**
- * Node Template Map - Maps node types to Angular components
- *
- * How it works:
- * 1. Each node has a 'type' property (e.g., 'trigger', 'custom', 'group')
- * 2. ng-diagram looks up the type in this map to find the component class
- * 3. The component is dynamically rendered for that node
- * 4. The node data is passed to the component via input signal
- *
- * Usage:
- * Pass this map to the ng-diagram component via [nodeTemplateMap] input:
- * <ng-diagram [nodeTemplateMap]="nodeTemplateMap" />
- *
- * Node Component Requirements:
- * - Must implement NgDiagramNodeTemplate<TData> interface
- * - Must have a 'node' input signal of type Node<TData>
- * - Can use ng-diagram directives like:
- *   - NgDiagramPortComponent for connection points
- *   - NgDiagramNodeResizeAdornmentComponent for resize handles
- *   - NgDiagramNodeRotateAdornmentComponent for rotation handle
- *   - NgDiagramNodeSelectedDirective for selection styling
- *
- * Default Behavior:
- * If a node has no type or type is not in map, ng-diagram uses a default node template
+ * Maps every circuit node type to the Angular component that renders it.
+ * `Ic` and `Board` reuse the same component, switching layout via `data.variant`.
  */
 export const nodeTemplateMap = new NgDiagramNodeTemplateMap([
-  [NodeTemplateType.Trigger, TriggerNodeComponent],
-  [NodeTemplateType.Custom, CustomNodeComponent],
-  [NodeTemplateType.Group, GroupNodeComponent],
+  [CircuitNodeType.Resistor, ResistorNodeComponent],
+  [CircuitNodeType.Capacitor, CapacitorNodeComponent],
+  [CircuitNodeType.Diode, DiodeNodeComponent],
+  [CircuitNodeType.Led, LedNodeComponent],
+  [CircuitNodeType.Battery, BatteryNodeComponent],
+  [CircuitNodeType.Gnd, GndNodeComponent],
+  [CircuitNodeType.Vcc, VccNodeComponent],
+  [CircuitNodeType.Ic, IcNodeComponent],
+  [CircuitNodeType.Board, IcNodeComponent],
 ]);

@@ -1,0 +1,41 @@
+:host {
+  display: block;
+  width: 60px;
+  height: 80px;
+
+  --ngd-port-background-color: var(--ngd-node-port-fill-default);
+  --ngd-port-border-color: var(--ngd-node-port-stroke-default);
+  --ngd-port-border-size: 2px;
+  --ngd-port-size: 8px;
+}
+
+.power-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+
+  &__symbol {
+    width: 60px;
+    height: 64px;
+    stroke: var(--ngd-txt-primary-default);
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+  }
+
+  &__label {
+    margin-top: 2px;
+    color: var(--ngd-txt-secondary-default);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+  }
+}
+
+:host(:hover) .power-card__symbol {
+  stroke: var(--ngd-node-stroke-primary-hover, #c08bff);
+}

@@ -1,0 +1,81 @@
+// Shared styles for two-port discrete schematic nodes (resistor, capacitor,
+// diode, LED, battery). Each node is a 140x60 (or 140x72 for LED) card with
+// a reference label on top, the schematic symbol in the middle, and a value
+// label below. Ports auto-position on the left/right edges.
+
+:host {
+  display: block;
+  width: 140px;
+  height: 60px;
+
+  --ngd-port-background-color: var(--ngd-node-port-fill-default);
+  --ngd-port-border-color: var(--ngd-node-port-stroke-default);
+  --ngd-port-border-size: 2px;
+  --ngd-port-size: 8px;
+}
+
+.component-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0;
+  user-select: none;
+
+  &__reference {
+    color: var(--ngd-txt-primary-default);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  &__symbol {
+    width: 100%;
+    height: 24px;
+    stroke: var(--ngd-txt-primary-default);
+    stroke-width: 1.5;
+    fill: none;
+
+    line,
+    polyline,
+    polygon,
+    path {
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  }
+
+  &__value,
+  &__pin-label {
+    color: var(--ngd-txt-secondary-default);
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  &__pin-row {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 30px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 6px;
+    pointer-events: none;
+    color: var(--ngd-txt-secondary-default);
+    font-size: 8px;
+    font-weight: 400;
+  }
+}
+
+// Selection styling — relies on NgDiagramNodeSelectedDirective adding the class.
+:host([data-selected='true']) .component-card__symbol {
+  stroke: var(--ngd-node-stroke-primary-hover, #c08bff);
+}
+
+:host(:hover) .component-card__symbol {
+  stroke: var(--ngd-node-stroke-primary-hover, #c08bff);
+}

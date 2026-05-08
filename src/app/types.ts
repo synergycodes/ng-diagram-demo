@@ -1,11 +1,11 @@
 export type Size = 'xlarge' | 'large' | 'medium' | 'small' | 'xsmall';
 
-export interface PaletteData extends BaseNodeEdgeData {
-  description: string;
-  icon: string;
-  status?: StatusType;
-}
-
+/**
+ * Loose duck-type used by middleware / config callbacks that just need access
+ * to common per-node fields (label, snap settings). Each circuit-specific data
+ * interface lives in `circuit/circuit-types.ts` and is structurally compatible
+ * with this — there is no nominal relationship.
+ */
 export interface BaseNodeEdgeData {
   label: string;
   positionOnEdge?: number;
@@ -16,5 +16,3 @@ export interface BaseNodeEdgeData {
   snapResizeStep?: number;
   snapRotateStep?: number;
 }
-
-export type StatusType = 'pending' | 'in-progress' | 'completed' | 'blocked';

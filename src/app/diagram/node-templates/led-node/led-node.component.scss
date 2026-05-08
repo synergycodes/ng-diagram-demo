@@ -1,0 +1,10 @@
+@use '../component-card.scss';
+
+:host {
+  height: 72px;
+}
+
+.component-card__symbol {
+  height: 36px;
+  color: var(--ngd-txt-primary-default);
+}

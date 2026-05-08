@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp *)",
+      "WebFetch(domain:www.figma.com)",
+      "Bash(cat ~/.claude.json 2>/dev/null | grep -i figma | head -20; echo \"---\"; cat ~/.claude/settings.json 2>/dev/null | grep -i figma; echo \"---\"; cat /Users/jacek/synergy/ng-circuit-builder/.claude/settings.json 2>/dev/null | grep -i figma; echo \"---\"; ls ~/.claude/mcp* 2>/dev/null; echo \"---\"; claude mcp list 2>/dev/null | head -30)",
+      "Read(//Users/jacek/**)",
+      "Read(//Users/jacek/.claude/**)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); mcp=d.get\\('mcpServers',{}\\); print\\('USER mcpServers:', list\\(mcp.keys\\(\\)\\)\\); proj=d.get\\('projects',{}\\).get\\('/Users/jacek/synergy/ng-circuit-builder',{}\\); print\\('PROJECT keys:', list\\(proj.keys\\(\\)\\)\\); print\\('PROJECT mcpServers:', list\\(proj.get\\('mcpServers',{}\\).keys\\(\\)\\)\\); print\\('enabledMcpjsonServers:', proj.get\\('enabledMcpjsonServers'\\)\\); print\\('enableAllProjectMcpServers:', proj.get\\('enableAllProjectMcpServers'\\)\\); print\\('disabledMcpjsonServers:', proj.get\\('disabledMcpjsonServers'\\)\\)\")",
+      "mcp__claude_ai_Figma__get_screenshot",
+      "mcp__claude_ai_Figma__get_design_context",
+      "Bash(git -C /Users/jacek/synergy/ng-circuit-builder log --oneline -15)",
+      "mcp__ngdiagram__search_docs",
+      "mcp__ngdiagram__search_symbols",
+      "mcp__ngdiagram__get_symbol",
+      "Bash(npx tsc *)",
+      "Bash(npx ng *)",
+      "Bash(npm start *)"
+    ]
+  }
+}

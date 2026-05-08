@@ -1,0 +1,13 @@
+<ng-diagram-node-rotate-adornment />
+<div class="component-card" (contextmenu)="onRightClick($event)">
+  <div class="component-card__reference">{{ reference() }}</div>
+  <svg class="component-card__symbol" viewBox="0 0 140 24" preserveAspectRatio="none">
+    <line x1="0" y1="12" x2="64" y2="12" />
+    <line x1="64" y1="2" x2="64" y2="22" />
+    <line x1="76" y1="2" x2="76" y2="22" />
+    <line x1="76" y1="12" x2="140" y2="12" />
+  </svg>
+  <div class="component-card__value">{{ value() }}</div>
+</div>
+<ng-diagram-port id="port-a" type="both" side="left" />
+<ng-diagram-port id="port-b" type="both" side="right" />
