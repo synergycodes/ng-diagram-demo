@@ -2,17 +2,18 @@
 <div class="component-card" (contextmenu)="onRightClick($event)">
   <div class="component-card__reference">{{ reference() }}</div>
   <svg class="component-card__symbol" viewBox="0 0 140 36" preserveAspectRatio="none">
-    <line x1="0" y1="24" x2="60" y2="24" />
-    <polygon points="60,14 60,34 80,24" fill="currentColor" />
-    <line x1="80" y1="14" x2="80" y2="34" />
-    <line x1="80" y1="24" x2="140" y2="24" />
-    <!-- LED arrows -->
-    <line x1="76" y1="10" x2="86" y2="0" />
-    <polyline points="83,0 86,0 86,3" />
-    <line x1="86" y1="10" x2="96" y2="0" />
-    <polyline points="93,0 96,0 96,3" />
+    <!-- wires + diode body, all centered on the SVG midline (y=18) -->
+    <line x1="0" y1="18" x2="60" y2="18" />
+    <polygon points="60,8 60,28 80,18" fill="currentColor" />
+    <line x1="80" y1="8" x2="80" y2="28" />
+    <line x1="80" y1="18" x2="140" y2="18" />
+    <!-- LED arrows above the diode body -->
+    <line x1="74" y1="6" x2="82" y2="0" />
+    <polyline points="79,0 82,0 82,3" />
+    <line x1="80" y1="6" x2="88" y2="0" />
+    <polyline points="85,0 88,0 88,3" />
   </svg>
   <div class="component-card__value">{{ details() }}</div>
 </div>
-<ng-diagram-port id="port-anode" type="both" side="left" />
-<ng-diagram-port id="port-cathode" type="both" side="right" />
+<ng-diagram-port id="port-anode" type="both" side="left" originPoint="center" [class.is-connected]="isConnected('port-anode')" />
+<ng-diagram-port id="port-cathode" type="both" side="right" originPoint="center" [class.is-connected]="isConnected('port-cathode')" />

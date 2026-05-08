@@ -3,17 +3,13 @@
   <div class="component-card__reference">{{ reference() }}</div>
   <svg class="component-card__symbol" viewBox="0 0 140 24" preserveAspectRatio="none">
     <line x1="0" y1="12" x2="62" y2="12" />
-    <!-- long plate (positive) -->
     <line x1="62" y1="2" x2="62" y2="22" />
-    <!-- short plate (negative) -->
     <line x1="70" y1="6" x2="70" y2="18" />
     <line x1="70" y1="12" x2="140" y2="12" />
+    <text x="58" y="9" text-anchor="end" class="terminal-label">+</text>
+    <text x="74" y="9" class="terminal-label">−</text>
   </svg>
-  <div class="component-card__pin-row">
-    <span>+</span>
-    <span style="margin-right: 60px;">−</span>
-  </div>
   <div class="component-card__value">{{ voltage() }}</div>
 </div>
-<ng-diagram-port id="port-pos" type="both" side="left" />
-<ng-diagram-port id="port-neg" type="both" side="right" />
+<ng-diagram-port id="port-pos" type="both" side="left" originPoint="center" [class.is-connected]="isConnected('port-pos')" />
+<ng-diagram-port id="port-neg" type="both" side="right" originPoint="center" [class.is-connected]="isConnected('port-neg')" />

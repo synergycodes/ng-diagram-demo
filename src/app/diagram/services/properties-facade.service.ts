@@ -72,10 +72,10 @@ export class PropertiesFacadeService {
   // Snap controls — kept for power users; only show for nodes.
   enableSnapDrag = computed(() => this.readNodeFlag('enableSnapDrag', false));
   enableSnapResize = computed(() => this.readNodeFlag('enableSnapResize', false));
-  enableSnapRotate = computed(() => this.readNodeFlag('enableSnapRotate', false));
+  enableSnapRotate = computed(() => this.readNodeFlag('enableSnapRotate', true));
   snapDragStep = computed(() => this.readNodeFlag('snapDragStep', 10));
   snapResizeStep = computed(() => this.readNodeFlag('snapResizeStep', 10));
-  snapRotateStep = computed(() => this.readNodeFlag('snapRotateStep', 30));
+  snapRotateStep = computed(() => this.readNodeFlag('snapRotateStep', 90));
 
   private readNodeFlag<T>(key: keyof CircuitNodeBaseData, fallback: T): T {
     const node = this.selectedNode();

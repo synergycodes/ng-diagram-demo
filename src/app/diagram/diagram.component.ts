@@ -59,6 +59,10 @@ import { ReferenceCounterService } from './services/reference-counter.service';
 import { TemplateService } from './services/template.service';
 import { SaveTemplateDialogComponent } from './services/save-template-dialog.component';
 import { TEMPLATE_DRAG_MIME } from './services/template-drag.constants';
+import { CustomIcLauncherService } from '../circuit/custom-ic-launcher.service';
+import { AiAgentService } from '../ai/services/ai-agent.service';
+import { DiagramAgentToolsService } from '../ai/services/diagram-agent-tools.service';
+import { AiWidgetComponent } from '../ai/ai-widget/ai-widget.component';
 
 import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middleware';
 
@@ -73,6 +77,7 @@ import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middlewa
     NgDiagramMinimapComponent,
     NavbarComponent,
     ContextMenuComponent,
+    AiWidgetComponent,
   ],
   providers: [
     ContextMenuService,
@@ -81,6 +86,9 @@ import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middlewa
     ContextMenuFacadeService,
     ReferenceCounterService,
     TemplateService,
+    CustomIcLauncherService,
+    DiagramAgentToolsService,
+    AiAgentService,
     provideNgDiagram(),
   ],
   templateUrl: './diagram.component.html',
@@ -206,6 +214,8 @@ export class DiagramComponent {
         sourcePort: 'port-b',
         target: 'led1',
         targetPort: 'port-anode',
+        sourceArrowhead: undefined,
+        targetArrowhead: undefined,
         data: {},
       },
     ],
@@ -270,6 +280,12 @@ export class DiagramComponent {
   onDiagramInit(event: DiagramInitEvent) {
     this.debugEvents.onDiagramInit(event);
     this.referenceCounter.seedFrom(this.diagramModelService.nodes() as Node<AnyCircuitData>[]);
+    // Ports use data-driven `@for` lists and `[style.top.px]` bindings (for
+    // ICs), and class bindings (for connected-port hiding). Per the
+    // ng-diagram docs these can race the initial ResizeObserver measurement,
+    // producing the "ports unmeasured" warning. A single explicit re-measure
+    // after the templates have settled clears it.
+    queueMicrotask(() => this.diagramService.invalidateMeasurements());
   }
   onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
     this.debugEvents.onEdgeDrawEnded(event);

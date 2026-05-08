@@ -43,6 +43,20 @@
               </ng-diagram-palette-item-preview>
             </ng-diagram-palette-item>
           }
+
+          @if (section.category === 'integrated-circuits') {
+            <button
+              type="button"
+              class="palette-section__action"
+              (click)="openCustomIc()"
+            >
+              <span class="palette-section__action-icon">+</span>
+              <span class="palette-section__action-text">
+                <span class="palette-section__action-label">Custom IC…</span>
+                <span class="palette-section__action-sub">Pick package & pin count</span>
+              </span>
+            </button>
+          }
         </div>
       </section>
     }

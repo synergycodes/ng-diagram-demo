@@ -112,3 +112,57 @@
     pointer-events: none;
   }
 }
+
+.palette-section__action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  border-radius: 12px;
+  border: 1px dashed var(--ngd-node-stroke-primary-default);
+  background: transparent;
+  color: var(--ngd-txt-primary-default);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+
+  &:hover {
+    border-style: solid;
+    border-color: var(--ngd-node-stroke-primary-hover);
+    background: var(--ngd-node-bg-primary-default);
+  }
+
+  &-icon {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: var(--ngd-ui-bg-secondary-default, #383a40);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--ngd-txt-secondary-default);
+  }
+
+  &-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.4;
+    min-width: 0;
+  }
+
+  &-label {
+    color: var(--ngd-txt-primary-default);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  &-sub {
+    color: var(--ngd-txt-secondary-default);
+    font-size: 10px;
+  }
+}

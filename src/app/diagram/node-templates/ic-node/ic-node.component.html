@@ -29,7 +29,7 @@
       />
     }
 
-    <!-- Left pin lines + numbers + names -->
+    <!-- Left side: pin lines + numbers (DIP) or names (board) -->
     @for (lp of leftPositions(); track lp.pin.number) {
       <line
         class="ic-node__pin-line"
@@ -38,21 +38,22 @@
         [attr.x2]="bodyOffsetX()"
         [attr.y2]="lp.y"
       />
-      @if (showPin1Marker()) {
+      @if (isBoard()) {
+        <text
+          class="ic-node__pin-name"
+          [attr.x]="bodyOffsetX() + 6"
+          [attr.y]="lp.y + 3"
+        >{{ lp.pin.name }}</text>
+      } @else {
         <text
           class="ic-node__pin-num"
-          [attr.x]="bodyOffsetX() + 5"
-          [attr.y]="lp.y - 1"
+          [attr.x]="bodyOffsetX() + 4"
+          [attr.y]="lp.y + 3"
         >{{ lp.pin.number }}</text>
       }
-      <text
-        class="ic-node__pin-name"
-        [attr.x]="bodyOffsetX() + (showPin1Marker() ? 5 : 6)"
-        [attr.y]="lp.y + (showPin1Marker() ? 9 : 3)"
-      >{{ lp.pin.name }}</text>
     }
 
-    <!-- Right pin lines + numbers + names -->
+    <!-- Right side: pin lines + numbers (DIP) or names (board) -->
     @for (rp of rightPositions(); track rp.pin.number) {
       <line
         class="ic-node__pin-line"
@@ -61,26 +62,24 @@
         [attr.x2]="nodeWidth()"
         [attr.y2]="rp.y"
       />
-      @if (showPin1Marker()) {
+      @if (isBoard()) {
+        <text
+          class="ic-node__pin-name ic-node__pin-name--right"
+          [attr.x]="bodyOffsetX() + bodyWidth() - 6"
+          [attr.y]="rp.y + 3"
+        >{{ rp.pin.name }}</text>
+      } @else {
         <text
           class="ic-node__pin-num ic-node__pin-num--right"
-          [attr.x]="bodyOffsetX() + bodyWidth() - 5"
-          [attr.y]="rp.y - 1"
+          [attr.x]="bodyOffsetX() + bodyWidth() - 4"
+          [attr.y]="rp.y + 3"
         >{{ rp.pin.number }}</text>
       }
-      <text
-        class="ic-node__pin-name ic-node__pin-name--right"
-        [attr.x]="bodyOffsetX() + bodyWidth() - (showPin1Marker() ? 5 : 6)"
-        [attr.y]="rp.y + (showPin1Marker() ? 9 : 3)"
-      >{{ rp.pin.name }}</text>
     }
   </svg>
 
-  <!-- Model name centered inside body -->
-  <span
-    class="ic-node__model"
-    [style.top.px]="modelLabelTop()"
-  >{{ model() }}</span>
+  <!-- Model name centered inside body (vertically centered on the body). -->
+  <span class="ic-node__model" [style.top.px]="modelLabelTop()">{{ model() }}</span>
 
   <!-- Ports — left side -->
   @for (lp of leftPositions(); track lp.pin.number) {
@@ -88,7 +87,8 @@
       [id]="portId(lp.pin)"
       type="both"
       side="left"
-      originPoint="centerLeft"
+      originPoint="center"
+      [class.is-connected]="isConnected(portId(lp.pin))"
       [style.top.px]="lp.y"
     />
   }
@@ -99,7 +99,8 @@
       [id]="portId(rp.pin)"
       type="both"
       side="right"
-      originPoint="centerRight"
+      originPoint="center"
+      [class.ic-node__port--connected]="isConnected(portId(rp.pin))"
       [style.top.px]="rp.y"
     />
   }

@@ -1,0 +1,49 @@
+.custom-ic-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 320px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &__label {
+    color: var(--ngd-txt-secondary-default);
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--ngd-input-stroke-primary-default, #4d5059);
+    background: transparent;
+    color: var(--ngd-txt-primary-default);
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+
+    &:focus {
+      border-color: var(--ngd-node-stroke-primary-hover);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+    }
+
+    &--textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+  }
+
+  &__hint {
+    color: var(--ngd-txt-secondary-default);
+    font-size: 11px;
+    font-weight: 400;
+  }
+}
