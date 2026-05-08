@@ -22,7 +22,11 @@ export type CircuitCategory =
   | 'passive'
   | 'semiconductors'
   | 'integrated-circuits'
+  | 'development-boards'
   | 'power-and-ground';
+
+/** Tabs shown above the palette search box (matches the v2 Figma layout). */
+export type PaletteTab = 'basic' | 'brands' | 'my';
 
 /** Properties shared by every circuit node. */
 export interface CircuitNodeBaseData {

@@ -1,8 +1,59 @@
 <app-sidebar [position]="'right'" [collapsed]="collapsed()">
   <div sidebarHeader>Properties</div>
 
-  <!-- Node selected: type-aware properties -->
-  @if (selectedNode() && selectedNodeType()) {
+  <!-- Empty state — no node and no edge selected -->
+  @if (!selectedNode() && !selectedEdge()) {
+    <div class="properties-empty">
+      <svg viewBox="0 0 32 32" class="properties-empty__icon" aria-hidden="true">
+        <circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="1.5" />
+      </svg>
+      <h4 class="properties-empty__title">Nothing selected</h4>
+      <p class="properties-empty__hint">Select a node on the canvas to edit its properties.</p>
+    </div>
+  }
+
+  <!-- Multi-select header — N>1 nodes selected -->
+  @if (multiSelected()) {
+    <div class="properties-header">
+      <div class="properties-header__icon">
+        @if (iconType(); as it) {
+          <app-palette-item-icon [iconType]="it" />
+        }
+      </div>
+      <div class="properties-header__text">
+        <div class="properties-header__title">{{ multiSelectTitle() }}</div>
+        <div class="properties-header__subtitle">
+          {{ selectedNodes().length }} components selected
+        </div>
+      </div>
+    </div>
+
+    <div class="properties__form">
+      <h4 class="properties__section">General</h4>
+      <div class="properties__field">
+        <label class="properties__label">Reference</label>
+        <input
+          class="properties__input"
+          type="text"
+          [value]="multiSelectReferenceList()"
+          readonly
+        />
+      </div>
+      <div class="properties__field">
+        <label class="properties__label">Description</label>
+        <textarea
+          class="properties__input properties__textarea"
+          [ngModel]="data()?.description ?? ''"
+          (ngModelChange)="update('description', $event)"
+          placeholder="Shared notes for the selected components…"
+          rows="3"
+        ></textarea>
+      </div>
+    </div>
+  }
+
+  <!-- Single-node state — exactly one node selected -->
+  @if (selectedNode() && selectedNodeType() && !multiSelected()) {
     <div class="properties-header">
       <div class="properties-header__icon">
         @if (iconType(); as it) {

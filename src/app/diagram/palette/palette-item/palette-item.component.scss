@@ -1,57 +1,59 @@
 :host {
+  display: block;
   width: 100%;
 }
 
-.palette-item {
+.palette-card {
   display: flex;
-  width: 100%;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
   padding: 8px;
-
+  width: 100%;
   border-radius: 12px;
   border: 1px solid var(--ngd-node-stroke-primary-default);
   background: var(--ngd-node-bg-primary-default);
+  user-select: none;
 
   &:hover {
     border-color: var(--ngd-node-stroke-primary-hover);
   }
 
-  &__icon {
+  &__symbol {
     display: flex;
-    width: 44px;
-    height: 44px;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-
+    height: 64px;
     border-radius: 8px;
     background: var(--ngd-ui-bg-secondary-default, #383a40);
-  }
 
-  &__text {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    line-height: 1.4;
+    // The host element of the icon component is itself a flex container so
+    // its single SVG child is centered both horizontally and vertically. The
+    // SVG then fills its host and relies on `preserveAspectRatio="xMidYMid"`
+    // for visual centering of the schematic content.
+    ::ng-deep app-palette-item-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      padding: 8px 12px;
+    }
+
+    ::ng-deep .icon {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   &__label {
+    text-align: center;
     color: var(--ngd-txt-primary-default);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  &__subtitle {
-    color: var(--ngd-txt-secondary-default);
-    font-size: 10px;
-    font-weight: 400;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 }

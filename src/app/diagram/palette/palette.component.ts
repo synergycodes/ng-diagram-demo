@@ -5,11 +5,17 @@ import {
   NgDiagramPaletteItemPreviewComponent,
   NgDiagramViewportService,
 } from 'ng-diagram';
+import { PaletteTab } from '../../circuit/circuit-types';
+import { CustomIcLauncherService } from '../../circuit/custom-ic-launcher.service';
+import {
+  CircuitPaletteEntry,
+  groupBySection,
+  PALETTE_ENTRIES,
+  TABS,
+} from '../../circuit/palette-data';
+import { SidebarComponent } from '../../ui-components/sidebar/sidebar.component';
 import { PaletteItemPreviewComponent } from './palette-item-preview/palette-item-preview.component';
 import { PaletteItemComponent } from './palette-item/palette-item.component';
-import { SidebarComponent } from '../../ui-components/sidebar/sidebar.component';
-import { CircuitPaletteEntry, PALETTE_ENTRIES, groupBySection } from '../../circuit/palette-data';
-import { CustomIcLauncherService } from '../../circuit/custom-ic-launcher.service';
 
 @Component({
   selector: 'app-palette',
@@ -30,18 +36,18 @@ export class PaletteComponent {
 
   scale = inject(NgDiagramViewportService).scale;
 
+  readonly tabs = TABS;
+  activeTab = signal<PaletteTab>('basic');
   query = signal('');
-
-  openCustomIc() {
-    this.customIc.open();
-  }
 
   private readonly entries: CircuitPaletteEntry[] = PALETTE_ENTRIES;
 
   filtered = computed(() => {
     const q = this.query().trim().toLowerCase();
-    if (!q) return this.entries;
-    return this.entries.filter(
+    const tab = this.activeTab();
+    const inTab = this.entries.filter((e) => e.tab === tab);
+    if (!q) return inTab;
+    return inTab.filter(
       (e) =>
         e.label.toLowerCase().includes(q) ||
         e.subtitle.toLowerCase().includes(q) ||
@@ -50,4 +56,12 @@ export class PaletteComponent {
   });
 
   sections = computed(() => groupBySection(this.filtered()));
+
+  selectTab(tab: PaletteTab) {
+    this.activeTab.set(tab);
+  }
+
+  openCustomIc() {
+    this.customIc.open();
+  }
 }

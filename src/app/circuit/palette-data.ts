@@ -8,6 +8,7 @@ import {
   DiodeData,
   IcData,
   LedData,
+  PaletteTab,
   PowerNetData,
   ResistorData,
 } from './circuit-types';
@@ -15,6 +16,8 @@ import { IC_CATALOG } from './ic-catalog';
 import { PaletteIconType, defaultIconForType } from './palette-icon';
 
 export interface CircuitPaletteEntry {
+  /** Top-level tab the entry belongs to. */
+  tab: PaletteTab;
   category: CircuitCategory;
   label: string;
   subtitle: string;
@@ -28,8 +31,15 @@ export interface CircuitPaletteEntry {
 export const CATEGORIES: { id: CircuitCategory; title: string }[] = [
   { id: 'passive', title: 'Passive' },
   { id: 'semiconductors', title: 'Semiconductors' },
+  { id: 'development-boards', title: 'Development boards' },
   { id: 'integrated-circuits', title: 'Integrated Circuits' },
   { id: 'power-and-ground', title: 'Power & Ground' },
+];
+
+export const TABS: { id: PaletteTab; title: string }[] = [
+  { id: 'basic', title: 'Basic' },
+  { id: 'brands', title: 'Brands' },
+  { id: 'my', title: 'My' },
 ];
 
 const FIXED_SIZE = {
@@ -60,6 +70,7 @@ export function computeIcNodeSize(data: IcData): { width: number; height: number
 }
 
 const resistor: CircuitPaletteEntry = {
+  tab: 'basic',
   category: 'passive',
   label: 'Resistor',
   subtitle: 'R · 2 pins',
@@ -81,6 +92,7 @@ const resistor: CircuitPaletteEntry = {
 };
 
 const capacitor: CircuitPaletteEntry = {
+  tab: 'basic',
   category: 'passive',
   label: 'Capacitor',
   subtitle: 'C · 2 pins',
@@ -101,6 +113,7 @@ const capacitor: CircuitPaletteEntry = {
 };
 
 const diode: CircuitPaletteEntry = {
+  tab: 'basic',
   category: 'semiconductors',
   label: 'Diode',
   subtitle: 'D · 2 pins',
@@ -120,6 +133,7 @@ const diode: CircuitPaletteEntry = {
 };
 
 const led: CircuitPaletteEntry = {
+  tab: 'basic',
   category: 'semiconductors',
   label: 'LED',
   subtitle: 'D · 2 pins',
@@ -139,6 +153,7 @@ const led: CircuitPaletteEntry = {
 };
 
 const battery: CircuitPaletteEntry = {
+  tab: 'basic',
   category: 'power-and-ground',
   label: 'Battery',
   subtitle: 'BAT · 2 pins',
@@ -157,6 +172,7 @@ const battery: CircuitPaletteEntry = {
 };
 
 const vcc: CircuitPaletteEntry = {
+  tab: 'basic',
   category: 'power-and-ground',
   label: 'VCC',
   subtitle: '1 pin · source',
@@ -176,6 +192,7 @@ const vcc: CircuitPaletteEntry = {
 };
 
 const gnd: CircuitPaletteEntry = {
+  tab: 'basic',
   category: 'power-and-ground',
   label: 'GND',
   subtitle: '1 pin · target',
@@ -199,8 +216,13 @@ const icEntries: CircuitPaletteEntry[] = IC_CATALOG.map((entry) => {
     reference: `${entry.referencePrefix}?`,
     ...entry.data,
   };
+  // Boards (Arduino, ESP32, NodeMCU, Pico) live under Basic > Development
+  // boards. Chip-style ICs (NE555, LM358, …) live under Brands so the Basic
+  // tab stays focused on schematic primitives.
+  const isBoard = data.variant === 'board';
   return {
-    category: 'integrated-circuits',
+    tab: isBoard ? 'basic' : 'brands',
+    category: isBoard ? 'development-boards' : 'integrated-circuits',
     label: entry.paletteLabel,
     subtitle: entry.paletteSubtitle,
     iconType: defaultIconForType(entry.nodeType),
@@ -237,4 +259,8 @@ export function groupBySection(entries: CircuitPaletteEntry[]): PaletteSection[]
     title,
     items: entries.filter((e) => e.category === id),
   })).filter((s) => s.items.length > 0);
+}
+
+export function entriesForTab(tab: PaletteTab): CircuitPaletteEntry[] {
+  return PALETTE_ENTRIES.filter((e) => e.tab === tab);
 }

@@ -48,6 +48,34 @@ body {
 
   --node-group-min-width: 300px;
   --node-group-min-height: 200px;
+
+  /* Semantic tokens added in the v2 design — referenced by the palette tabs,
+   * Export button, and selected states. Sourced from the Figma design tokens. */
+  --ngd-sem-color-accent-electric-strong: #2563ff;
+  --ngd-sem-color-accent-electric-text: #dceaff;
+  --ngd-sem-color-accent-electric-subtle: #1142b8;
+  --ngd-sem-color-text-secondary: #edeff3;
+  --ngd-sem-color-text-tertiary: #bdc1cc;
+}
+
+/* v2 design swaps the global accent from purple to electric blue. Override
+ * the tokens emitted by tokens.css so every existing reference (FAB, primary
+ * buttons, focus rings, selected node strokes, edge selection, etc.) picks
+ * up the new color without having to touch every component. */
+html[data-theme='dark'] {
+  --ngd-button-primary-bg-default: var(--ngd-sem-color-accent-electric-strong);
+  --ngd-button-primary-bg-hover: #3b78ff;
+  --ngd-button-primary-bg-active: var(--ngd-sem-color-accent-electric-subtle);
+  --ngd-button-primary-bg-focus: var(--ngd-sem-color-accent-electric-strong);
+  --ngd-button-primary-bg-loading: var(--ngd-sem-color-accent-electric-strong);
+  --ngd-node-stroke-primary-hover: var(--ngd-sem-color-accent-electric-strong);
+  --ngd-input-stroke-primary-focus: var(--ngd-sem-color-accent-electric-strong);
+  --ngd-focus-ring-node-active: rgba(37, 99, 255, 0.4);
+  --ngd-dropdown-bg-secondary-active: var(--ngd-sem-color-accent-electric-strong);
+
+  /* Default-edge stroke / selection — matches the blue selection outline used
+   * around components in the v2 design. */
+  --ngd-default-edge-stroke-selected: var(--ngd-sem-color-accent-electric-strong);
 }
 
 html,

@@ -22,17 +22,21 @@ export class PropertiesFacadeService {
   private readonly modelService = inject(NgDiagramModelService);
   private readonly diagramService = inject(NgDiagramService);
 
-  selectedNode = computed<Node<AnyCircuitData> | null>(() => {
+  selectedNodes = computed<Node<AnyCircuitData>[]>(() => {
     const sel = this.selectionService.selection();
-    return (sel.nodes[0] as Node<AnyCircuitData> | undefined) ?? null;
+    return sel.nodes as Node<AnyCircuitData>[];
   });
+
+  selectedNode = computed<Node<AnyCircuitData> | null>(() => this.selectedNodes()[0] ?? null);
+
+  multiSelected = computed(() => this.selectedNodes().length > 1);
 
   selectedEdge = computed<Edge | null>(() => {
     const sel = this.selectionService.selection();
     return (sel.edges[0] as Edge | undefined) ?? null;
   });
 
-  hasSelection = computed(() => !!this.selectedNode() || !!this.selectedEdge());
+  hasSelection = computed(() => this.selectedNodes().length > 0 || !!this.selectedEdge());
 
   /** Concrete circuit type of the selected node (if it is a circuit node). */
   selectedNodeType = computed<CircuitNodeType | null>(() => {

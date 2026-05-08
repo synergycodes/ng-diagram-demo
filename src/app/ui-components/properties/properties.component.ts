@@ -36,9 +36,28 @@ export class PropertiesComponent {
   collapsed = input(true);
 
   selectedNode = this.facade.selectedNode;
+  selectedNodes = this.facade.selectedNodes;
+  multiSelected = this.facade.multiSelected;
   selectedEdge = this.facade.selectedEdge;
   selectedNodeType = this.facade.selectedNodeType;
   edgeRouting = this.facade.edgeRouting;
+
+  /** "U1 + LED1" or "U1 + 2 more" when 4+ nodes selected. */
+  multiSelectTitle = computed(() => {
+    const refs = this.selectedNodes()
+      .map((n) => (n.data as AnyCircuitData)?.reference)
+      .filter((r): r is string => !!r);
+    if (refs.length <= 1) return refs[0] ?? '';
+    if (refs.length === 2) return refs.join(' + ');
+    return `${refs[0]} + ${refs.length - 1} more`;
+  });
+
+  multiSelectReferenceList = computed(() =>
+    this.selectedNodes()
+      .map((n) => (n.data as AnyCircuitData)?.reference)
+      .filter((r): r is string => !!r)
+      .join(', '),
+  );
 
   readonly Type = CircuitNodeType;
 

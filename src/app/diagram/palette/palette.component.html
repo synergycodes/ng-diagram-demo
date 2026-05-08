@@ -1,6 +1,19 @@
 <app-sidebar [title]="'Components'">
+  <div class="palette-tabs">
+    @for (tab of tabs; track tab.id) {
+      <button
+        type="button"
+        class="palette-tabs__tab"
+        [class.is-active]="activeTab() === tab.id"
+        (click)="selectTab(tab.id)"
+      >
+        {{ tab.title }}
+      </button>
+    }
+  </div>
+
   <div class="palette-search">
-    <svg viewBox="0 0 16 16" class="palette-search__icon">
+    <svg viewBox="0 0 16 16" class="palette-search__icon" aria-hidden="true">
       <circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5" />
       <line x1="11" y1="11" x2="14" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
     </svg>
@@ -11,13 +24,29 @@
       [ngModel]="query()"
       (ngModelChange)="query.set($event)"
     />
+    <button class="palette-search__filter" type="button" title="Filter" aria-label="Filter">
+      <svg viewBox="0 0 18 18" aria-hidden="true">
+        <path
+          d="M2 4h14M5 9h8M8 14h2"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        />
+      </svg>
+    </button>
   </div>
 
   <div class="palette__sections">
     @for (section of sections(); track section.category) {
       <section class="palette-section">
-        <h3 class="palette-section__title">{{ section.title }}</h3>
-        <div class="palette-section__items">
+        <header class="palette-section__header">
+          <h3 class="palette-section__title">{{ section.title }}</h3>
+          <svg viewBox="0 0 18 18" class="palette-section__caret" aria-hidden="true">
+            <polyline points="5,7 9,11 13,7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </header>
+        <div class="palette-section__grid">
           @for (entry of section.items; track entry.key) {
             <ng-diagram-palette-item [item]="entry.ngItem">
               <app-palette-item [entry]="entry" />
@@ -27,23 +56,28 @@
             </ng-diagram-palette-item>
           }
 
-          @if (section.category === 'integrated-circuits') {
+          @if (activeTab() === 'brands' && section.category === 'integrated-circuits') {
             <button
               type="button"
               class="palette-section__action"
               (click)="openCustomIc()"
             >
-              <span class="palette-section__action-icon">+</span>
-              <span class="palette-section__action-text">
-                <span class="palette-section__action-label">Custom IC…</span>
-                <span class="palette-section__action-sub">Pick package & pin count</span>
-              </span>
+              <span class="palette-section__action-plus">+</span>
+              <span class="palette-section__action-label">Custom IC…</span>
             </button>
           }
         </div>
       </section>
     }
-    @if (sections().length === 0) {
+
+    @if (activeTab() === 'my') {
+      <div class="palette__empty">
+        <p>Saved components will appear here.</p>
+        <button class="palette__primary" type="button" (click)="openCustomIc()">
+          + Create a custom IC
+        </button>
+      </div>
+    } @else if (sections().length === 0) {
       <p class="palette__empty">No components match "{{ query() }}".</p>
     }
   </div>

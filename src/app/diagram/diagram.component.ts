@@ -107,7 +107,9 @@ export class DiagramComponent {
 
   backgroundType = signal<BackgroundType>('dots');
   debugMode = this.debugEvents.debugMode;
-  propertiesCollapsed = signal(true);
+  // Properties panel stays open — its empty state ("Nothing selected") is
+  // intentional UI in the v2 design, not an empty hole worth collapsing.
+  propertiesCollapsed = signal(false);
 
   /**
    * Initial demo schematic — VCC → resistor → LED → GND, plus an NE555 next
@@ -269,7 +271,6 @@ export class DiagramComponent {
     this.debugEvents.onSelectionMoved(event);
   }
   onSelectionGestureEnded(event: SelectionGestureEndedEvent) {
-    this.propertiesCollapsed.set(event.nodes.length === 0 && event.edges.length === 0);
     this.debugEvents.onSelectionGestureEnded(event);
   }
   onSelectionRemoved(event: SelectionRemovedEvent) {

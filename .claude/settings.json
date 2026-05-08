@@ -21,7 +21,25 @@
       "Skill(claude-api:*)",
       "Bash(npm uninstall *)",
       "Bash(node -e \"const p = require\\('./node_modules/ai/package.json'\\); console.log\\('ai', p.version\\); const o = require\\('./node_modules/@openrouter/ai-sdk-provider/package.json'\\); console.log\\('@openrouter/ai-sdk-provider', o.version\\); const z = require\\('./node_modules/zod/package.json'\\); console.log\\('zod', z.version\\);\")",
-      "WebFetch(domain:openrouter.ai)"
+      "WebFetch(domain:openrouter.ai)",
+      "mcp__claude_ai_Figma__get_metadata",
+      "Bash(mkdir -p /tmp/figma-shots)",
+      "Bash(curl -s -o /tmp/figma-shots/97-11084.png \"https://www.figma.com/api/mcp/asset/2adb63d3-b4ca-4c58-81b8-f28e8e76aec6\")",
+      "Read(//tmp/figma-shots/**)",
+      "Bash(perl -ne ' *)",
+      "Bash(awk ' *)",
+      "Bash(sort -t'|' -k3 -n)",
+      "Read(//tmp/**)",
+      "Bash(sort -t'|' -k2 -n)",
+      "Bash(awk -F'|' '$2 != \"-6275\" { print $5 \"|\" $6 \"|\" $1 \"|\" $2 \"|\" $3 \"|\" $4 }')",
+      "Bash(head -2 /tmp/figma_metadata.xml)",
+      "Read(//private/tmp/**)",
+      "Bash(curl -s -o editor-99936.png \"https://www.figma.com/api/mcp/asset/2ad666d3-d7d3-433c-8c87-69b43ba3da22\")",
+      "Bash(curl -s -o editor-101788.png \"https://www.figma.com/api/mcp/asset/03141f9b-e2fa-4f62-905e-bef0d586a7f6\")",
+      "Bash(curl -s -o lib-sidebar-v2.png \"https://www.figma.com/api/mcp/asset/fd54bd50-d7e8-4608-ba10-1caa2160e4a3\")",
+      "Bash(curl -s -o props-sidebar.png \"https://www.figma.com/api/mcp/asset/636ebfd4-c615-465e-9a82-2a8e8b67a715\")",
+      "mcp__claude_ai_Figma__get_variable_defs",
+      "Bash(curl -s -o props-modal.png \"https://www.figma.com/api/mcp/asset/a89773e1-f29e-4044-b943-cf5e7bb002a5\")"
     ]
   }
 }
