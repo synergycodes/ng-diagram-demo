@@ -56,15 +56,13 @@ export function createDiagramConfig(
     },
 
     // Node Rotation Configuration
-    // Controls snap-to-angle behavior during rotation
+    // Locks rotation to 4 standard directions (0°, 90°, 180°, 270°) by default.
     nodeRotation: {
-      // Callback: Should this node snap to angles when rotated?
       shouldSnapForNode: (node: Node<BaseNodeEdgeData>) =>
-        node.data.enableSnapRotate ?? false,
+        node.data.enableSnapRotate ?? true,
 
-      // Callback: What angle step to use? (e.g., 30° = 12 positions, 45° = 8 positions)
       computeSnapAngleForNode: (node: Node<BaseNodeEdgeData>) => {
-        return node.data.snapRotateStep ?? 30;
+        return node.data.snapRotateStep ?? 90;
       },
     },
 
