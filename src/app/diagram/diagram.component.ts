@@ -58,6 +58,7 @@ import { createDiagramConfig } from './services/diagram.config';
 import { ReferenceCounterService } from './services/reference-counter.service';
 import { TemplateService } from './services/template.service';
 import { SaveTemplateDialogComponent } from './services/save-template-dialog.component';
+import { TEMPLATE_DRAG_MIME } from './services/template-drag.constants';
 
 import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middleware';
 
@@ -227,6 +228,26 @@ export class DiagramComponent {
   onPaletteItemDropped(event: PaletteItemDroppedEvent) {
     this.debugEvents.onPaletteItemDropped(event);
     this.referenceCounter.assignReference(event.node as Node<AnyCircuitData>);
+  }
+
+  /** Allow drop only when the dragged payload is a template. */
+  onTemplateDragOver(event: DragEvent) {
+    if (!event.dataTransfer?.types.includes(TEMPLATE_DRAG_MIME)) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+  }
+
+  /** Expand the dragged template centered on the cursor's position in flow coords. */
+  onTemplateDrop(event: DragEvent) {
+    const id = event.dataTransfer?.getData(TEMPLATE_DRAG_MIME);
+    if (!id) return;
+    event.preventDefault();
+    const dropPoint = this.viewportService.clientToFlowPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
+    const { nodeIds } = this.templateService.expand(id, dropPoint);
+    this.referenceCounter.renumber(nodeIds);
   }
 
   onSaveAsTemplate() {

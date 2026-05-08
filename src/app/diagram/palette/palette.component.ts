@@ -10,7 +10,7 @@ import { PaletteItemComponent } from './palette-item/palette-item.component';
 import { SidebarComponent } from '../../ui-components/sidebar/sidebar.component';
 import { CircuitPaletteEntry, PALETTE_ENTRIES, groupBySection } from '../../circuit/palette-data';
 import { TemplateService } from '../services/template.service';
-import { ReferenceCounterService } from '../services/reference-counter.service';
+import { TEMPLATE_DRAG_MIME } from '../services/template-drag.constants';
 
 @Component({
   selector: 'app-palette',
@@ -27,15 +27,12 @@ import { ReferenceCounterService } from '../services/reference-counter.service';
   ],
 })
 export class PaletteComponent {
-  private readonly viewportService = inject(NgDiagramViewportService);
-  private readonly templateService = inject(TemplateService);
-  private readonly referenceCounter = inject(ReferenceCounterService);
-
-  scale = this.viewportService.scale;
+  scale = inject(NgDiagramViewportService).scale;
 
   query = signal('');
 
   private readonly entries: CircuitPaletteEntry[] = PALETTE_ENTRIES;
+  private readonly templateService = inject(TemplateService);
 
   filtered = computed(() => {
     const q = this.query().trim().toLowerCase();
@@ -50,7 +47,7 @@ export class PaletteComponent {
 
   sections = computed(() => groupBySection(this.filtered()));
 
-  // Templates section (placeholder UI — throwaway, click-to-insert at viewport center).
+  // Templates section (placeholder UI; throwaway).
   templates = this.templateService.describe;
 
   filteredTemplates = computed(() => {
@@ -60,15 +57,9 @@ export class PaletteComponent {
     return list.filter((t) => t.name.toLowerCase().includes(q));
   });
 
-  onTemplateClick(templateId: string) {
-    const center = this.computeViewportCenter();
-    const { nodeIds } = this.templateService.expand(templateId, center);
-    this.referenceCounter.renumber(nodeIds);
-  }
-
-  private computeViewportCenter(): { x: number; y: number } {
-    const w = window.innerWidth / 2;
-    const h = window.innerHeight / 2;
-    return this.viewportService.clientToFlowPosition({ x: w, y: h });
+  onTemplateDragStart(event: DragEvent, templateId: string) {
+    if (!event.dataTransfer) return;
+    event.dataTransfer.setData(TEMPLATE_DRAG_MIME, templateId);
+    event.dataTransfer.effectAllowed = 'copy';
   }
 }
