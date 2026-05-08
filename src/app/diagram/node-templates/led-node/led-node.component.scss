@@ -1,9 +1,8 @@
 @use '../component-card.scss';
 
-:host {
-  height: 72px;
-}
-
+// LED needs a taller symbol than the other 2-port discretes because the
+// emission arrows extend above the diode body. Wire midline still sits at
+// viewBox center (y=18) so the shared centering in component-card works.
 .component-card__symbol {
   height: 36px;
   color: var(--ngd-txt-primary-default);

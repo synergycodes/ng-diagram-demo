@@ -1,5 +1,14 @@
 @use '../component-card.scss';
 
 .component-card__symbol {
+  // currentColor is used by the diode triangle's fill.
   color: var(--ngd-txt-primary-default);
+
+  text.terminal-label {
+    font-size: 8px;
+    font-weight: 400;
+    font-family: 'Poppins', system-ui, sans-serif;
+    fill: var(--ngd-txt-secondary-default);
+    stroke: none;
+  }
 }

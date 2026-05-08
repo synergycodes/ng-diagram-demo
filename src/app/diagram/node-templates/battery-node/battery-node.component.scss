@@ -1,10 +1,9 @@
 @use '../component-card.scss';
 
-.component-card__pin-row {
-  top: 28px;
-  padding: 0;
-  justify-content: center;
-  gap: 26px;
-  font-weight: 600;
+.component-card__symbol text.terminal-label {
   font-size: 9px;
+  font-weight: 600;
+  font-family: 'Poppins', system-ui, sans-serif;
+  fill: var(--ngd-txt-secondary-default);
+  stroke: none;
 }

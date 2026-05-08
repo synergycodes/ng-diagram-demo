@@ -1,12 +1,17 @@
 // Shared styles for two-port discrete schematic nodes (resistor, capacitor,
 // diode, LED, battery). Each node is a 140x60 (or 140x72 for LED) card with
-// a reference label on top, the schematic symbol in the middle, and a value
-// label below. Ports auto-position on the left/right edges.
+// a reference label on top, the schematic symbol whose wire sits exactly on
+// the host's vertical center (so it lines up with the side="left/right"
+// ports), and a value label below.
+//
+// Positioning is absolute on purpose: a flex layout would distribute leftover
+// space and shift the symbol off-center for nodes whose symbol height ≠ wire
+// midline (e.g. LED with arrows above the diode body).
 
 :host {
   display: block;
-  width: 140px;
-  height: 60px;
+  width: 100%;
+  height: 100%;
 
   --ngd-port-background-color: var(--ngd-node-port-fill-default);
   --ngd-port-border-color: var(--ngd-node-port-stroke-default);
@@ -18,14 +23,14 @@
   position: relative;
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 2px 0;
   user-select: none;
 
   &__reference {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    right: 0;
+    text-align: center;
     color: var(--ngd-txt-primary-default);
     font-size: 11px;
     font-weight: 600;
@@ -33,8 +38,15 @@
   }
 
   &__symbol {
+    // Wire midline of the inline SVG must sit at viewBox vertical center —
+    // every two-port template is authored that way so this rule centers the
+    // symbol on the host's vertical center, which is also where ports anchor.
+    position: absolute;
+    top: 50%;
+    left: 0;
     width: 100%;
     height: 24px;
+    transform: translateY(-50%);
     stroke: var(--ngd-txt-primary-default);
     stroke-width: 1.5;
     fill: none;
@@ -48,8 +60,12 @@
     }
   }
 
-  &__value,
-  &__pin-label {
+  &__value {
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    right: 0;
+    text-align: center;
     color: var(--ngd-txt-secondary-default);
     font-size: 10px;
     font-weight: 400;
@@ -58,9 +74,10 @@
 
   &__pin-row {
     position: absolute;
+    top: 50%;
+    transform: translateY(calc(-50% + 6px));
     left: 0;
     right: 0;
-    top: 30px;
     display: flex;
     justify-content: space-between;
     padding: 0 6px;
@@ -71,11 +88,18 @@
   }
 }
 
-// Selection styling — relies on NgDiagramNodeSelectedDirective adding the class.
 :host([data-selected='true']) .component-card__symbol {
   stroke: var(--ngd-node-stroke-primary-hover, #c08bff);
 }
 
 :host(:hover) .component-card__symbol {
   stroke: var(--ngd-node-stroke-primary-hover, #c08bff);
+}
+
+ng-diagram-port.is-connected {
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+:host(:hover) ng-diagram-port.is-connected {
+  opacity: 1;
 }

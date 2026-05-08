@@ -1,0 +1,112 @@
+.ai-widget {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+
+  &__fab {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 0;
+    background: var(--ngd-button-primary-bg-default, #6c4cff);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    font-size: 26px;
+    line-height: 1;
+
+    &:hover {
+      filter: brightness(1.1);
+    }
+  }
+
+  &__fab-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  &__panel {
+    width: 380px;
+    height: 560px;
+    max-height: calc(100vh - 120px);
+    background: var(--ngd-ui-bg-primary-default, #27282b);
+    border: 1px solid var(--ngd-ui-stroke-primary-default, #383a40);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--ngd-ui-stroke-primary-default);
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ngd-txt-primary-default);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  &__title-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--ngd-node-stroke-primary-hover, #c08bff);
+  }
+
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__icon-button {
+    background: transparent;
+    border: 0;
+    color: var(--ngd-txt-secondary-default);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 18px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    line-height: 1;
+
+    &:hover {
+      color: var(--ngd-txt-primary-default);
+      background: var(--ngd-ui-bg-secondary-default, #383a40);
+    }
+
+    &:not(:last-child) {
+      font-size: 11px;
+      font-weight: 500;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+}

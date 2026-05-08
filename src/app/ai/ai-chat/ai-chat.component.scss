@@ -1,0 +1,213 @@
+// The widget body is a flex column; the host needs to be a flex item that
+// fills it so the inner transcript can claim a bounded height and scroll.
+:host {
+  display: flex;
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+}
+
+.ai-chat {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+
+  &__transcript {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 12px 12px 4px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__empty {
+    color: var(--ngd-txt-secondary-default);
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+    padding: 16px;
+    margin: auto 0;
+
+    p {
+      margin: 4px 0;
+    }
+  }
+
+  &__empty-hint {
+    font-size: 11px;
+    opacity: 0.7;
+  }
+
+  &__input-row {
+    display: flex;
+    gap: 6px;
+    padding: 8px 12px 12px 12px;
+    border-top: 1px solid var(--ngd-ui-stroke-primary-default);
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--ngd-input-stroke-primary-default, #4d5059);
+    background: transparent;
+    color: var(--ngd-txt-primary-default);
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1.4;
+    resize: none;
+    outline: none;
+
+    &:focus {
+      border-color: var(--ngd-node-stroke-primary-hover);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__send,
+  &__reset {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 0;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    min-width: 56px;
+  }
+
+  &__send {
+    background: var(--ngd-button-primary-bg-default, #6c4cff);
+    color: white;
+    flex: 1;
+
+    &:hover:not(:disabled) {
+      filter: brightness(1.1);
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+  }
+
+  &__reset {
+    background: transparent;
+    color: var(--ngd-txt-secondary-default);
+    border: 1px solid var(--ngd-input-stroke-primary-default, #4d5059);
+
+    &:hover:not(:disabled) {
+      border-color: var(--ngd-node-stroke-primary-hover);
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+  }
+}
+
+.ai-msg {
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-width: 92%;
+
+  &--user {
+    align-self: flex-end;
+    background: var(--ngd-button-primary-bg-default, #6c4cff);
+    color: white;
+  }
+
+  &--assistant {
+    align-self: flex-start;
+    background: var(--ngd-ui-bg-secondary-default, #383a40);
+    color: var(--ngd-txt-primary-default);
+  }
+
+  &--error {
+    align-self: stretch;
+    max-width: 100%;
+    background: rgba(255, 80, 80, 0.12);
+    color: #ff8a8a;
+    border: 1px solid rgba(255, 80, 80, 0.3);
+  }
+
+  &__caret {
+    display: inline-block;
+    margin-left: 1px;
+    animation: ai-caret-blink 1s steps(1) infinite;
+  }
+}
+
+@keyframes ai-caret-blink {
+  50% { opacity: 0; }
+}
+
+.ai-tool {
+  align-self: stretch;
+  border: 1px solid var(--ngd-ui-stroke-primary-default);
+  background: var(--ngd-ui-bg-secondary-default, #383a40);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 11px;
+  color: var(--ngd-txt-secondary-default);
+
+  &.is-error {
+    border-color: rgba(255, 80, 80, 0.4);
+  }
+
+  &__head {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  &__icon {
+    width: 16px;
+    text-align: center;
+    color: var(--ngd-txt-primary-default);
+  }
+
+  &__name {
+    color: var(--ngd-txt-primary-default);
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 11px;
+  }
+
+  &__input,
+  &__result {
+    margin: 4px 0 0 22px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--ngd-txt-secondary-default);
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 10px;
+    line-height: 1.4;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  &__result {
+    color: #ff8a8a;
+  }
+}

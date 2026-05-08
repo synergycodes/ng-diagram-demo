@@ -1,0 +1,79 @@
+<div class="ai-chat">
+  <div class="ai-chat__transcript" #scroll>
+    @if (agent.items().length === 0) {
+      <div class="ai-chat__empty">
+        <p>Ask the agent to build, modify, or explain a schematic.</p>
+        <p class="ai-chat__empty-hint">
+          Try: <em>"Build a 555 timer astable circuit blinking an LED at 1Hz"</em>
+        </p>
+      </div>
+    }
+    @for (item of agent.items(); track item.id) {
+      @switch (item.kind) {
+        @case ('user') {
+          <div class="ai-msg ai-msg--user">{{ item.text }}</div>
+        }
+        @case ('assistant') {
+          <div class="ai-msg ai-msg--assistant" [class.is-pending]="item.pending">
+            {{ item.text }}@if (item.pending) {<span class="ai-msg__caret">▍</span>}
+          </div>
+        }
+        @case ('tool-call') {
+          <div class="ai-tool" [class.is-error]="item.status === 'error'">
+            <div class="ai-tool__head">
+              <span class="ai-tool__icon">
+                @switch (item.status) {
+                  @case ('pending') { ⋯ }
+                  @case ('success') { ✓ }
+                  @case ('error') { ✕ }
+                }
+              </span>
+              <code class="ai-tool__name">{{ item.name }}</code>
+            </div>
+            <pre class="ai-tool__input">{{ formatToolInput(item.input) }}</pre>
+            @if (item.result && item.status === 'error') {
+              <pre class="ai-tool__result">{{ item.result }}</pre>
+            }
+          </div>
+        }
+        @case ('error') {
+          <div class="ai-msg ai-msg--error">{{ item.text }}</div>
+        }
+      }
+    }
+  </div>
+
+  <form
+    class="ai-chat__input-row"
+    (submit)="$event.preventDefault(); send()"
+  >
+    <textarea
+      class="ai-chat__input"
+      rows="2"
+      placeholder="Ask Claude…"
+      [ngModel]="draft()"
+      (ngModelChange)="draft.set($event)"
+      [disabled]="agent.isRunning()"
+      name="draft"
+      (keydown.enter)="$event.preventDefault(); send()"
+    ></textarea>
+    <div class="ai-chat__actions">
+      <button
+        class="ai-chat__reset"
+        type="button"
+        (click)="reset()"
+        [disabled]="agent.items().length === 0 && !agent.isRunning()"
+        title="New conversation"
+      >
+        New
+      </button>
+      <button
+        class="ai-chat__send"
+        type="submit"
+        [disabled]="agent.isRunning() || !draft().trim()"
+      >
+        @if (agent.isRunning()) { … } @else { Send }
+      </button>
+    </div>
+  </form>
+</div>

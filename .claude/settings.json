@@ -15,7 +15,13 @@
       "mcp__ngdiagram__get_symbol",
       "Bash(npx tsc *)",
       "Bash(npx ng *)",
-      "Bash(npm start *)"
+      "Bash(npm start *)",
+      "Bash(npm install *)",
+      "Skill(claude-api)",
+      "Skill(claude-api:*)",
+      "Bash(npm uninstall *)",
+      "Bash(node -e \"const p = require\\('./node_modules/ai/package.json'\\); console.log\\('ai', p.version\\); const o = require\\('./node_modules/@openrouter/ai-sdk-provider/package.json'\\); console.log\\('@openrouter/ai-sdk-provider', o.version\\); const z = require\\('./node_modules/zod/package.json'\\); console.log\\('zod', z.version\\);\")",
+      "WebFetch(domain:openrouter.ai)"
     ]
   }
 }

@@ -1,0 +1,68 @@
+<div class="ai-widget" [class.is-open]="isOpen()">
+  @if (isOpen()) {
+    <div class="ai-widget__panel">
+      <header class="ai-widget__header">
+        <span class="ai-widget__title">
+          <svg viewBox="0 0 24 24" class="ai-widget__title-icon" aria-hidden="true">
+            <path
+              d="M12 2 L4 7 V17 L12 22 L20 17 V7 Z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linejoin="round"
+            />
+            <circle cx="12" cy="12" r="3" fill="currentColor" />
+          </svg>
+          AI Assistant
+        </span>
+        <div class="ai-widget__header-actions">
+          @if (isAuthenticated()) {
+            <button
+              class="ai-widget__icon-button"
+              type="button"
+              (click)="signOut()"
+              title="Sign out (forget API key)"
+            >Sign out</button>
+          }
+          <button
+            class="ai-widget__icon-button"
+            type="button"
+            (click)="toggle()"
+            title="Close"
+            aria-label="Close"
+          >×</button>
+        </div>
+      </header>
+      <div class="ai-widget__body">
+        @if (isAuthenticated()) {
+          <app-ai-chat />
+        } @else {
+          <app-ai-auth-form />
+        }
+      </div>
+    </div>
+  }
+
+  <button
+    class="ai-widget__fab"
+    type="button"
+    (click)="toggle()"
+    [attr.aria-expanded]="isOpen()"
+    [title]="isOpen() ? 'Close AI assistant' : 'Open AI assistant'"
+  >
+    @if (isOpen()) {
+      <span aria-hidden="true">×</span>
+    } @else {
+      <svg viewBox="0 0 24 24" class="ai-widget__fab-icon" aria-hidden="true">
+        <path
+          d="M12 2 L4 7 V17 L12 22 L20 17 V7 Z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linejoin="round"
+        />
+        <circle cx="12" cy="12" r="3" fill="currentColor" />
+      </svg>
+    }
+  </button>
+</div>

@@ -9,6 +9,7 @@ import { PaletteItemPreviewComponent } from './palette-item-preview/palette-item
 import { PaletteItemComponent } from './palette-item/palette-item.component';
 import { SidebarComponent } from '../../ui-components/sidebar/sidebar.component';
 import { CircuitPaletteEntry, PALETTE_ENTRIES, groupBySection } from '../../circuit/palette-data';
+import { CustomIcLauncherService } from '../../circuit/custom-ic-launcher.service';
 
 @Component({
   selector: 'app-palette',
@@ -25,9 +26,15 @@ import { CircuitPaletteEntry, PALETTE_ENTRIES, groupBySection } from '../../circ
   ],
 })
 export class PaletteComponent {
+  private readonly customIc = inject(CustomIcLauncherService);
+
   scale = inject(NgDiagramViewportService).scale;
 
   query = signal('');
+
+  openCustomIc() {
+    this.customIc.open();
+  }
 
   private readonly entries: CircuitPaletteEntry[] = PALETTE_ENTRIES;
 
