@@ -5,9 +5,7 @@
       [id]="edge().id + '-label'"
       [positionOnEdge]="edge().data.positionOnEdge ?? 0.5"
     >
-      <div class="custom-edge-label__content" [class.selected]="edge().selected">
-        {{ edge().data.label }}
-      </div>
+      <ng-diagram-default-edge-label>{{ edge().data.label }}</ng-diagram-default-edge-label>
     </ng-diagram-base-edge-label>
   }
 </ng-diagram-base-edge>
