@@ -75,6 +75,12 @@ export function createDiagramConfig(
       // Uses a map of node types to min sizes, with a default fallback
       getMinNodeSize: (node: Node) =>
         minNodeSizes.get(node.type ?? '') ?? { width: 100, height: 50 },
+
+      // Keep group members contained: shrinking a group stops at the bounds
+      // of its children (with resize snapping, at the nearest snap value that
+      // still contains them). The library default is true (members may end up
+      // outside the group).
+      allowResizeBelowChildrenBounds: false,
     },
 
     // Linking Configuration

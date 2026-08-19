@@ -4,6 +4,7 @@ import {
   NgDiagramEdgeTemplate, // Interface that all edge templates must implement
   NgDiagramBaseEdgeComponent, // Pre-built component for rendering edge path
   NgDiagramBaseEdgeLabelComponent, // Pre-built component for rendering edge label
+  NgDiagramDefaultEdgeLabelComponent, // Pre-built default label chip (public since 1.3)
 } from 'ng-diagram';
 import { BaseNodeEdgeData } from '../../../types';
 
@@ -19,7 +20,9 @@ import { BaseNodeEdgeData } from '../../../types';
  *
  * Use ng-diagram base components:
  * - NgDiagramBaseEdgeComponent: Renders the path (handles all routing algorithms)
- * - NgDiagramBaseEdgeLabelComponent: Renders the label at specified position
+ * - NgDiagramBaseEdgeLabelComponent: Positions the label on the edge
+ * - NgDiagramDefaultEdgeLabelComponent: Wraps label content in the default chip —
+ *   theme-aware background plus hover/selected border highlights, no custom CSS needed
  * - Just customize styling via CSS
  * - Handles selection, interaction automatically
  *
@@ -40,8 +43,9 @@ import { BaseNodeEdgeData } from '../../../types';
   styleUrl: './custom-edge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    NgDiagramBaseEdgeComponent,      // Renders the edge path
-    NgDiagramBaseEdgeLabelComponent, // Renders the edge label
+    NgDiagramBaseEdgeComponent,        // Renders the edge path
+    NgDiagramBaseEdgeLabelComponent,   // Positions the label on the edge
+    NgDiagramDefaultEdgeLabelComponent, // Default label chip composed inside the base label
   ],
 })
 export class CustomEdgeComponent implements NgDiagramEdgeTemplate<BaseNodeEdgeData> {
