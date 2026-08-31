@@ -1,3 +1,5 @@
+import { EdgeLabelPosition } from 'ng-diagram';
+
 export type Size = 'xlarge' | 'large' | 'medium' | 'small' | 'xsmall';
 
 export interface PaletteData extends BaseNodeEdgeData {
@@ -8,10 +10,12 @@ export interface PaletteData extends BaseNodeEdgeData {
 
 export interface BaseNodeEdgeData {
   label: string;
-  positionOnEdge?: number;
+  // Relative (0-1 fraction of the path) or absolute ('Npx'; negative = from the target)
+  positionOnEdge?: EdgeLabelPosition;
   enableSnapDrag?: boolean;
   enableSnapResize?: boolean;
   enableSnapRotate?: boolean;
+  lockY?: boolean;
   snapDragStep?: number;
   snapResizeStep?: number;
   snapRotateStep?: number;

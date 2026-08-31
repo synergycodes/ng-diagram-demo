@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavButtonComponent } from '../nav-button/nav-button.component';
+import { Size } from '../../types';
 
 export interface SegmentPickerButton {
   id: string;
@@ -23,5 +24,6 @@ export interface SegmentPickerButton {
 export class SegmentPickerComponent {
   buttons = input<SegmentPickerButton[]>([]);
   activeButton = input<string>('');
+  size = input<Size>('small');
   toggleSwitch = output<void>();
 }

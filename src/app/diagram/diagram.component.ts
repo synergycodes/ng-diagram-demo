@@ -20,6 +20,7 @@ import {
   NgDiagramNodeTemplateMap, // Map of node type -> component template
   NgDiagramPaletteItem, // Type for palette items (drag & drop)
   Node, // Node interface
+  EdgeLabelPosition, // number (0-1) or 'Npx' - see properties panel
   EdgeRoutingName, // Edge routing types ('orthogonal', 'polyline', 'bezier')
 
   // Services - Key ng-diagram services for diagram manipulation
@@ -174,39 +175,53 @@ export class DiagramComponent {
    */
   model = initializeModel({
     nodes: [
+      // One node per template, side by side - see node-template-map.ts
       {
-        id: '1',
-        data: {},
-        position: { x: 100, y: 100 },
+        id: 'trigger-1',
+        type: NodeTemplateType.Trigger,
+        data: { label: 'Trigger', description: 'Initiate workflows', icon: 'ph-lightning' },
+        position: { x: 40, y: 80 },
+      },
+      {
+        id: 'custom-1',
+        type: NodeTemplateType.Custom,
+        data: {
+          label: 'Task Status',
+          description: 'Track task progress',
+          icon: 'ph-check-circle',
+          status: 'in-progress',
+        },
+        position: { x: 520, y: 60 },
+      },
+      // No 'type' - rendered by ng-diagram's built-in default node template
+      {
+        id: 'default-1',
+        data: { label: 'Default node' },
+        position: { x: 1020, y: 98 },
         autoSize: false,
         size: { width: 150, height: 50 },
       },
       {
-        id: '2',
-        data: {},
-        position: { x: 400, y: 200 },
-        autoSize: false,
-        size: { width: 150, height: 50 },
-      },
-      {
-        id: '3',
+        id: 'group-1',
         type: NodeTemplateType.Group,
         isGroup: true,
-        data: {},
-        position: { x: 300, y: 400 },
+        data: { label: 'Group' },
+        position: { x: 520, y: 460 },
       },
       {
-        id: '4',
-        data: {},
-        position: { x: 360, y: 500 },
-        groupId: '3',
+        id: 'default-2',
+        data: { label: 'In a group' },
+        position: { x: 580, y: 540 },
+        groupId: 'group-1',
+        autoSize: false,
+        size: { width: 150, height: 50 },
       },
     ],
     edges: [
       {
-        id: '1',
-        source: '1',
-        target: '2',
+        id: 'edge-1',
+        source: 'trigger-1',
+        target: 'custom-1',
         sourcePort: 'port-right', // Must match port IDs in node template
         targetPort: 'port-left', // Must match port IDs in node template
         targetArrowhead: 'ng-diagram-arrow', // Built-in arrowhead
@@ -223,6 +238,16 @@ export class DiagramComponent {
         //   { x: 350, y: 250 },
         //   { x: 400, y: 225 },
         // ],
+      },
+      // No 'type' - ng-diagram's built-in default edge
+      {
+        id: 'edge-2',
+        source: 'custom-1',
+        target: 'default-1',
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        targetArrowhead: 'ng-diagram-arrow',
+        data: {},
       },
     ],
   });
@@ -241,6 +266,7 @@ export class DiagramComponent {
   snapDragStep = this.propertiesFacade.snapDragStep;
   snapResizeStep = this.propertiesFacade.snapResizeStep;
   snapRotateStep = this.propertiesFacade.snapRotateStep;
+  lockY = this.propertiesFacade.lockY;
 
   constructor() {
     /**
@@ -348,6 +374,10 @@ export class DiagramComponent {
     this.debugEvents.onPaletteItemDropped(event);
   }
 
+  lockYChange(lockY: boolean) {
+    this.propertiesFacade.updateLockY(lockY);
+  }
+
   labelChange(label: string) {
     this.propertiesFacade.updateLabel(label);
   }
@@ -356,7 +386,7 @@ export class DiagramComponent {
     this.propertiesFacade.updateRouting(routing);
   }
 
-  labelPositionChange(positionOnEdge: number) {
+  labelPositionChange(positionOnEdge: EdgeLabelPosition) {
     this.propertiesFacade.updateLabelPosition(positionOnEdge);
   }
 

@@ -1,0 +1,14 @@
+/* Drag ghost for untyped palette items - mirrors the library's default node
+   template (base-node-template) using the same ngDiagram design tokens. */
+.default-node-ghost {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 150px;
+  height: 50px;
+  padding: 0.5rem;
+  background-color: var(--ngd-node-bg-primary-default);
+  border: var(--ngd-node-border-size) solid var(--ngd-node-border-color);
+  border-radius: var(--ngd-node-border-radius);
+  color: var(--ngd-txt-primary-default);
+}

@@ -39,6 +39,7 @@ import { nodeTemplateMap } from '../../node-template-map';
 @Component({
   selector: 'app-palette-item-preview',
   templateUrl: './palette-item-preview.component.html',
+  styleUrl: './palette-item-preview.component.scss',
   imports: [NgComponentOutlet, PaletteItemComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

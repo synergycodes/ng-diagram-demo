@@ -5,7 +5,8 @@ import { BaseNodeEdgeData } from '../../types';
  * Horizontal Lock Middleware
  *
  * This middleware demonstrates how to constrain node movement to a single axis.
- * Nodes with label 'horizontal' can only move horizontally (X axis) - their Y position is locked.
+ * Nodes with `data.lockY === true` (the "Lock vertical movement" checkbox in the
+ * properties panel) can only move horizontally (X axis) - their Y position is locked.
  *
  * ng-diagram Middleware Concepts:
  *
@@ -42,11 +43,11 @@ export const horizontalLockMiddleware: Middleware = {
         const updatedNode = context.nodesMap.get(nodeId);
         const originalNode = context.initialNodesMap.get(nodeId);
 
-        // Check if this node has label 'horizontal' and has valid positions
+        // Check if this node has the lock enabled and has valid positions
         if (
           updatedNode &&
           originalNode &&
-          (updatedNode.data as BaseNodeEdgeData)?.label === 'horizontal' &&
+          (updatedNode.data as BaseNodeEdgeData)?.lockY === true &&
           updatedNode.position &&
           originalNode.position
         ) {

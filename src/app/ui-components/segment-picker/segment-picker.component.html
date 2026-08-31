@@ -4,7 +4,7 @@
       [active]="btn.id === activeButton()"
       [title]="btn.title"
       [round]="true"
-      [size]="'small'"
+      [size]="size()"
       (clickAction)="toggleSwitch.emit()"
     >
       <i [class]="`ph ${btn.icon}`"></i>

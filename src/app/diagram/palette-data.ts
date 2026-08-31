@@ -24,6 +24,15 @@ import { NodeTemplateType } from './node-templates/node-template.types';
  */
 export const paletteModel: NgDiagramPaletteItem<PaletteData>[] = [
   {
+    // No 'type' - ng-diagram renders this with its built-in default node template.
+    // The default template shows data.label; description/icon are used only by the palette tile.
+    data: {
+      label: 'Default Node',
+      description: "The library's built-in template",
+      icon: 'ph-square',
+    },
+  },
+  {
     type: NodeTemplateType.Trigger,
     data: {
       label: 'Trigger',

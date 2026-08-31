@@ -6,6 +6,7 @@ import {
   Node,
   Edge,
   EdgeRoutingName, // Type for edge routing algorithms: 'orthogonal', 'polyline', 'bezier'
+  EdgeLabelPosition, // number (0-1 fraction) or 'Npx' (absolute; negative = from the target)
   SelectionGestureEndedEvent,
 } from 'ng-diagram';
 import { BaseNodeEdgeData } from '../../types';
@@ -63,7 +64,7 @@ export class PropertiesFacadeService {
    * not for the default edges. An edge must have a 'type' property to use a custom
    * edge template (defined in edgeTemplateMap).
    */
-  edgeLabelPosition = computed<number | null>(() => {
+  edgeLabelPosition = computed<EdgeLabelPosition | null>(() => {
     const selection = this.selectionService.selection();
     const edge = selection.edges[0] as Edge<BaseNodeEdgeData> | undefined;
     if (!edge || !edge.data.label || !edge.type) return null;
@@ -103,8 +104,21 @@ export class PropertiesFacadeService {
   enableSnapRotate = computed<boolean | null>(() => {
     const selection = this.selectionService.selection();
     const node = selection.nodes[0] as Node<BaseNodeEdgeData> | undefined;
-    if (!node) return null;
+    // The group template has no rotate adornment, so hide the rotate controls for groups
+    if (!node || ('isGroup' in node && node.isGroup === true)) return null;
     return node.data.enableSnapRotate ?? false;
+  });
+
+  /**
+   * Whether the horizontal-lock middleware pins this node's Y position
+   * (see diagram/middlewares/horizontal-lock.middleware.ts)
+   */
+  lockY = computed<boolean | null>(() => {
+    const selection = this.selectionService.selection();
+    const node = selection.nodes[0] as Node<BaseNodeEdgeData> | undefined;
+    // Groups are containers - the demo constraint applies to regular nodes only
+    if (!node || ('isGroup' in node && node.isGroup === true)) return null;
+    return node.data.lockY ?? false;
   });
 
   /**
@@ -136,7 +150,7 @@ export class PropertiesFacadeService {
   snapRotateStep = computed<number | null>(() => {
     const selection = this.selectionService.selection();
     const node = selection.nodes[0] as Node<BaseNodeEdgeData> | undefined;
-    if (!node) return null;
+    if (!node || ('isGroup' in node && node.isGroup === true)) return null;
     return node.data.snapRotateStep ?? 30;
   });
 
@@ -181,10 +195,12 @@ export class PropertiesFacadeService {
   /**
    * Update the position of the label on the selected edge
    *
-   * Range: 0.0 (at source) to 1.0 (at target)
+   * Accepts ng-diagram's EdgeLabelPosition union:
+   * - number 0.0 (at source) to 1.0 (at target) - a fraction of the path
+   * - 'Npx' string - absolute pixels from the source; negative counts from the target
    * This is stored in edge.data (custom property)
    */
-  updateLabelPosition(positionOnEdge: number) {
+  updateLabelPosition(positionOnEdge: EdgeLabelPosition) {
     const { edges } = this.selectionService.selection();
     const edge = edges[0];
 
@@ -242,6 +258,19 @@ export class PropertiesFacadeService {
         ...node.data,
         enableSnapRotate,
       });
+    }
+  }
+
+  /**
+   * Toggle the horizontal-lock middleware for the selected node
+   * The middleware reads this value from node.data on every move
+   */
+  updateLockY(lockY: boolean) {
+    const { nodes } = this.selectionService.selection();
+    const node = nodes[0];
+
+    if (node) {
+      this.modelService.updateNodeData(node.id, { ...node.data, lockY });
     }
   }
 

@@ -2,6 +2,9 @@
   <ng-container
     *ngComponentOutlet="componentType() || null; inputs: { node: item() }"
   ></ng-container>
+} @else if (!item().type) {
+  <!-- Untyped items become ng-diagram's default node - mimic its look for the drag ghost -->
+  <div class="default-node-ghost">{{ item().data.label }}</div>
 } @else {
   <app-palette-item [item]="item()" />
 }

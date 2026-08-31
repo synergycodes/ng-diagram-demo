@@ -2,11 +2,12 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": false
   },
   "newProjectRoot": "projects",
   "projects": {
-    "ng-diagram-meetup-demo": {
+    "ng-diagram-demo": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -64,10 +65,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "ng-diagram-meetup-demo:build:production"
+              "buildTarget": "ng-diagram-demo:build:production"
             },
             "development": {
-              "buildTarget": "ng-diagram-meetup-demo:build:development"
+              "buildTarget": "ng-diagram-demo:build:development"
             }
           },
           "defaultConfiguration": "development"

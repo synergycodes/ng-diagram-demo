@@ -1,24 +1,20 @@
-# Diagramming Resources
+# ngDiagram Feature Demo
 
-- 🌐 **ngDiagram website**: [ngdiagram.dev](https://www.ngdiagram.dev/)
-- 💻 **ngDiagram GitHub**: [github.com/synergycodes/ng-diagram](https://github.com/synergycodes/ng-diagram)
-- 📚 **ngDiagram Documentation**: [Getting Started](https://www.ngdiagram.dev/docs/intro/quick-start/)
-- 🎤 **Presentation**: [View slides](https://synergiapro-my.sharepoint.com/:p:/g/personal/lukasz_jazwa_synergycodes_com/ESwjUjti0kRGnRpHUWQqcRUB-6RhkzalJoDsEj4DnJXsLg?e=SnBFxV)
-- 📖 **Additional Resources**: [synergycodes.com/diagramming-resources](https://www.synergycodes.com/diagramming-resources)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/licenses/MIT)
 
-# NgDiagramMeetupDemo
+**Live demo:** [synergycodes.github.io/ng-diagram-demo](https://synergycodes.github.io/ng-diagram-demo/)
 
-[Live Demo](https://synergycodes.github.io/ng-diagram-demo/)
+![ngDiagram feature demo — a palette with default and custom nodes, a bezier edge with a movable label, a group, and the properties panel with routing and label-position controls](docs/assets/demo.png)
 
-A showcase demonstrating how to use [ng-diagram](https://www.ngdiagram.dev/) - an Angular library for creating interactive diagrams.
+A showcase of [ngDiagram](https://www.ngdiagram.dev/) — an Angular library for creating interactive diagrams. One app wires up the library's main features side by side: custom node and edge templates, a drag-and-drop palette, grouping, a clipboard context menu, snapping, rotation, and a custom middleware.
 
 ## Project Structure
 
-### 📁 `src/app/diagram/` - **Main ng-diagram Integration**
-This directory contains all the core ng-diagram logic and showcases how to use the library. **Start here to learn ng-diagram!**
+### 📁 `src/app/diagram/` - **Main ngDiagram Integration**
+This directory contains all the core ngDiagram logic and showcases how to use the library. **Start here to learn ngDiagram!**
 
 - **`diagram.component.ts`** - Main diagram component with documentation on:
-  - ng-diagram services (ModelService, SelectionService, ViewportService, etc.)
+  - ngDiagram services (ModelService, SelectionService, ViewportService, etc.)
   - Event handling (all diagram events with examples)
   - Configuration setup
   - Model initialization
@@ -31,7 +27,7 @@ This directory contains all the core ng-diagram logic and showcases how to use t
 
 - **`palette/`** - Drag & drop palette system:
   - `palette-data.ts` - Palette item definitions
-  - `palette.component.ts` - How ng-diagram drag & drop works
+  - `palette.component.ts` - How ngDiagram drag & drop works
   - Components for palette items and drag previews
 
 - **`node-templates/`** - Custom node components:
@@ -51,33 +47,34 @@ Shared TypeScript interfaces used across the application.
 
 ### 📁 `src/app/diagram/middlewares/` - **Custom Middleware**
 
-- **`horizontal-lock.middleware.ts`** - Demonstrates how to constrain node movement using the middleware pipeline. Nodes with the name **"horizontal"** are restricted to X-axis movement only (their Y position stays locked). Try it out by renaming any node to "horizontal" and dragging it around.
+- **`horizontal-lock.middleware.ts`** - Demonstrates how to constrain node movement using the middleware pipeline. Nodes with **Lock vertical movement** checked in the properties panel are restricted to X-axis movement only (their Y position stays locked). Select any node, tick the checkbox, and drag it around.
 
-## Quick Start
+## Getting Started
 
-### Installation
+Built against Angular 21.2 and ngDiagram 1.3 (see `package.json`); Node.js 20.19+ or 22.12+ and npm 10+.
 
 ```bash
+git clone https://github.com/synergycodes/ng-diagram-demo.git
+cd ng-diagram-demo
 npm install
-```
-
-### Development server
-
-To start a local development server, run:
-
-```bash
 npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Open [http://localhost:4200](http://localhost:4200) — a small diagram loads with every node template side by side: the library's default node, the two custom templates, and a group with a child. Try dragging new nodes in from the left palette, right-clicking a node for the clipboard context menu, and ticking **Lock vertical movement** on a selected node - a custom middleware then pins its Y position while you drag. `npm run build` compiles to `dist/`.
 
+Working with an AI coding tool? Copy [`mcp.json`](mcp.json) to `.mcp.json` (or your tool's MCP config) to add the ngDiagram docs MCP server — searchable ngDiagram documentation and API reference right in the session. The file carries the Windows command; the macOS/Linux variant is noted inside.
 
-## Building
+## Support
 
-To build the project run:
+- **Issues**: [GitHub Issues](https://github.com/synergycodes/ng-diagram-demo/issues)
+- **ngDiagram Discussions**: [GitHub Discussions](https://github.com/synergycodes/ng-diagram/discussions), [Discord](https://discord.gg/FDMjRuarFb)
+- **ngDiagram Documentation**: [ngdiagram.dev/docs](https://www.ngdiagram.dev/docs)
+- **More diagramming resources**: [synergycodes.com/diagramming-resources](https://www.synergycodes.com/diagramming-resources)
 
-```bash
-npm build
-```
+## License
 
-This will compile your project and store the build artifacts in the `dist/` directory.
+MIT — see [LICENSE](LICENSE).
+
+---
+
+Built with ❤️ by the [Synergy Codes](https://www.synergycodes.com/) team

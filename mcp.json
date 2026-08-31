@@ -1,0 +1,9 @@
+{
+  "//": "Windows config (npx needs the cmd shim). On macOS/Linux use: { \"command\": \"npx\", \"args\": [\"-y\", \"@ng-diagram/mcp\"] }",
+  "mcpServers": {
+    "ng-diagram-docs": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@ng-diagram/mcp"]
+    }
+  }
+}

@@ -68,4 +68,12 @@
     gap: var(--ngd-token-spacing-button-s-gap);
     font-size: 16px;
   }
+
+  &--xsmall {
+    height: 16px;
+    width: 16px;
+    padding: 2px;
+    gap: 2px;
+    font-size: 13px;
+  }
 }
