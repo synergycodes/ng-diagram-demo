@@ -67,10 +67,10 @@ export class DecisionNodeComponent implements NgDiagramNodeTemplate<DecisionNode
   node = input.required<Node<DecisionNodeData>>();
 
   // Computed signals for reactive data access
-  nodeLabel = computed(() => this.node()?.data?.['label'] ?? 'Unknown');
-  nodeDescription = computed(() => this.node()?.data?.['description'] ?? 'No description');
-  nodeIcon = computed(() => `ph ${this.node()?.data?.['icon'] ?? 'ph-placeholder'}`);
-  nodeOptions = computed(() => this.node()?.data?.['options'] ?? []);
+  nodeLabel = computed(() => this.node()?.data?.label ?? 'Unknown');
+  nodeDescription = computed(() => this.node()?.data?.description ?? 'No description');
+  nodeIcon = computed(() => `ph ${this.node()?.data?.icon ?? 'ph-placeholder'}`);
+  nodeOptions = computed(() => this.node()?.data?.options ?? []);
 
   /**
    * Right-click handler for context menu
@@ -91,8 +91,7 @@ export class DecisionNodeComponent implements NgDiagramNodeTemplate<DecisionNode
     const currentNode = this.node();
     if (currentNode) {
       // Select this node if not already selected
-      const selectedNodes = this.selectionService.selection().nodes;
-      if (!selectedNodes.some((n) => n.id === currentNode.id)) {
+      if (!currentNode.selected) {
         this.selectionService.select([currentNode.id]);
       }
 

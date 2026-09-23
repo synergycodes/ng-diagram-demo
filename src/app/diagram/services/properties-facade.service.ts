@@ -203,11 +203,13 @@ export class PropertiesFacadeService {
    *
    * Because each option renders its own port, dropping an option would leave
    * any edge drawn from that port pointing at a port that no longer exists.
-   * Those edges are deleted first, so the model is never in that state.
+   * The edge removal and the option update are committed together in a single
+   * transaction, so the model is never observed in that state.
    *
    * This demonstrates:
    * - NgDiagramModelService.getConnectedEdges() to find a node's edges
    * - NgDiagramModelService.deleteEdges() to remove them
+   * - NgDiagramService.transaction() to apply both changes atomically
    */
   async updateDecisionOptionCount(count: number) {
     const { nodes } = this.selectionService.selection();
@@ -221,7 +223,7 @@ export class PropertiesFacadeService {
     if (target < current.length) {
       const removedIds = new Set(current.slice(target).map((option) => option.id));
 
-      // Edges drawn from a removed option's port would dangle - delete them first
+      // Edges drawn from a removed option's port would dangle - collect them for removal
       const staleEdgeIds = this.modelService
         .getConnectedEdges(node.id)
         .filter(
@@ -230,13 +232,16 @@ export class PropertiesFacadeService {
         )
         .map((edge) => edge.id);
 
-      if (staleEdgeIds.length > 0) {
-        await this.modelService.deleteEdges(staleEdgeIds);
-      }
+      // One atomic commit - the model is never seen with an edge whose port has gone
+      await this.diagramService.transaction(() => {
+        if (staleEdgeIds.length > 0) {
+          this.modelService.deleteEdges(staleEdgeIds);
+        }
 
-      this.modelService.updateNodeData(node.id, {
-        ...node.data,
-        options: current.slice(0, target),
+        this.modelService.updateNodeData(node.id, {
+          ...node.data,
+          options: current.slice(0, target),
+        });
       });
       return;
     }
