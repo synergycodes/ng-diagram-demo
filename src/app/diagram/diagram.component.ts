@@ -293,7 +293,7 @@ export class DiagramComponent {
   snapResizeStep = this.propertiesFacade.snapResizeStep;
   snapRotateStep = this.propertiesFacade.snapRotateStep;
   lockY = this.propertiesFacade.lockY;
-  decisionOptionCount = this.propertiesFacade.decisionOptionCount;
+  decisionOptions = this.propertiesFacade.decisionOptions;
 
   constructor() {
     /**
@@ -405,8 +405,16 @@ export class DiagramComponent {
     this.propertiesFacade.updateLockY(lockY);
   }
 
-  decisionOptionCountChange(count: number) {
-    this.propertiesFacade.updateDecisionOptionCount(count);
+  decisionOptionRename(event: { id: string; label: string }) {
+    this.propertiesFacade.renameDecisionOption(event.id, event.label);
+  }
+
+  decisionOptionRemove(id: string) {
+    this.propertiesFacade.removeDecisionOption(id);
+  }
+
+  decisionOptionAdd() {
+    this.propertiesFacade.addDecisionOption();
   }
 
   labelChange(label: string) {

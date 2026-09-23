@@ -29,3 +29,6 @@ export interface DecisionOption {
   id: string;
   label: string;
 }
+
+/** Upper bound for the decision branch list edited in the properties panel */
+export const MAX_DECISION_OPTIONS = 10;

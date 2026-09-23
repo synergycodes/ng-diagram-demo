@@ -11,19 +11,44 @@
       placeholder="Enter value"
     />
 
-    @if (decisionOptionCount() !== null) {
-      <label for="decision-count-input" class="properties__label">Decisions:</label>
-      <input
-        id="decision-count-input"
-        type="number"
-        class="properties__input"
-        [ngModel]="decisionOptionCount()"
-        (ngModelChange)="onDecisionOptionCountChange($event)"
-        min="0"
-        max="10"
-        step="1"
-        title="Number of decision branches; removing one deletes any edge drawn from its port"
-      />
+    @if (decisionOptions() !== null) {
+      <label class="properties__label">Decisions:</label>
+      <div class="properties__option-list">
+        @for (option of decisionOptions(); track option.id) {
+          <div class="properties__option-row">
+            <input
+              type="text"
+              class="properties__input"
+              [ngModel]="option.label"
+              (ngModelChange)="onDecisionOptionRename(option.id, $event)"
+              placeholder="Branch label"
+              [attr.aria-label]="'Rename branch ' + option.label"
+            />
+            <ngd-button
+              buttonType="ghost"
+              size="xsmall"
+              icon="ph-trash"
+              title="Remove this branch and any edge drawn from its port"
+              (clickAction)="decisionOptionRemove.emit(option.id)"
+              [noText]="true"
+            ></ngd-button>
+          </div>
+        } @empty {
+          <div class="properties__option-empty">No branches yet</div>
+        }
+      </div>
+      <ngd-button
+        buttonType="secondary"
+        size="small"
+        icon="ph-plus"
+        [disabled]="!canAddDecisionOption()"
+        [title]="
+          canAddDecisionOption()
+            ? 'Add a branch'
+            : 'Limit of ' + maxDecisionOptions + ' branches reached'
+        "
+        (clickAction)="decisionOptionAdd.emit()"
+      >Add branch</ngd-button>
     }
 
     @if (edgeRouting() !== null) {

@@ -9,14 +9,12 @@ import {
   EdgeLabelPosition, // number (0-1 fraction) or 'Npx' (absolute; negative = from the target)
   SelectionGestureEndedEvent,
 } from 'ng-diagram';
-import { BaseNodeEdgeData, DecisionOption } from '../../types';
+import { BaseNodeEdgeData, DecisionOption, MAX_DECISION_OPTIONS } from '../../types';
 import { NodeTemplateType } from '../node-templates/node-template.types';
 
 /** Node data shape the decision node reads - see decision-node.component.ts */
 type DecisionNodeData = BaseNodeEdgeData & { options?: DecisionOption[] };
 
-/** Upper bound for the decision branch count exposed in the properties panel */
-const MAX_DECISION_OPTIONS = 10;
 
 /**
  * PropertiesFacadeService
@@ -162,16 +160,16 @@ export class PropertiesFacadeService {
   });
 
   /**
-   * Computed signal for the number of branches on the selected decision node
+   * Computed signal for the branches on the selected decision node
    *
-   * Returns null for any other selection, which hides the control in the panel
+   * Returns null for any other selection, which hides the list in the panel
    * (the same pattern the routing and snapping fields use).
    */
-  decisionOptionCount = computed<number | null>(() => {
+  decisionOptions = computed<DecisionOption[] | null>(() => {
     const selection = this.selectionService.selection();
     const node = selection.nodes[0] as Node<DecisionNodeData> | undefined;
     if (!node || node.type !== NodeTemplateType.Decision) return null;
-    return node.data.options?.length ?? 0;
+    return node.data.options ?? [];
   });
 
   /**
@@ -197,9 +195,56 @@ export class PropertiesFacadeService {
   }
 
   /**
-   * Resize the branch list on the selected decision node
+   * The selected node, but only when it is a decision node
+   */
+  private selectedDecisionNode(): Node<DecisionNodeData> | null {
+    const { nodes } = this.selectionService.selection();
+    const node = nodes[0] as Node<DecisionNodeData> | undefined;
+    if (!node || node.type !== NodeTemplateType.Decision) return null;
+    return node;
+  }
+
+  /**
+   * Append a branch to the selected decision node
    *
-   * Growing appends new options; shrinking drops them from the end.
+   * Capped at MAX_DECISION_OPTIONS; the panel disables its button at the same
+   * limit, so hitting this guard means the two drifted apart.
+   */
+  addDecisionOption() {
+    const node = this.selectedDecisionNode();
+    if (!node) return;
+
+    const current = node.data.options ?? [];
+    if (current.length >= MAX_DECISION_OPTIONS) return;
+
+    const index = this.nextOptionIndex(new Set(current.map((option) => option.id)));
+    this.modelService.updateNodeData(node.id, {
+      ...node.data,
+      options: [...current, { id: `option-${index}`, label: `Option ${index}` }],
+    });
+  }
+
+  /**
+   * Rename one branch of the selected decision node
+   *
+   * Only the label changes - the id stays put because it is the port id that
+   * any already-drawn edge refers to.
+   */
+  renameDecisionOption(id: string, label: string) {
+    const node = this.selectedDecisionNode();
+    if (!node) return;
+
+    const current = node.data.options ?? [];
+    if (!current.some((option) => option.id === id)) return;
+
+    this.modelService.updateNodeData(node.id, {
+      ...node.data,
+      options: current.map((option) => (option.id === id ? { ...option, label } : option)),
+    });
+  }
+
+  /**
+   * Remove one branch from the selected decision node
    *
    * Because each option renders its own port, dropping an option would leave
    * any edge drawn from that port pointing at a port that no longer exists.
@@ -211,50 +256,30 @@ export class PropertiesFacadeService {
    * - NgDiagramModelService.deleteEdges() to remove them
    * - NgDiagramService.transaction() to apply both changes atomically
    */
-  async updateDecisionOptionCount(count: number) {
-    const { nodes } = this.selectionService.selection();
-    const node = nodes[0] as Node<DecisionNodeData> | undefined;
-    if (!node || node.type !== NodeTemplateType.Decision) return;
+  async removeDecisionOption(id: string) {
+    const node = this.selectedDecisionNode();
+    if (!node) return;
 
     const current = node.data.options ?? [];
-    const target = Math.max(0, Math.min(MAX_DECISION_OPTIONS, Math.round(count)));
-    if (target === current.length) return;
+    if (!current.some((option) => option.id === id)) return;
 
-    if (target < current.length) {
-      const removedIds = new Set(current.slice(target).map((option) => option.id));
+    // Edges drawn from the removed option's port would dangle - collect them for removal
+    const staleEdgeIds = this.modelService
+      .getConnectedEdges(node.id)
+      .filter((edge) => edge.source === node.id && edge.sourcePort === id)
+      .map((edge) => edge.id);
 
-      // Edges drawn from a removed option's port would dangle - collect them for removal
-      const staleEdgeIds = this.modelService
-        .getConnectedEdges(node.id)
-        .filter(
-          (edge) =>
-            edge.source === node.id && !!edge.sourcePort && removedIds.has(edge.sourcePort),
-        )
-        .map((edge) => edge.id);
+    // One atomic commit - the model is never seen with an edge whose port has gone
+    await this.diagramService.transaction(() => {
+      if (staleEdgeIds.length > 0) {
+        this.modelService.deleteEdges(staleEdgeIds);
+      }
 
-      // One atomic commit - the model is never seen with an edge whose port has gone
-      await this.diagramService.transaction(() => {
-        if (staleEdgeIds.length > 0) {
-          this.modelService.deleteEdges(staleEdgeIds);
-        }
-
-        this.modelService.updateNodeData(node.id, {
-          ...node.data,
-          options: current.slice(0, target),
-        });
+      this.modelService.updateNodeData(node.id, {
+        ...node.data,
+        options: current.filter((option) => option.id !== id),
       });
-      return;
-    }
-
-    const usedIds = new Set(current.map((option) => option.id));
-    const options = [...current];
-    while (options.length < target) {
-      const index = this.nextOptionIndex(usedIds);
-      usedIds.add(`option-${index}`);
-      options.push({ id: `option-${index}`, label: `Option ${index}` });
-    }
-
-    this.modelService.updateNodeData(node.id, { ...node.data, options });
+    });
   }
 
   /**

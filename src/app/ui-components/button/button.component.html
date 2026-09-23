@@ -15,11 +15,14 @@
   [class.button--success]="buttonType() === 'success'"
   [class.button--warning]="buttonType() === 'warning'"
   [class.button--secondary]="buttonType() === 'secondary'"
+  [class.button--icon-only]="noText()"
   (click)="clickAction.emit($event)"
 >
-  <span class="button__text">
-    <ng-content></ng-content>
-  </span>
+  @if (!noText()) {
+    <span class="button__text">
+      <ng-content></ng-content>
+    </span>
+  }
   @if (icon()) {
     <i [class]="`button__icon ph ${icon()}`"></i>
   }
