@@ -293,6 +293,7 @@ export class DiagramComponent {
   snapResizeStep = this.propertiesFacade.snapResizeStep;
   snapRotateStep = this.propertiesFacade.snapRotateStep;
   lockY = this.propertiesFacade.lockY;
+  decisionOptionCount = this.propertiesFacade.decisionOptionCount;
 
   constructor() {
     /**
@@ -402,6 +403,10 @@ export class DiagramComponent {
 
   lockYChange(lockY: boolean) {
     this.propertiesFacade.updateLockY(lockY);
+  }
+
+  decisionOptionCountChange(count: number) {
+    this.propertiesFacade.updateDecisionOptionCount(count);
   }
 
   labelChange(label: string) {

@@ -33,6 +33,7 @@ export class PropertiesComponent {
   snapResizeStep = input<number | null>(null);
   snapRotateStep = input<number | null>(null);
   lockY = input<boolean | null>(null);
+  decisionOptionCount = input<number | null>(null);
 
   labelChange = output<string>();
   routingChange = output<EdgeRoutingName>();
@@ -44,6 +45,7 @@ export class PropertiesComponent {
   snapResizeStepChange = output<number>();
   snapRotateStepChange = output<number>();
   lockYChange = output<boolean>();
+  decisionOptionCountChange = output<number>();
 
   readonly labelPositionButtons: SegmentPickerButton[] = [
     { id: 'relative', icon: 'ph-percent', title: 'Relative - a fraction of the path (0-1)' },
@@ -58,6 +60,12 @@ export class PropertiesComponent {
 
   onInputChange(value: string) {
     this.labelChange.emit(value);
+  }
+
+  onDecisionOptionCountChange(value: string) {
+    const numValue = parseInt(value, 10);
+    if (isNaN(numValue) || numValue < 0) return;
+    this.decisionOptionCountChange.emit(numValue);
   }
 
   onRoutingChange(value: EdgeRoutingName) {

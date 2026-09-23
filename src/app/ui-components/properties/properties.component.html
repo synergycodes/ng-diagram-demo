@@ -11,6 +11,21 @@
       placeholder="Enter value"
     />
 
+    @if (decisionOptionCount() !== null) {
+      <label for="decision-count-input" class="properties__label">Decisions:</label>
+      <input
+        id="decision-count-input"
+        type="number"
+        class="properties__input"
+        [ngModel]="decisionOptionCount()"
+        (ngModelChange)="onDecisionOptionCountChange($event)"
+        min="0"
+        max="10"
+        step="1"
+        title="Number of decision branches; removing one deletes any edge drawn from its port"
+      />
+    }
+
     @if (edgeRouting() !== null) {
       <label for="routing-select" class="properties__label">Routing:</label>
       <select
