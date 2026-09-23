@@ -193,6 +193,21 @@ export class DiagramComponent {
         },
         position: { x: 520, y: 60 },
       },
+      {
+        id: 'decision-1',
+        type: NodeTemplateType.Decision,
+        data: {
+          label: 'Decision',
+          description: 'Branch on a condition',
+          icon: 'ph-git-branch',
+          options: [
+            { id: 'approved', label: 'Approved' },
+            { id: 'rejected', label: 'Rejected' },
+            { id: 'review', label: 'Needs review' },
+          ],
+        },
+        position: { x: 520, y: 260 },
+      },
       // No 'type' - rendered by ng-diagram's built-in default node template
       {
         id: 'default-1',
@@ -238,6 +253,17 @@ export class DiagramComponent {
         //   { x: 350, y: 250 },
         //   { x: 400, y: 225 },
         // ],
+      },
+      {
+        id: 'edge-3',
+        source: 'trigger-1',
+        target: 'decision-1',
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        targetArrowhead: 'ng-diagram-arrow',
+        routing: 'bezier',
+        type: 'custom-edge',
+        data: { label: 'branch' },
       },
       // No 'type' - ng-diagram's built-in default edge
       {
@@ -480,7 +506,12 @@ export class DiagramComponent {
    */
   private initializeMinNodeSizes(): Map<string, { width: number; height: number }> {
     const style = getComputedStyle(document.documentElement);
-    const nodeTypes = [NodeTemplateType.Trigger, NodeTemplateType.Custom, NodeTemplateType.Group];
+    const nodeTypes = [
+      NodeTemplateType.Trigger,
+      NodeTemplateType.Custom,
+      NodeTemplateType.Decision,
+      NodeTemplateType.Group,
+    ];
 
     const map = new Map(
       nodeTypes.map((type) => [

@@ -13,5 +13,6 @@
 export enum NodeTemplateType {
   Trigger = 'trigger',
   Custom = 'custom',
+  Decision = 'decision',
   Group = 'group',
 }

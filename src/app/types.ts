@@ -6,6 +6,7 @@ export interface PaletteData extends BaseNodeEdgeData {
   description: string;
   icon: string;
   status?: StatusType;
+  options?: DecisionOption[];
 }
 
 export interface BaseNodeEdgeData {
@@ -22,3 +23,9 @@ export interface BaseNodeEdgeData {
 }
 
 export type StatusType = 'pending' | 'in-progress' | 'completed' | 'blocked';
+
+/** A single branch rendered by the decision node */
+export interface DecisionOption {
+  id: string;
+  label: string;
+}
