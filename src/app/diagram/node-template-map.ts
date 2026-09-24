@@ -1,6 +1,7 @@
 import { NgDiagramNodeTemplateMap } from 'ng-diagram';
 import { GroupNodeComponent } from './node-templates/group-node/group-node.component';
 import { CustomNodeComponent } from './node-templates/custom-node/custom-node.component';
+import { DecisionNodeComponent } from './node-templates/decision-node/decision-node.component';
 import { TriggerNodeComponent } from './node-templates/trigger-node/trigger-node.component';
 import { NodeTemplateType } from './node-templates/node-template.types';
 
@@ -32,5 +33,6 @@ import { NodeTemplateType } from './node-templates/node-template.types';
 export const nodeTemplateMap = new NgDiagramNodeTemplateMap([
   [NodeTemplateType.Trigger, TriggerNodeComponent],
   [NodeTemplateType.Custom, CustomNodeComponent],
+  [NodeTemplateType.Decision, DecisionNodeComponent],
   [NodeTemplateType.Group, GroupNodeComponent],
 ]);

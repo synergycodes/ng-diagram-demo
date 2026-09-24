@@ -83,6 +83,16 @@ export function createDiagramConfig(
       allowResizeBelowChildrenBounds: false,
     },
 
+    // Z-Index Configuration
+    // Controls how nodes and edges are layered against each other
+    zIndex: {
+      // By default (false) edges render *below* the nodes they connect, which
+      // hides the first leg of any edge whose port sits inside the node body
+      // rather than on its outer boundary - e.g. the decision node's per-option
+      // ports. Drawing edges above their connected nodes keeps them visible.
+      edgesAboveConnectedNodes: true,
+    },
+
     // Linking Configuration
     // Customizes edge creation when user draws connections
     linking: {

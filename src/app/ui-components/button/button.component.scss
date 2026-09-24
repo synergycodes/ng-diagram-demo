@@ -10,6 +10,14 @@
     line-height: 100%;
   }
 
+  // Icon-only buttons (noText) have no text to give them width, so they end up
+  // taller than they are wide. Keep them square whatever the size variant, while
+  // still growing if the icon plus padding needs more room than the height.
+  &--icon-only {
+    aspect-ratio: 1;
+    min-width: fit-content;
+  }
+
   &--xlarge {
     padding: var(--ngd-token-spacing-button-xl-v-pad-2)
       var(--ngd-token-spacing-button-xl-h-pad-2);
@@ -233,7 +241,10 @@
   &--ghost {
     border: 1px solid var(--ngd-button-ghost-destructive-stroke-default);
     background: var(--ngd-button-ghost-destructive-bg-default);
-    color: var(--ngd-txt-destructive-default);
+    // tokens.css (auto-generated) misspells this as `destuctive`, so the correct
+    // spelling resolves to nothing and the icon falls back to inherited black.
+    // Prefer the correct name, fall back to the typo until the generator is fixed.
+    color: var(--ngd-txt-destructive-default, var(--ngd-txt-destuctive-default));
 
     &:hover {
       border: 1px solid var(--ngd-button-ghost-destructive-stroke-default);

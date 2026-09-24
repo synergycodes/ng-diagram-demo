@@ -193,6 +193,23 @@ export class DiagramComponent {
         },
         position: { x: 520, y: 60 },
       },
+      {
+        id: 'decision-1',
+        type: NodeTemplateType.Decision,
+        data: {
+          label: 'Decision',
+          description: 'Branch on a condition',
+          icon: 'ph-git-branch',
+          options: [
+            { id: 'approved', label: 'Approved' },
+            { id: 'rejected', label: 'Rejected' },
+            { id: 'review', label: 'Needs review' },
+          ],
+        },
+        position: { x: 520, y: 260 },
+        autoSize: false,
+        size: { width: 241, height: 190 },
+      },
       // No 'type' - rendered by ng-diagram's built-in default node template
       {
         id: 'default-1',
@@ -239,6 +256,26 @@ export class DiagramComponent {
         //   { x: 400, y: 225 },
         // ],
       },
+      {
+        id: 'TEMP-probe-rejected',
+        source: 'decision-1',
+        target: 'default-1',
+        sourcePort: 'rejected',
+        targetPort: 'port-left',
+        targetArrowhead: 'ng-diagram-arrow',
+        data: {},
+      },
+      {
+        id: 'edge-3',
+        source: 'trigger-1',
+        target: 'decision-1',
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        targetArrowhead: 'ng-diagram-arrow',
+        routing: 'bezier',
+        type: 'custom-edge',
+        data: { label: 'branch' },
+      },
       // No 'type' - ng-diagram's built-in default edge
       {
         id: 'edge-2',
@@ -267,6 +304,7 @@ export class DiagramComponent {
   snapResizeStep = this.propertiesFacade.snapResizeStep;
   snapRotateStep = this.propertiesFacade.snapRotateStep;
   lockY = this.propertiesFacade.lockY;
+  decisionOptions = this.propertiesFacade.decisionOptions;
 
   constructor() {
     /**
@@ -378,6 +416,18 @@ export class DiagramComponent {
     this.propertiesFacade.updateLockY(lockY);
   }
 
+  decisionOptionRename(event: { id: string; label: string }) {
+    this.propertiesFacade.renameDecisionOption(event.id, event.label);
+  }
+
+  decisionOptionRemove(id: string) {
+    this.propertiesFacade.removeDecisionOption(id);
+  }
+
+  decisionOptionAdd() {
+    this.propertiesFacade.addDecisionOption();
+  }
+
   labelChange(label: string) {
     this.propertiesFacade.updateLabel(label);
   }
@@ -480,7 +530,12 @@ export class DiagramComponent {
    */
   private initializeMinNodeSizes(): Map<string, { width: number; height: number }> {
     const style = getComputedStyle(document.documentElement);
-    const nodeTypes = [NodeTemplateType.Trigger, NodeTemplateType.Custom, NodeTemplateType.Group];
+    const nodeTypes = [
+      NodeTemplateType.Trigger,
+      NodeTemplateType.Custom,
+      NodeTemplateType.Decision,
+      NodeTemplateType.Group,
+    ];
 
     const map = new Map(
       nodeTypes.map((type) => [
