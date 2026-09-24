@@ -51,6 +51,9 @@
     font-style: normal;
     font-weight: 600;
     line-height: 140%;
+    // Clearing the name empties this line box, which would shrink the header and
+    // drag every option port below it upwards. Hold one line of height either way.
+    min-height: 1.4em;
   }
 
   &__description {
@@ -59,6 +62,7 @@
     font-style: normal;
     font-weight: 400;
     line-height: 140%;
+    min-height: 1.4em; // same reason as __label
   }
 
   &__options {
@@ -80,6 +84,10 @@
     font-style: normal;
     font-weight: 400;
     line-height: 140%;
+    // A branch renamed to an empty string would collapse this row and shift the
+    // ports of every row below it. box-sizing is border-box globally, so the
+    // min-height has to cover the 6px padding and 1px border on each side.
+    min-height: calc(1.4em + 14px);
 
     &--empty {
       color: var(--ngd-txt-secondary-default);

@@ -207,6 +207,8 @@ export class DiagramComponent {
           ],
         },
         position: { x: 520, y: 260 },
+        autoSize: false,
+        size: { width: 241, height: 190 },
       },
       // No 'type' - rendered by ng-diagram's built-in default node template
       {
@@ -253,6 +255,15 @@ export class DiagramComponent {
         //   { x: 350, y: 250 },
         //   { x: 400, y: 225 },
         // ],
+      },
+      {
+        id: 'TEMP-probe-rejected',
+        source: 'decision-1',
+        target: 'default-1',
+        sourcePort: 'rejected',
+        targetPort: 'port-left',
+        targetArrowhead: 'ng-diagram-arrow',
+        data: {},
       },
       {
         id: 'edge-3',

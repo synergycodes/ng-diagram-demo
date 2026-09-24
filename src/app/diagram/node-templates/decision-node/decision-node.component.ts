@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  untracked,
+} from '@angular/core';
 import {
   NgDiagramNodeResizeAdornmentComponent, // Adds resize handles to node
   NgDiagramNodeRotateAdornmentComponent, // Adds rotation handle to node
@@ -6,6 +14,7 @@ import {
   NgDiagramNodeTemplate, // Interface that all node templates must implement
   NgDiagramPortComponent, // Connection point for drawing edges
   NgDiagramSelectionService, // Service for managing selection
+  NgDiagramService, // Core service - used here to re-measure ports
   NgDiagramViewportService, // Service for coordinate transformation
   Node, // Node type from ng-diagram
 } from 'ng-diagram';
@@ -59,6 +68,7 @@ export class DecisionNodeComponent implements NgDiagramNodeTemplate<DecisionNode
   private readonly contextMenuService = inject(ContextMenuService);
   private readonly viewportService = inject(NgDiagramViewportService);
   private readonly selectionService = inject(NgDiagramSelectionService);
+  private readonly diagramService = inject(NgDiagramService);
 
   /**
    * Node data input - REQUIRED for all node templates
@@ -71,6 +81,26 @@ export class DecisionNodeComponent implements NgDiagramNodeTemplate<DecisionNode
   nodeDescription = computed(() => this.node()?.data?.description ?? 'No description');
   nodeIcon = computed(() => `ph ${this.node()?.data?.icon ?? 'ph-placeholder'}`);
   nodeOptions = computed(() => this.node()?.data?.options ?? []);
+
+  constructor() {
+    // Option ports sit inside the rows, so removing or re-wrapping a row moves the ports
+    // below it without resizing anything the ResizeObserver watches (e.g. a node the user
+    // has resized, which no longer auto-sizes). Without this the library keeps the stale
+    // port geometry and edges stay pinned where the old port used to be.
+    let firstRun = true;
+    effect(() => {
+      this.nodeOptions();
+      if (firstRun) {
+        firstRun = false; // the library measures the initial render itself
+        return;
+      }
+      // Fire-and-forget: awaiting inside a transaction resolves before the fresh
+      // geometry lands, and the docs call out that awaiting there is wrong.
+      untracked(() =>
+        this.diagramService.invalidateMeasurements({ nodes: [{ nodeId: this.node().id }] }),
+      );
+    });
+  }
 
   /**
    * Right-click handler for context menu
