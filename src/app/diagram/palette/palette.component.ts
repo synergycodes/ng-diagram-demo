@@ -43,14 +43,12 @@ import { PaletteData } from '../../types';
  *    <ng-diagram-palette-item-preview>
  *      <app-palette-item-preview [item]="paletteItem" />
  *    </ng-diagram-palette-item-preview>
- *    The preview takes no space in the palette layout, and the drag image under
- *    the cursor is scaled to the current zoom by ng-diagram - no scaling code needed.
+ *    The preview takes no space in the palette layout.
  *
  * Key Features:
  * - Zero configuration drag & drop (directives handle all mechanics)
  * - Automatic coordinate transformation (screen to diagram space)
  * - Custom preview support
- * - Drag image follows the diagram zoom automatically
  */
 @Component({
   selector: 'app-palette',
