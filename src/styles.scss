@@ -51,6 +51,13 @@ body {
 
   --node-group-min-width: 300px;
   --node-group-min-height: 200px;
+
+  /* Relink handles (since 1.4) - ng-diagram moves a handle from the end of the
+     line into the port by (handle size / 2 - 2px), which centers the default
+     0.75rem handle on the library's default 8px port. The custom node ports are
+     12px (8px + 2 x 2px border), so a 1rem handle is the one centered on them
+     and covers the whole port. */
+  --ngd-relink-handle-size: 1rem;
 }
 
 html,
