@@ -3,6 +3,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   DiagramInitEvent, // Emitted when diagram is initialized and ready
   EdgeDrawEndedEvent, // Emitted when an edge draw gesture ends (success or cancel)
+  EdgeRelinkStartedEvent, // Emitted when the user starts dragging an end of an existing edge
+  EdgeRelinkEndedEvent, // Emitted when an edge relink gesture ends (success or revert)
   SelectionMovedEvent, // Emitted when selected nodes are dragged
   SelectionGestureEndedEvent, // Emitted when a selection gesture completes (on pointerup)
   SelectionRemovedEvent, // Emitted when selected items are deleted
@@ -59,19 +61,26 @@ export class DebugEventsService {
    * Event data:
    * - success: Whether the edge was created
    * - edge: The newly created edge object (when successful)
-   * - source: Source node
-   * - target: Target node (when successful)
+   * - source: Source node (absent for draws started with startLinkingFromPosition)
+   * - target: Target node (absent when the edge was kept as a dangling edge)
    * - reason: Cancellation reason (when cancelled)
    * - dropPosition: Where the gesture ended
+   *
+   * With danglingEdges.enabled, a drop on empty canvas still reports success: true -
+   * check event.target to tell a connected edge from a dangling one.
    */
   onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
     if (!this.debugMode()) return;
-    if (event.success) {
+    if (event.success && event.target) {
       this.snackBar.open(
-        `Edge drawn from ${event.edge!.source} to ${event.edge!.target}`,
+        `Edge drawn from ${event.source?.id ?? 'a free point'} to ${event.target.id}`,
         '',
         { duration: 4000 }
       );
+    } else if (event.success) {
+      this.snackBar.open(`Edge kept as a dangling edge: ${event.edge!.id}`, '', {
+        duration: 4000,
+      });
     } else {
       this.snackBar.open(
         `Edge draw cancelled: ${event.reason}`,
@@ -79,6 +88,50 @@ export class DebugEventsService {
         { duration: 4000 }
       );
     }
+  }
+
+  /**
+   * Relinking Event: Edge Relink Started
+   *
+   * Emitted when the user starts dragging a relink handle of a selected edge
+   * (more than ~5px of pointer movement - a plain click on a handle does nothing).
+   *
+   * Event data:
+   * - edge: Snapshot of the edge at gesture start
+   * - end: Which end is dragged ('source' | 'target')
+   */
+  onEdgeRelinkStarted(event: EdgeRelinkStartedEvent) {
+    if (!this.debugMode()) return;
+    this.snackBar.open(`Relinking ${event.end} end of ${event.edge.id}`, '', {
+      duration: 4000,
+    });
+  }
+
+  /**
+   * Relinking Event: Edge Relink Ended
+   *
+   * Emitted when a relink gesture ends, whatever the outcome.
+   *
+   * Event data:
+   * - edge: The edge after the relink (unchanged snapshot on failure)
+   * - end: The dragged end
+   * - previousNode / previousPort: Where the end was connected before (if it was)
+   * - previousPosition: Where the end was anchored before (if it was free)
+   * - target / targetPort: The new connection (on reconnect)
+   * - success: Whether the edge changed (reconnected or detached)
+   * - reason: 'noTarget' | 'invalidConnection' | 'cancelled' (on failure)
+   */
+  onEdgeRelinkEnded(event: EdgeRelinkEndedEvent) {
+    if (!this.debugMode()) return;
+    let message: string;
+    if (event.success && event.target) {
+      message = `Reconnected ${event.end} of ${event.edge.id} to ${event.target.id}`;
+    } else if (event.success) {
+      message = `Detached ${event.end} of ${event.edge.id} - now a dangling edge`;
+    } else {
+      message = `Relink reverted: ${event.reason}`;
+    }
+    this.snackBar.open(message, '', { duration: 4000 });
   }
 
   /**
@@ -123,18 +176,21 @@ export class DebugEventsService {
    * Selection Event: Items Deleted
    *
    * Emitted when selected nodes and/or edges are deleted.
-   * Edges connected to deleted nodes are also deleted automatically.
+   * Edges connected to deleted nodes are deleted too - unless
+   * danglingEdges.detachOnNodeDelete keeps them as dangling edges.
    *
    * Event data:
    * - deletedNodes: Array of nodes that were deleted
    * - deletedEdges: Array of edges that were deleted (including auto-deleted edges)
+   * - detachedEdges: Edges kept as dangling edges instead of deleted ([] when none)
    */
   onSelectionRemoved(event: SelectionRemovedEvent) {
     if (!this.debugMode()) return;
     const nodeCount = event.deletedNodes.length;
     const edgeCount = event.deletedEdges.length;
+    const detachedCount = event.detachedEdges.length;
     this.snackBar.open(
-      `Deleted ${nodeCount} node(s), ${edgeCount} edge(s)`,
+      `Deleted ${nodeCount} node(s), ${edgeCount} edge(s), detached ${detachedCount} edge(s)`,
       '',
       { duration: 4000 }
     );

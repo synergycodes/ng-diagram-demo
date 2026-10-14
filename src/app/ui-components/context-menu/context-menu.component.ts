@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, output } from '@angular/core';
+import { Component, HostListener, inject, input, output } from '@angular/core';
 import { ContextMenuService } from './context-menu.service';
 
 export interface PasteEvent {
@@ -18,12 +18,16 @@ export class ContextMenuComponent {
   menuPosition = this.contextMenuService.menuPosition;
   nodeContext = this.contextMenuService.nodeContext;
 
+  /** "Start edge here" needs danglingEdges.enabled - the item is hidden without it */
+  canStartEdge = input(false);
+
   copyClick = output<void>();
   cutClick = output<void>();
   pasteClick = output<PasteEvent>();
   deleteClick = output<void>();
   bringToFrontClick = output<void>();
   sendToBackClick = output<void>();
+  startEdgeClick = output<void>();
 
   @HostListener('document:click')
   closeMenu() {
@@ -47,6 +51,10 @@ export class ContextMenuComponent {
 
   onDelete() {
     this.deleteClick.emit();
+  }
+
+  onStartEdge() {
+    this.startEdgeClick.emit();
   }
 
   onBringToFront() {

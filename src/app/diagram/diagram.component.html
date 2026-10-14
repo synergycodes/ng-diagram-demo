@@ -7,6 +7,8 @@
     [middlewares]="middlewares"
     (diagramInit)="onDiagramInit($event)"
     (edgeDrawEnded)="onEdgeDrawEnded($event)"
+    (edgeRelinkStarted)="onEdgeRelinkStarted($event)"
+    (edgeRelinkEnded)="onEdgeRelinkEnded($event)"
     (selectionMoved)="onSelectionMoved($event)"
     (selectionGestureEnded)="onSelectionGestureEnded($event)"
     (selectionRemoved)="onSelectionRemoved($event)"
@@ -24,9 +26,13 @@
   <ng-diagram-minimap />
   <app-navbar
     (toggleDebugModeClick)="debugMode.set(!debugMode())"
+    (toggleRelinkingClick)="relinkingEnabled.set(!relinkingEnabled())"
+    (toggleDanglingEdgesClick)="danglingEdgesEnabled.set(!danglingEdgesEnabled())"
     (backgroundTypeChange)="backgroundType.set($event)"
     (searchNodeClick)="onSearchNode($event)"
     [isDebugMode]="debugMode()"
+    [isRelinkingEnabled]="relinkingEnabled()"
+    [isDanglingEdgesEnabled]="danglingEdgesEnabled()"
     [backgroundType]="backgroundType()"
   />
   <app-palette [model]="paletteModel" />
@@ -43,6 +49,12 @@
     [snapRotateStep]="snapRotateStep()"
     [lockY]="lockY()"
     [decisionOptions]="decisionOptions()"
+    [edgeRelinkable]="edgeRelinkable()"
+    [edgeFreeEnds]="edgeFreeEnds()"
+    [relinkingEnabled]="relinkingEnabled()"
+    [danglingEdgesEnabled]="danglingEdgesEnabled()"
+    (relinkableChange)="relinkableChange($event)"
+    (detachEnd)="detachEdgeEnd($event)"
     (labelChange)="labelChange($event)"
     (routingChange)="routingChange($event)"
     (labelPositionChange)="labelPositionChange($event)"
@@ -58,6 +70,8 @@
     (snapRotateStepChange)="snapRotateStepChange($event)"
   />
   <app-context-menu
+    [canStartEdge]="danglingEdgesEnabled()"
+    (startEdgeClick)="onContextMenuStartEdge()"
     (copyClick)="onContextMenuCopy()"
     (cutClick)="onContextMenuCut()"
     (pasteClick)="onContextMenuPaste($event)"

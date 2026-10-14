@@ -91,6 +91,32 @@
     gap: 8px;
   }
 
+  &__end-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 24px;
+  }
+
+  &__end-name {
+    min-width: 56px;
+    color: var(--ngd-txt-primary-default);
+    font-size: 14px;
+    line-height: 140%;
+  }
+
+  &__end-status {
+    flex: 1;
+    color: var(--ngd-txt-secondary-default);
+    font-size: 13px;
+    line-height: 140%;
+
+    &--free {
+      color: var(--ngd-txt-primary-default);
+      font-style: italic;
+    }
+  }
+
   &__checkbox-label {
     display: flex;
     align-items: center;

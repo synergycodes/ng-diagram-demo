@@ -22,6 +22,8 @@ import {
   Node, // Node interface
   EdgeLabelPosition, // number (0-1) or 'Npx' - see properties panel
   EdgeRoutingName, // Edge routing types ('orthogonal', 'polyline', 'bezier')
+  EdgeEnd, // 'source' | 'target' - one end of an edge
+  Point, // { x, y }
 
   // Services - Key ng-diagram services for diagram manipulation
   NgDiagramService, // Main service - initialization, config updates
@@ -37,6 +39,8 @@ import {
   // Event types - All available diagram events
   DiagramInitEvent, // Fired when diagram is initialized
   EdgeDrawEndedEvent, // Fired when edge draw gesture ends (success or cancel)
+  EdgeRelinkStartedEvent, // Fired when the user starts dragging an end of an existing edge
+  EdgeRelinkEndedEvent, // Fired when an edge relink gesture ends (success or revert)
   SelectionMovedEvent, // Fired when nodes are dragged
   SelectionGestureEndedEvent, // Fired when a selection gesture completes (on pointerup)
   SelectionRemovedEvent, // Fired when nodes/edges are deleted
@@ -51,7 +55,7 @@ import {
 import { PaletteComponent } from './palette/palette.component';
 import { PropertiesComponent } from '../ui-components/properties/properties.component';
 import { NavbarComponent, BackgroundType } from '../ui-components/navbar/navbar.component';
-import { BaseNodeEdgeData, PaletteData } from '../types';
+import { BaseNodeEdgeData, EdgeRelinkableOption, PaletteData } from '../types';
 import { paletteModel } from './palette-data';
 import { nodeTemplateMap } from './node-template-map';
 import { edgeTemplateMap } from './edge-template-map';
@@ -161,6 +165,17 @@ export class DiagramComponent {
   debugMode = this.debugEvents.debugMode;
   propertiesCollapsed = signal(true);
 
+  /**
+   * Edge relinking and dangling edges (since 1.4) - both start enabled
+   * (see services/diagram.config.ts) and can be switched off from the navbar
+   * to show the library's default behavior next to the new one.
+   */
+  relinkingEnabled = signal(true);
+  danglingEdgesEnabled = signal(true);
+
+  /** Where the canvas context menu was opened, in flow coordinates */
+  private contextMenuFlowPosition: Point = { x: 0, y: 0 };
+
   // ===================================
   // Diagram Model Initialization
   // ===================================
@@ -257,15 +272,6 @@ export class DiagramComponent {
         // ],
       },
       {
-        id: 'TEMP-probe-rejected',
-        source: 'decision-1',
-        target: 'default-1',
-        sourcePort: 'rejected',
-        targetPort: 'port-left',
-        targetArrowhead: 'ng-diagram-arrow',
-        data: {},
-      },
-      {
         id: 'edge-3',
         source: 'trigger-1',
         target: 'decision-1',
@@ -275,6 +281,19 @@ export class DiagramComponent {
         routing: 'bezier',
         type: 'custom-edge',
         data: { label: 'branch' },
+      },
+      // Dangling edge (since 1.4) - the target end is free: no node, no port,
+      // anchored at targetPosition (flow coordinates). Select it and drag the
+      // handle at its free end onto a port to connect it.
+      {
+        id: 'edge-dangling',
+        source: 'decision-1',
+        sourcePort: 'review',
+        target: '', // free end - always '' (never null or undefined)
+        targetPosition: { x: 1020, y: 420 },
+        targetArrowhead: 'ng-diagram-arrow',
+        type: 'custom-edge',
+        data: { label: 'dangling' },
       },
       // No 'type' - ng-diagram's built-in default edge
       {
@@ -305,6 +324,8 @@ export class DiagramComponent {
   snapRotateStep = this.propertiesFacade.snapRotateStep;
   lockY = this.propertiesFacade.lockY;
   decisionOptions = this.propertiesFacade.decisionOptions;
+  edgeRelinkable = this.propertiesFacade.edgeRelinkable;
+  edgeFreeEnds = this.propertiesFacade.edgeFreeEnds;
 
   constructor() {
     /**
@@ -314,6 +335,20 @@ export class DiagramComponent {
     effect(() => {
       if (this.diagramService.isInitialized()) {
         this.diagramService.updateConfig({ debugMode: this.debugMode() });
+      }
+    });
+
+    /**
+     * Relinking and dangling edges can be switched at runtime too -
+     * updateConfig() deep-merges the partial config into the current one.
+     */
+    effect(() => {
+      if (this.diagramService.isInitialized()) {
+        const danglingEdges = this.danglingEdgesEnabled();
+        this.diagramService.updateConfig({
+          linking: { defaultRelinkable: this.relinkingEnabled() },
+          danglingEdges: { enabled: danglingEdges, detachOnNodeDelete: danglingEdges },
+        });
       }
     });
   }
@@ -341,6 +376,23 @@ export class DiagramComponent {
   }
 
   /**
+   * EdgeRelinkStartedEvent - Fired when the user starts dragging a relink handle
+   * event.edge is a snapshot of the edge, event.end the dragged end
+   */
+  onEdgeRelinkStarted(event: EdgeRelinkStartedEvent) {
+    this.debugEvents.onEdgeRelinkStarted(event);
+  }
+
+  /**
+   * EdgeRelinkEndedEvent - Fired when a relink gesture ends
+   * event.success + event.target = reconnected; event.success alone = end detached;
+   * otherwise event.reason says why the edge was left unchanged
+   */
+  onEdgeRelinkEnded(event: EdgeRelinkEndedEvent) {
+    this.debugEvents.onEdgeRelinkEnded(event);
+  }
+
+  /**
    * SelectionMovedEvent - Fired when nodes are dragged
    * event.nodes contains all moved nodes with new positions
    */
@@ -359,7 +411,8 @@ export class DiagramComponent {
 
   /**
    * SelectionRemovedEvent - Fired when nodes/edges are deleted
-   * event.deletedNodes and event.deletedEdges contain deleted items
+   * event.deletedNodes and event.deletedEdges contain deleted items,
+   * event.detachedEdges the edges kept as dangling edges (danglingEdges.detachOnNodeDelete)
    */
   onSelectionRemoved(event: SelectionRemovedEvent) {
     this.debugEvents.onSelectionRemoved(event);
@@ -428,6 +481,14 @@ export class DiagramComponent {
     this.propertiesFacade.addDecisionOption();
   }
 
+  relinkableChange(option: EdgeRelinkableOption) {
+    this.propertiesFacade.updateRelinkable(option);
+  }
+
+  detachEdgeEnd(end: EdgeEnd) {
+    this.propertiesFacade.detachEdgeEnd(end);
+  }
+
   labelChange(label: string) {
     this.propertiesFacade.updateLabel(label);
   }
@@ -480,6 +541,17 @@ export class DiagramComponent {
     this.contextMenuFacade.delete();
   }
 
+  /**
+   * Start drawing an edge from the point where the menu was opened (since 1.4)
+   *
+   * The free end follows the pointer until the next click: a click on a port
+   * connects it, a click on empty canvas leaves an edge with both ends free.
+   * Requires danglingEdges.enabled - the menu hides the item without it.
+   */
+  onContextMenuStartEdge() {
+    this.diagramService.startLinkingFromPosition(this.contextMenuFlowPosition);
+  }
+
   onContextMenuBringToFront() {
     this.contextMenuFacade.bringToFront();
   }
@@ -498,6 +570,12 @@ export class DiagramComponent {
       y: event.clientY,
     });
     this.contextMenuService.showDiagramMenu(cursorPosition);
+
+    // Flow coordinates (pan and zoom applied) - the anchor for "Start edge here"
+    this.contextMenuFlowPosition = this.viewportService.clientToFlowPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
   }
 
   onSearchNode(query: string) {

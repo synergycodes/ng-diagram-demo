@@ -14,6 +14,9 @@
       <li (click)="onSendToBack()">Send to Back</li>
     } @else {
       <li (click)="onPaste($event)">Paste</li>
+      @if (canStartEdge()) {
+        <li (click)="onStartEdge()">Start edge here</li>
+      }
     }
   </ul>
 </div>

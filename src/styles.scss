@@ -68,6 +68,13 @@ body {
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
+/* Dangling edges (since 1.4) - any edge with a free end gets the `dangling`
+   class on ng-diagram-base-edge, for the default and custom edge templates alike.
+   Draw previews never get it, even though they always have a free end. */
+ng-diagram-base-edge.dangling {
+  --edge-stroke-dasharray: 6 4;
+}
+
 /* Custom snackbar styles */
 .mat-mdc-snack-bar-container {
   .mdc-snackbar__surface {

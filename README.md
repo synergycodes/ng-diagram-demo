@@ -6,7 +6,7 @@
 
 ![ngDiagram feature demo — a palette with default and custom nodes, a bezier edge with a movable label, a group, and the properties panel with routing and label-position controls](docs/assets/demo.png)
 
-A showcase of [ngDiagram](https://www.ngdiagram.dev/) — an Angular library for creating interactive diagrams. One app wires up the library's main features side by side: custom node and edge templates, a drag-and-drop palette, grouping, a clipboard context menu, snapping, rotation, and a custom middleware.
+A showcase of [ngDiagram](https://www.ngdiagram.dev/) — an Angular library for creating interactive diagrams. One app wires up the library's main features side by side: custom node and edge templates, a drag-and-drop palette, grouping, a clipboard context menu, snapping, rotation, a custom middleware, and edge relinking with dangling edges.
 
 ## Project Structure
 
@@ -49,9 +49,22 @@ Shared TypeScript interfaces used across the application.
 
 - **`horizontal-lock.middleware.ts`** - Demonstrates how to constrain node movement using the middleware pipeline. Nodes with **Lock vertical movement** checked in the properties panel are restricted to X-axis movement only (their Y position stays locked). Select any node, tick the checkbox, and drag it around.
 
+## Edge Relinking and Dangling Edges
+
+Both features are on by default (`linking.defaultRelinkable` and `danglingEdges` in `src/app/diagram/services/diagram.config.ts`). The two toggles next to the background buttons in the navbar switch them off and on, so you can compare them with the default behavior.
+
+- **Relinking** - select an edge and drag the handle at either end onto another port. Drop it back where it was, or press <kbd>Esc</kbd>, to leave the edge unchanged. In the properties panel, **Relinkable ends** overrides the default for the selected edge: both ends, source only, target only, or locked.
+- **Dangling edges** - edges with a free end, drawn dashed. The diagram loads with one (the **dangling** edge from the decision node). You get more when you:
+  - drop a new edge or a relink handle on empty canvas,
+  - delete a node: its edges stay, anchored where its ports were,
+  - click **Detach** next to an end in the properties panel,
+  - right-click the canvas and pick **Start edge here**: the edge follows the pointer until you click a port (connects it) or empty canvas (both ends stay free).
+
+Drag the handle at a free end onto a port to connect it again. With debug mode on (the bug button), snackbars report the `edgeDrawEnded`, `edgeRelinkStarted`/`edgeRelinkEnded` and `selectionRemoved` events, including the detached edges.
+
 ## Getting Started
 
-Built against Angular 21.2 and ngDiagram 1.3 (see `package.json`); Node.js 20.19+ or 22.12+ and npm 10+.
+Built against Angular 21.2 and ngDiagram 1.4 (see `package.json`); Node.js 20.19+ or 22.12+ and npm 10+.
 
 ```bash
 git clone https://github.com/synergycodes/ng-diagram-demo.git
@@ -60,7 +73,7 @@ npm install
 npm start
 ```
 
-Open [http://localhost:4200](http://localhost:4200) — a small diagram loads with every node template side by side: the library's default node, the two custom templates, and a group with a child. Try dragging new nodes in from the left palette, right-clicking a node for the clipboard context menu, and ticking **Lock vertical movement** on a selected node - a custom middleware then pins its Y position while you drag. `npm run build` compiles to `dist/`.
+Open [http://localhost:4200](http://localhost:4200) — a small diagram loads with every node template side by side: the library's default node, the two custom templates, and a group with a child. Try dragging new nodes in from the left palette, right-clicking a node for the clipboard context menu, and ticking **Lock vertical movement** on a selected node - a custom middleware then pins its Y position while you drag. Select an edge and drag one of its end handles to relink it, or drop it on empty canvas to leave it dangling. `npm run build` compiles to `dist/`.
 
 Working with an AI coding tool? Copy [`mcp.json`](mcp.json) to `.mcp.json` (or your tool's MCP config) to add the ngDiagram docs MCP server — searchable ngDiagram documentation and API reference right in the session. The file carries the Windows command; the macOS/Linux variant is noted inside.
 

@@ -48,8 +48,12 @@ export class NavbarComponent {
   toggleDebugModeClick = output<void>();
   backgroundTypeChange = output<BackgroundType>();
   searchNodeClick = output<string>();
+  toggleRelinkingClick = output<void>();
+  toggleDanglingEdgesClick = output<void>();
 
   isDebugMode = input.required<boolean>();
+  isRelinkingEnabled = input.required<boolean>();
+  isDanglingEdgesEnabled = input.required<boolean>();
   backgroundType = input<BackgroundType>('dots');
 
   searchQuery = signal('');

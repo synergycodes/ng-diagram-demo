@@ -7,9 +7,16 @@ import {
   Edge,
   EdgeRoutingName, // Type for edge routing algorithms: 'orthogonal', 'polyline', 'bezier'
   EdgeLabelPosition, // number (0-1 fraction) or 'Npx' (absolute; negative = from the target)
-  SelectionGestureEndedEvent,
+  EdgeEnd, // 'source' | 'target'
+  hasFreeEndpoint, // Whether an edge end is free (not connected to a node) - since 1.4
 } from 'ng-diagram';
-import { BaseNodeEdgeData, DecisionOption, MAX_DECISION_OPTIONS } from '../../types';
+import {
+  BaseNodeEdgeData,
+  DecisionOption,
+  EdgeFreeEnds,
+  EdgeRelinkableOption,
+  MAX_DECISION_OPTIONS,
+} from '../../types';
 import { NodeTemplateType } from '../node-templates/node-template.types';
 
 /** Node data shape the decision node reads - see decision-node.component.ts */
@@ -160,6 +167,43 @@ export class PropertiesFacadeService {
   });
 
   /**
+   * Computed signal for the per-edge relinking override of the selected edge
+   *
+   * Maps the edge's own `relinkable` property to a panel option:
+   * - undefined -> 'default' (linking.defaultRelinkable from the config applies)
+   * - true -> 'both', false -> 'none', 'source' / 'target' -> that end only
+   */
+  edgeRelinkable = computed<EdgeRelinkableOption | null>(() => {
+    const edge = this.selectionService.selection().edges[0];
+    if (!edge) return null;
+    switch (edge.relinkable) {
+      case undefined:
+        return 'default';
+      case true:
+        return 'both';
+      case false:
+        return 'none';
+      default:
+        return edge.relinkable;
+    }
+  });
+
+  /**
+   * Computed signal telling which ends of the selected edge are free (dangling)
+   *
+   * A free end has `source`/`target` set to '' and its anchor in
+   * `sourcePosition`/`targetPosition`; hasFreeEndpoint() checks exactly that.
+   */
+  edgeFreeEnds = computed<EdgeFreeEnds | null>(() => {
+    const edge = this.selectionService.selection().edges[0];
+    if (!edge) return null;
+    return {
+      source: hasFreeEndpoint(edge, 'source'),
+      target: hasFreeEndpoint(edge, 'target'),
+    };
+  });
+
+  /**
    * Computed signal for the branches on the selected decision node
    *
    * Returns null for any other selection, which hides the list in the panel
@@ -306,6 +350,34 @@ export class PropertiesFacadeService {
     if (edge) {
       this.modelService.updateEdge(edge.id, { routing });
     }
+  }
+
+  /**
+   * Override relinking for the selected edge
+   *
+   * `relinkable` is a built-in edge property (not in edge.data). Setting it to
+   * undefined removes the override, so linking.defaultRelinkable applies again.
+   */
+  updateRelinkable(option: EdgeRelinkableOption) {
+    const edge = this.selectionService.selection().edges[0];
+    if (!edge) return;
+
+    const relinkable =
+      option === 'default' ? undefined : option === 'both' ? true : option === 'none' ? false : option;
+    this.modelService.updateEdge(edge.id, { relinkable });
+  }
+
+  /**
+   * Detach one end of the selected edge, turning it into a dangling edge
+   *
+   * NgDiagramModelService.detachEdge() clears the end's node and port and anchors
+   * it where it is now. It requires danglingEdges.enabled - otherwise it does
+   * nothing and logs a console warning, so the panel disables the buttons then.
+   */
+  detachEdgeEnd(end: EdgeEnd) {
+    const edge = this.selectionService.selection().edges[0];
+    if (!edge || hasFreeEndpoint(edge, end)) return;
+    this.modelService.detachEdge(edge.id, end);
   }
 
   /**

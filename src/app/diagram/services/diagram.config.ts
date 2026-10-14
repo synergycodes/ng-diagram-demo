@@ -103,6 +103,25 @@ export function createDiagramConfig(
         ...edge,
         type: 'custom-edge',
       }),
+
+      // Relinking (since 1.4): a selected edge shows a handle at each end that can be
+      // dragged onto another port. `true` = both ends, 'source' / 'target' = one end only.
+      // An edge overrides this default with its own `relinkable` property
+      // (see the "Relinkable ends" field in the properties panel).
+      // Toggled at runtime from the navbar - see DiagramComponent.
+      defaultRelinkable: true,
+    },
+
+    // Dangling Edges Configuration (since 1.4)
+    // Edges may have a free end: `source`/`target` set to '' and the anchor stored in
+    // `sourcePosition`/`targetPosition`. Toggled at runtime from the navbar.
+    danglingEdges: {
+      // Master switch: a draw or relink dropped on empty canvas keeps the edge with a free end
+      // (instead of discarding the draw / reverting the relink). Also enables
+      // NgDiagramModelService.detachEdge() and NgDiagramService.startLinkingFromPosition().
+      enabled: true,
+      // Deleting a node keeps its edges, anchored where the node's port was
+      detachOnNodeDelete: true,
     },
   };
 }

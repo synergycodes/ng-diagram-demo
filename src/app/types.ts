@@ -32,3 +32,16 @@ export interface DecisionOption {
 
 /** Upper bound for the decision branch list edited in the properties panel */
 export const MAX_DECISION_OPTIONS = 10;
+
+/**
+ * Per-edge relinking override shown in the properties panel.
+ * 'default' = no `relinkable` on the edge (linking.defaultRelinkable applies),
+ * 'both' = true, 'none' = false, 'source' / 'target' = only that end.
+ */
+export type EdgeRelinkableOption = 'default' | 'both' | 'source' | 'target' | 'none';
+
+/** Which ends of an edge are free (not connected to a node) */
+export interface EdgeFreeEnds {
+  source: boolean;
+  target: boolean;
+}

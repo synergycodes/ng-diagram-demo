@@ -43,6 +43,22 @@
         ><i class="ph ph-grid-four"></i
       ></ngd-nav-button>
     </div>
+    <div class="button-group">
+      <ngd-nav-button
+        [active]="isRelinkingEnabled()"
+        (clickAction)="toggleRelinkingClick.emit()"
+        title="Edge relinking: select an edge and drag a handle at its end to another port"
+        size="small"
+        ><i class="ph ph-plugs-connected"></i
+      ></ngd-nav-button>
+      <ngd-nav-button
+        [active]="isDanglingEdgesEnabled()"
+        (clickAction)="toggleDanglingEdgesClick.emit()"
+        title="Dangling edges: keep edges dropped on empty canvas and edges of deleted nodes"
+        size="small"
+        ><i class="ph ph-link-break"></i
+      ></ngd-nav-button>
+    </div>
     <ngd-nav-button
       [active]="isDebugMode()"
       (clickAction)="toggleDebugModeClick.emit()"
