@@ -60,6 +60,13 @@ body {
   --ngd-relink-handle-size: 1rem;
 }
 
+/* ng-diagram 1.4.0 has no dark-theme value for the edge hover color - the light one
+   (#27282b) is almost invisible on the dark canvas. Fixed in the next ng-diagram
+   release, which makes this override unnecessary. */
+html[data-theme='dark'] {
+  --ngd-default-edge-stroke-hover: #6f7480;
+}
+
 html,
 body {
   height: 100%;
