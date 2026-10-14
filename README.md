@@ -20,7 +20,7 @@ This directory contains all the core ngDiagram logic and showcases how to use th
   - Model initialization
 
 - **`services/`**
-  - `diagram.config.ts` - NgDiagramConfig with snapping, zoom, rotation, etc.
+  - `diagram.config.ts` - NgDiagramConfig with snapping, zoom, rotation, edge relinking, dangling edges and grouping rules
   - `properties-facade.service.ts` - Properties panel integration
   - `debug-events.service.ts` - Complete event handling reference
   - `context-menu-facade.service.ts` - Clipboard and z-order operations
@@ -34,6 +34,7 @@ This directory contains all the core ngDiagram logic and showcases how to use th
 - **`node-templates/`** - Custom node components:
   - `trigger-node/` - Basic node with ports, resize, and rotation
   - `custom-node/` - Interactive node with status dropdown
+  - `decision-node/` - Node with an output port per branch, branches edited in the properties panel
   - `group-node/` - Container node for grouping, collapsible to its header
   - `node-template-map.ts` - Type-to-component mapping
 
