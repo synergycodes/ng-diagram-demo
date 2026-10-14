@@ -13,7 +13,6 @@ import {
 import {
   BaseNodeEdgeData,
   DecisionOption,
-  EdgeFreeEnds,
   EdgeRelinkableOption,
   MAX_DECISION_OPTIONS,
 } from '../../types';
@@ -21,6 +20,18 @@ import { NodeTemplateType } from '../node-templates/node-template.types';
 
 /** Node data shape the decision node reads - see decision-node.component.ts */
 type DecisionNodeData = BaseNodeEdgeData & { options?: DecisionOption[] };
+
+/**
+ * Panel option -> the edge's own `relinkable` value.
+ * undefined = no override, so linking.defaultRelinkable from the config applies.
+ */
+const RELINKABLE_BY_OPTION: Record<EdgeRelinkableOption, boolean | EdgeEnd | undefined> = {
+  default: undefined,
+  both: true,
+  source: 'source',
+  target: 'target',
+  none: false,
+};
 
 
 /**
@@ -169,23 +180,14 @@ export class PropertiesFacadeService {
   /**
    * Computed signal for the per-edge relinking override of the selected edge
    *
-   * Maps the edge's own `relinkable` property to a panel option:
-   * - undefined -> 'default' (linking.defaultRelinkable from the config applies)
-   * - true -> 'both', false -> 'none', 'source' / 'target' -> that end only
+   * Maps the edge's own `relinkable` property back to a panel option
+   * (see RELINKABLE_BY_OPTION).
    */
   edgeRelinkable = computed<EdgeRelinkableOption | null>(() => {
-    const edge = this.selectionService.selection().edges[0];
+    const edge = this.selectedEdge();
     if (!edge) return null;
-    switch (edge.relinkable) {
-      case undefined:
-        return 'default';
-      case true:
-        return 'both';
-      case false:
-        return 'none';
-      default:
-        return edge.relinkable;
-    }
+    const options = Object.keys(RELINKABLE_BY_OPTION) as EdgeRelinkableOption[];
+    return options.find((option) => RELINKABLE_BY_OPTION[option] === edge.relinkable) ?? 'default';
   });
 
   /**
@@ -194,8 +196,8 @@ export class PropertiesFacadeService {
    * A free end has `source`/`target` set to '' and its anchor in
    * `sourcePosition`/`targetPosition`; hasFreeEndpoint() checks exactly that.
    */
-  edgeFreeEnds = computed<EdgeFreeEnds | null>(() => {
-    const edge = this.selectionService.selection().edges[0];
+  edgeFreeEnds = computed<Record<EdgeEnd, boolean> | null>(() => {
+    const edge = this.selectedEdge();
     if (!edge) return null;
     return {
       source: hasFreeEndpoint(edge, 'source'),
@@ -236,6 +238,13 @@ export class PropertiesFacadeService {
     if (edge) {
       this.modelService.updateEdgeData(edge.id, { ...edge.data, label });
     }
+  }
+
+  /**
+   * The first selected edge, if any
+   */
+  private selectedEdge(): Edge | undefined {
+    return this.selectionService.selection().edges[0];
   }
 
   /**
@@ -359,12 +368,9 @@ export class PropertiesFacadeService {
    * undefined removes the override, so linking.defaultRelinkable applies again.
    */
   updateRelinkable(option: EdgeRelinkableOption) {
-    const edge = this.selectionService.selection().edges[0];
+    const edge = this.selectedEdge();
     if (!edge) return;
-
-    const relinkable =
-      option === 'default' ? undefined : option === 'both' ? true : option === 'none' ? false : option;
-    this.modelService.updateEdge(edge.id, { relinkable });
+    this.modelService.updateEdge(edge.id, { relinkable: RELINKABLE_BY_OPTION[option] });
   }
 
   /**
@@ -375,7 +381,7 @@ export class PropertiesFacadeService {
    * nothing and logs a console warning, so the panel disables the buttons then.
    */
   detachEdgeEnd(end: EdgeEnd) {
-    const edge = this.selectionService.selection().edges[0];
+    const edge = this.selectedEdge();
     if (!edge || hasFreeEndpoint(edge, end)) return;
     this.modelService.detachEdge(edge.id, end);
   }

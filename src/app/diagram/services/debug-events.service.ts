@@ -71,23 +71,15 @@ export class DebugEventsService {
    */
   onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
     if (!this.debugMode()) return;
+    let message: string;
     if (event.success && event.target) {
-      this.snackBar.open(
-        `Edge drawn from ${event.source?.id ?? 'a free point'} to ${event.target.id}`,
-        '',
-        { duration: 4000 }
-      );
+      message = `Edge drawn from ${event.source?.id ?? 'a free point'} to ${event.target.id}`;
     } else if (event.success) {
-      this.snackBar.open(`Edge kept as a dangling edge: ${event.edge!.id}`, '', {
-        duration: 4000,
-      });
+      message = `Edge kept as a dangling edge: ${event.edge!.id}`;
     } else {
-      this.snackBar.open(
-        `Edge draw cancelled: ${event.reason}`,
-        '',
-        { duration: 4000 }
-      );
+      message = `Edge draw cancelled: ${event.reason}`;
     }
+    this.snackBar.open(message, '', { duration: 4000 });
   }
 
   /**

@@ -87,10 +87,10 @@
     @if (edgeFreeEnds(); as freeEnds) {
       <label class="properties__label">Dangling ends:</label>
       <div class="properties__checkbox-group">
-        @for (end of edgeEnds; track end) {
-          <div class="properties__end-row">
-            <span class="properties__end-name">{{ end === 'source' ? 'Source' : 'Target' }}</span>
-            @if (freeEnds[end]) {
+        @for (end of edgeEnds; track end.value) {
+          <div class="properties__snap-row properties__end-row">
+            <span class="properties__end-name">{{ end.label }}</span>
+            @if (freeEnds[end.value]) {
               <span class="properties__end-status properties__end-status--free">free</span>
             } @else {
               <span class="properties__end-status">connected</span>
@@ -104,7 +104,7 @@
                     ? 'Detach this end - it stays where it is now'
                     : 'Turn on dangling edges in the navbar to detach an end'
                 "
-                (clickAction)="detachEnd.emit(end)"
+                (clickAction)="detachEnd.emit(end.value)"
               >Detach</ngd-button>
             }
           </div>

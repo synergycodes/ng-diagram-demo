@@ -10,7 +10,7 @@ import {
   NgDiagramSelectionService,
   NgDiagramViewportService,
 } from 'ng-diagram';
-import { GroupNodeData } from '../../../types';
+import { CollapsibleGroupData } from '../../../types';
 import { ContextMenuService } from '../../../ui-components/context-menu/context-menu.service';
 import { GroupCollapseService } from '../../services/group-collapse.service';
 
@@ -54,7 +54,7 @@ import { GroupCollapseService } from '../../services/group-collapse.service';
     '[class.ng-diagram-port-hoverable-over-node]': 'true',
   },
 })
-export class GroupNodeComponent implements NgDiagramGroupNodeTemplate<GroupNodeData> {
+export class GroupNodeComponent implements NgDiagramGroupNodeTemplate<CollapsibleGroupData> {
   private readonly contextMenuService = inject(ContextMenuService);
   private readonly viewportService = inject(NgDiagramViewportService);
   private readonly selectionService = inject(NgDiagramSelectionService);
@@ -66,7 +66,7 @@ export class GroupNodeComponent implements NgDiagramGroupNodeTemplate<GroupNodeD
    * GroupNode extends Node with additional property:
    * - highlighted: boolean - true when dragging nodes over the group
    */
-  node = input.required<GroupNode<GroupNodeData>>();
+  node = input.required<GroupNode<CollapsibleGroupData>>();
 
   /** Group title from node data */
   groupTitle = computed(() => this.node().data?.label ?? 'Group');
@@ -81,10 +81,10 @@ export class GroupNodeComponent implements NgDiagramGroupNodeTemplate<GroupNodeD
   /** Collapsed groups show only the header, with the number of hidden nodes */
   collapsed = computed(() => this.node().data.collapsed ?? false);
   childCount = computed(() => {
-    // countChildren() reads the model, not a signal - reading nodes() makes this
+    // getChildrenNested() reads the model, not a signal - reading nodes() makes this
     // recompute on every model change
     this.modelService.nodes();
-    return this.groupCollapse.countChildren(this.node().id);
+    return this.modelService.getChildrenNested(this.node().id).length;
   });
 
   toggleCollapse() {

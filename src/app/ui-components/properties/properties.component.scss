@@ -91,10 +91,8 @@
     gap: 8px;
   }
 
+  // Combined with __snap-row for the flex layout
   &__end-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
     min-height: 24px;
   }
 

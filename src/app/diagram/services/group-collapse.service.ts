@@ -6,10 +6,7 @@ import {
   EdgeEnd,
   GroupNode,
 } from 'ng-diagram';
-import { GroupNodeData, ReroutedEdgeEnd } from '../../types';
-
-/** A collapsed group shrinks to its header bar; 48px keeps the ports (top: 24px) centered */
-export const COLLAPSED_GROUP_SIZE = { width: 200, height: 48 };
+import { COLLAPSED_GROUP_SIZE, CollapsibleGroupData, ReroutedEdgeEnd } from '../../types';
 
 /** Group ports (see group-node.component.html) that rerouted edge ends connect to */
 const GROUP_PORT_BY_END: Record<EdgeEnd, string> = {
@@ -17,7 +14,11 @@ const GROUP_PORT_BY_END: Record<EdgeEnd, string> = {
   target: 'port-left', // 'both' port
 };
 
-/** The source or target end of an edge, connected to the given node and port */
+/**
+ * The source or target end of an edge, connected to the given node and port.
+ * NgDiagramModelService.attachEdge() does not fit here: it updates one edge per call
+ * and rejects hidden nodes, while collapse/expand reconnects ends of hidden children.
+ */
 function endPatch(end: EdgeEnd, nodeId: string, portId?: string): Partial<Edge> {
   return end === 'source'
     ? { source: nodeId, sourcePort: portId }
@@ -45,7 +46,7 @@ export class GroupCollapseService {
   private readonly modelService = inject(NgDiagramModelService);
   private readonly diagramService = inject(NgDiagramService);
 
-  toggle(group: GroupNode<GroupNodeData>) {
+  toggle(group: GroupNode<CollapsibleGroupData>) {
     if (group.data.collapsed) {
       this.expand(group);
     } else {
@@ -53,12 +54,7 @@ export class GroupCollapseService {
     }
   }
 
-  /** Number of nodes inside the group, nested groups included */
-  countChildren(groupId: string): number {
-    return this.modelService.getChildrenNested(groupId).length;
-  }
-
-  private collapse(group: GroupNode<GroupNodeData>) {
+  private collapse(group: GroupNode<CollapsibleGroupData>) {
     const directChildren = this.modelService.getChildren(group.id);
     const nestedChildIds = new Set(
       this.modelService.getChildrenNested(group.id).map((child) => child.id),
@@ -90,7 +86,7 @@ export class GroupCollapseService {
     });
   }
 
-  private expand(group: GroupNode<GroupNodeData>) {
+  private expand(group: GroupNode<CollapsibleGroupData>) {
     const { expandedSize, expandedAutoSize, reroutedEdgeEnds = [], ...data } = group.data;
     const directChildren = this.modelService.getChildren(group.id);
 

@@ -53,7 +53,7 @@ export interface ReroutedEdgeEnd {
 }
 
 /** Data of a group node - the collapse state and what expanding restores */
-export interface GroupNodeData extends BaseNodeEdgeData {
+export interface CollapsibleGroupData extends BaseNodeEdgeData {
   collapsed?: boolean;
   /** Size and autoSize of the group before it collapsed */
   expandedSize?: { width: number; height: number };
@@ -61,8 +61,5 @@ export interface GroupNodeData extends BaseNodeEdgeData {
   reroutedEdgeEnds?: ReroutedEdgeEnd[];
 }
 
-/** Which ends of an edge are free (not connected to a node) */
-export interface EdgeFreeEnds {
-  source: boolean;
-  target: boolean;
-}
+/** A collapsed group shrinks to its header bar; 48px keeps the ports (top: 24px) centered */
+export const COLLAPSED_GROUP_SIZE = { width: 200, height: 48 };

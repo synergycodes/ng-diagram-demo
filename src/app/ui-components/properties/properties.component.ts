@@ -14,12 +14,7 @@ import {
 } from '../segment-picker/segment-picker.component';
 import { EdgeEnd, EdgeLabelPosition, EdgeRoutingName } from 'ng-diagram';
 import { ButtonComponent } from '../button/button.component';
-import {
-  DecisionOption,
-  EdgeFreeEnds,
-  EdgeRelinkableOption,
-  MAX_DECISION_OPTIONS,
-} from '../../types';
+import { DecisionOption, EdgeRelinkableOption, MAX_DECISION_OPTIONS } from '../../types';
 
 @Component({
   selector: 'app-properties',
@@ -42,7 +37,7 @@ export class PropertiesComponent {
   lockY = input<boolean | null>(null);
   decisionOptions = input<DecisionOption[] | null>(null);
   edgeRelinkable = input<EdgeRelinkableOption | null>(null);
-  edgeFreeEnds = input<EdgeFreeEnds | null>(null);
+  edgeFreeEnds = input<Record<EdgeEnd, boolean> | null>(null);
   relinkingEnabled = input(true);
   danglingEdgesEnabled = input(true);
 
@@ -81,7 +76,10 @@ export class PropertiesComponent {
     { value: 'none', label: 'Locked' },
   ];
 
-  readonly edgeEnds: EdgeEnd[] = ['source', 'target'];
+  readonly edgeEnds: { value: EdgeEnd; label: string }[] = [
+    { value: 'source', label: 'Source' },
+    { value: 'target', label: 'Target' },
+  ];
 
   onInputChange(value: string) {
     this.labelChange.emit(value);
