@@ -53,22 +53,11 @@ Shared TypeScript interfaces used across the application.
 
 ## Edge Relinking and Dangling Edges
 
-Both features are on by default (`linking.defaultRelinkable` and `danglingEdges` in `src/app/diagram/services/diagram.config.ts`). The two toggles next to the background buttons in the navbar switch them off and on, so you can compare them with the default behavior.
-
-- **Relinking** - select an edge and drag the handle at either end onto another port. Drop it back where it was, or press <kbd>Esc</kbd>, to leave the edge unchanged. In the properties panel, **Relinkable ends** overrides the default for the selected edge: both ends, source only, target only, or locked.
-- **Dangling edges** - edges with a free end, drawn dashed. You get one when you:
-  - drop a new edge or a relink handle on empty canvas,
-  - delete a node: its edges stay, anchored where its ports were,
-  - click **Detach** next to an end in the properties panel,
-  - right-click the canvas and pick **Start edge here**: the edge follows the pointer until you click a port (connects it) or empty canvas (both ends stay free).
-
-Drag the handle at a free end onto a port to connect it again. With debug mode on (the bug button), snackbars report the `edgeDrawEnded`, `edgeRelinkStarted`/`edgeRelinkEnded` and `selectionRemoved` events, including the detached edges.
+Select an edge and drag the handle at either end onto another port to relink it. Drop an edge on empty canvas, delete a node, or click **Detach** in the properties panel, and the edge keeps a free, dashed end. Both features are set in `diagram.config.ts` and can be switched off from the navbar for comparison.
 
 ## Collapsible Groups
 
-Click the arrow in a group's header to collapse it to the header bar, which then shows how many nodes are inside. Edges between the group's nodes and the rest of the diagram stay visible: while the group is collapsed, they connect to the group's own ports. Expanding restores the group's size and the original connections. Nested groups keep their own state, so a group collapsed inside another one is still collapsed after the outer one expands.
-
-A collapsed group can be moved, copied and deleted like any node, but it does not take new members until you expand it. The logic lives in `src/app/diagram/services/group-collapse.service.ts` and follows the library's [expand/collapse groups example](https://www.ngdiagram.dev/docs/examples/expand-collapse-groups): the nodes inside get the `hidden` flag (since 1.4), and the library hides their edges too.
+Click the arrow in a group's header to collapse it to the header bar; edges to the nodes inside move to the group's ports until it expands. Implemented in `group-collapse.service.ts`, following the library's [expand/collapse groups example](https://www.ngdiagram.dev/docs/examples/expand-collapse-groups).
 
 ## Getting Started
 
@@ -81,7 +70,7 @@ npm install
 npm start
 ```
 
-Open [http://localhost:4200](http://localhost:4200) — a small diagram loads with every node template: the three custom templates (trigger, task status, decision) and a group whose child is the library's default node. Try dragging new nodes in from the left palette, right-clicking a node for the clipboard context menu, and ticking **Lock vertical movement** on a selected node - a custom middleware then pins its Y position while you drag. Select an edge and drag one of its end handles to relink it, or drop it on empty canvas to leave it dangling. Click the arrow in the group's header to collapse it. `npm run build` compiles to `dist/`.
+Open [http://localhost:4200](http://localhost:4200) — a small diagram loads with every node template: the three custom templates (trigger, task status, decision) and a group whose child is the library's default node. Try dragging new nodes in from the left palette, right-clicking a node for the clipboard context menu, and ticking **Lock vertical movement** on a selected node - a custom middleware then pins its Y position while you drag. Select an edge and drag one of its end handles to relink it, or collapse the group from its header. `npm run build` compiles to `dist/`.
 
 Working with an AI coding tool? Copy [`mcp.json`](mcp.json) to `.mcp.json` (or your tool's MCP config) to add the ngDiagram docs MCP server — searchable ngDiagram documentation and API reference right in the session. The file carries the Windows command; the macOS/Linux variant is noted inside.
 
