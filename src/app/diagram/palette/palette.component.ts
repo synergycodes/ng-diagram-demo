@@ -1,15 +1,8 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  input,
-  output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import {
   NgDiagramPaletteItem, // Type for palette item configuration
   NgDiagramPaletteItemComponent, // Directive that makes an element draggable to the diagram
   NgDiagramPaletteItemPreviewComponent, // Component host for custom drag preview
-  NgDiagramViewportService, // Service to access current zoom scale
 } from 'ng-diagram';
 import { PaletteItemPreviewComponent } from './palette-item-preview/palette-item-preview.component';
 import { PaletteItemComponent } from './palette-item/palette-item.component';
@@ -47,15 +40,15 @@ import { PaletteData } from '../../types';
  *
  * 5. Custom Preview:
  *    Use NgDiagramPaletteItemPreviewComponent to show custom preview during drag:
- *    <ng-diagram-palette-item-preview [item]="paletteItem">
+ *    <ng-diagram-palette-item-preview>
  *      <app-palette-item-preview [item]="paletteItem" />
  *    </ng-diagram-palette-item-preview>
+ *    The preview takes no space in the palette layout.
  *
  * Key Features:
  * - Zero configuration drag & drop (directives handle all mechanics)
  * - Automatic coordinate transformation (screen to diagram space)
  * - Custom preview support
- * - Respects zoom level (scale) for accurate positioning
  */
 @Component({
   selector: 'app-palette',
@@ -76,10 +69,4 @@ export class PaletteComponent {
    * Each item defines a node type that can be dragged onto the diagram
    */
   model = input.required<NgDiagramPaletteItem<PaletteData>[]>();
-
-  /**
-   * Current diagram zoom scale
-   * Used to scale the preview to match diagram zoom level
-   */
-  scale = inject(NgDiagramViewportService).scale;
 }

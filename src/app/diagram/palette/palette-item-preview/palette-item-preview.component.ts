@@ -25,7 +25,6 @@ import { nodeTemplateMap } from '../../node-template-map';
  * 2. Custom Preview (with NgDiagramPaletteItemPreviewComponent):
  *    - Full control over preview appearance
  *    - Can show actual node template during drag
- *    - Can scale preview to match diagram zoom
  *    - Better user experience
  *
  * Shows the actual node template using NgComponentOutlet

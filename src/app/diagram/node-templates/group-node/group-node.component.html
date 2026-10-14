@@ -1,13 +1,29 @@
-<ng-diagram-node-resize-adornment>
+<!-- A collapsed group cannot be resized - expanding restores its previous size -->
+<ng-diagram-node-resize-adornment [defaultResizable]="!collapsed()">
   <div
     class="group-node"
+    [class.group-node--collapsed]="collapsed()"
     ngDiagramNodeSelected
     ngDiagramGroupHighlighted
     [node]="node()"
     (contextmenu)="onRightClick($event)"
   >
     <div class="group-node__header">
+      <!-- pointerdown would start dragging the group -->
+      <button
+        type="button"
+        class="group-node__toggle"
+        [attr.aria-expanded]="!collapsed()"
+        [attr.aria-label]="collapsed() ? 'Expand group' : 'Collapse group'"
+        (pointerdown)="$event.stopPropagation()"
+        (click)="toggleCollapse()"
+      >
+        <i class="ph ph-caret-right" [class.group-node__toggle-icon--expanded]="!collapsed()"></i>
+      </button>
       <div class="group-node__header-title">{{ groupTitle() }}</div>
+      @if (collapsed()) {
+        <span class="group-node__child-count">{{ childCount() }}</span>
+      }
     </div>
     <div class="group-node__content"><ng-content></ng-content></div>
   </div>

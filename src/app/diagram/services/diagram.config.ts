@@ -1,5 +1,5 @@
 import { NgDiagramConfig, Node, Edge } from 'ng-diagram';
-import { BaseNodeEdgeData } from '../../types';
+import { BaseNodeEdgeData, COLLAPSED_GROUP_SIZE, CollapsibleGroupData } from '../../types';
 
 /**
  * Create ng-diagram configuration
@@ -72,15 +72,25 @@ export function createDiagramConfig(
     // Controls minimum node sizes based on node type
     resize: {
       // Callback: What is the minimum size for this node?
-      // Uses a map of node types to min sizes, with a default fallback
-      getMinNodeSize: (node: Node) =>
-        minNodeSizes.get(node.type ?? '') ?? { width: 100, height: 50 },
+      // Uses a map of node types to min sizes, with a default fallback.
+      // It is also the min-width/min-height of every node with an explicit size, so a
+      // collapsed group gets its collapsed size here - see GroupCollapseService.
+      getMinNodeSize: (node: Node<Partial<CollapsibleGroupData>>) =>
+        node.data.collapsed
+          ? COLLAPSED_GROUP_SIZE
+          : (minNodeSizes.get(node.type ?? '') ?? { width: 100, height: 50 }),
 
       // Keep group members contained: shrinking a group stops at the bounds
       // of its children (with resize snapping, at the nearest snap value that
       // still contains them). The library default is true (members may end up
       // outside the group).
       allowResizeBelowChildrenBounds: false,
+    },
+
+    // Grouping Configuration
+    // A collapsed group shows only its header - it takes no new members until expanded
+    grouping: {
+      canGroup: (_node: Node, group: Node<Partial<CollapsibleGroupData>>) => !group.data.collapsed,
     },
 
     // Z-Index Configuration
@@ -103,6 +113,25 @@ export function createDiagramConfig(
         ...edge,
         type: 'custom-edge',
       }),
+
+      // Relinking (since 1.4): a selected edge shows a handle at each end that can be
+      // dragged onto another port. `true` = both ends, 'source' / 'target' = one end only.
+      // An edge overrides this default with its own `relinkable` property
+      // (see the "Relinkable ends" field in the properties panel).
+      // Toggled at runtime from the navbar - see DiagramComponent.
+      defaultRelinkable: true,
+    },
+
+    // Dangling Edges Configuration (since 1.4)
+    // Edges may have a free end: `source`/`target` set to '' and the anchor stored in
+    // `sourcePosition`/`targetPosition`. Toggled at runtime from the navbar.
+    danglingEdges: {
+      // Master switch: a draw or relink dropped on empty canvas keeps the edge with a free end
+      // (instead of discarding the draw / reverting the relink). Also enables
+      // NgDiagramModelService.detachEdge() and NgDiagramService.startLinkingFromPosition().
+      enabled: true,
+      // Deleting a node keeps its edges, anchored where the node's port was
+      detachOnNodeDelete: true,
     },
   };
 }

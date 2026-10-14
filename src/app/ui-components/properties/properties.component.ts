@@ -12,9 +12,9 @@ import {
   SegmentPickerButton,
   SegmentPickerComponent,
 } from '../segment-picker/segment-picker.component';
-import { EdgeLabelPosition, EdgeRoutingName } from 'ng-diagram';
+import { EdgeEnd, EdgeLabelPosition, EdgeRoutingName } from 'ng-diagram';
 import { ButtonComponent } from '../button/button.component';
-import { DecisionOption, MAX_DECISION_OPTIONS } from '../../types';
+import { DecisionOption, EdgeRelinkableOption, MAX_DECISION_OPTIONS } from '../../types';
 
 @Component({
   selector: 'app-properties',
@@ -36,6 +36,10 @@ export class PropertiesComponent {
   snapRotateStep = input<number | null>(null);
   lockY = input<boolean | null>(null);
   decisionOptions = input<DecisionOption[] | null>(null);
+  edgeRelinkable = input<EdgeRelinkableOption | null>(null);
+  edgeFreeEnds = input<Record<EdgeEnd, boolean> | null>(null);
+  relinkingEnabled = input(true);
+  danglingEdgesEnabled = input(true);
 
   labelChange = output<string>();
   routingChange = output<EdgeRoutingName>();
@@ -50,6 +54,8 @@ export class PropertiesComponent {
   decisionOptionRename = output<{ id: string; label: string }>();
   decisionOptionRemove = output<string>();
   decisionOptionAdd = output<void>();
+  relinkableChange = output<EdgeRelinkableOption>();
+  detachEnd = output<EdgeEnd>();
 
   readonly labelPositionButtons: SegmentPickerButton[] = [
     { id: 'relative', icon: 'ph-percent', title: 'Relative - a fraction of the path (0-1)' },
@@ -60,6 +66,19 @@ export class PropertiesComponent {
     { value: 'polyline', label: 'Polyline' },
     { value: 'orthogonal', label: 'Orthogonal' },
     { value: 'bezier', label: 'Bezier' },
+  ];
+
+  readonly relinkableOptions: { value: EdgeRelinkableOption; label: string }[] = [
+    { value: 'default', label: 'Config default' },
+    { value: 'both', label: 'Both ends' },
+    { value: 'source', label: 'Source only' },
+    { value: 'target', label: 'Target only' },
+    { value: 'none', label: 'Locked' },
+  ];
+
+  readonly edgeEnds: { value: EdgeEnd; label: string }[] = [
+    { value: 'source', label: 'Source' },
+    { value: 'target', label: 'Target' },
   ];
 
   onInputChange(value: string) {

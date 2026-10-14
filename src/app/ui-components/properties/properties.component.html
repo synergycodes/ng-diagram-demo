@@ -65,6 +65,53 @@
       </select>
     }
 
+    @if (edgeRelinkable() !== null) {
+      <label for="relinkable-select" class="properties__label">Relinkable ends:</label>
+      <select
+        id="relinkable-select"
+        class="properties__select"
+        [ngModel]="edgeRelinkable()"
+        (ngModelChange)="relinkableChange.emit($event)"
+        [title]="
+          relinkingEnabled()
+            ? 'Which ends of this edge show a relink handle when it is selected'
+            : 'Relinking is off in the navbar - only edges with their own override show handles'
+        "
+      >
+        @for (option of relinkableOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    }
+
+    @if (edgeFreeEnds(); as freeEnds) {
+      <label class="properties__label">Dangling ends:</label>
+      <div class="properties__checkbox-group">
+        @for (end of edgeEnds; track end.value) {
+          <div class="properties__snap-row properties__end-row">
+            <span class="properties__end-name">{{ end.label }}</span>
+            @if (freeEnds[end.value]) {
+              <span class="properties__end-status properties__end-status--free">free</span>
+            } @else {
+              <span class="properties__end-status">connected</span>
+              <ngd-button
+                buttonType="secondary"
+                size="xsmall"
+                icon="ph-link-break"
+                [disabled]="!danglingEdgesEnabled()"
+                [title]="
+                  danglingEdgesEnabled()
+                    ? 'Detach this end - it stays where it is now'
+                    : 'Turn on dangling edges in the navbar to detach an end'
+                "
+                (clickAction)="detachEnd.emit(end.value)"
+              >Detach</ngd-button>
+            }
+          </div>
+        }
+      </div>
+    }
+
     @if (edgeLabelPosition() !== null) {
       <label for="label-position-input" class="properties__label">Label Position:</label>
       <div class="properties__snap-row">
