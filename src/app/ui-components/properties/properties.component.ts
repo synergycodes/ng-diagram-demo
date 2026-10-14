@@ -13,13 +13,15 @@ import {
   SegmentPickerComponent,
 } from '../segment-picker/segment-picker.component';
 import { EdgeLabelPosition, EdgeRoutingName } from 'ng-diagram';
+import { ButtonComponent } from '../button/button.component';
+import { DecisionOption, MAX_DECISION_OPTIONS } from '../../types';
 
 @Component({
   selector: 'app-properties',
   templateUrl: './properties.component.html',
   styleUrls: ['./properties.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SidebarComponent, FormsModule, SegmentPickerComponent],
+  imports: [SidebarComponent, FormsModule, SegmentPickerComponent, ButtonComponent],
 })
 export class PropertiesComponent {
   collapsed = input(true);
@@ -33,6 +35,7 @@ export class PropertiesComponent {
   snapResizeStep = input<number | null>(null);
   snapRotateStep = input<number | null>(null);
   lockY = input<boolean | null>(null);
+  decisionOptions = input<DecisionOption[] | null>(null);
 
   labelChange = output<string>();
   routingChange = output<EdgeRoutingName>();
@@ -44,6 +47,9 @@ export class PropertiesComponent {
   snapResizeStepChange = output<number>();
   snapRotateStepChange = output<number>();
   lockYChange = output<boolean>();
+  decisionOptionRename = output<{ id: string; label: string }>();
+  decisionOptionRemove = output<string>();
+  decisionOptionAdd = output<void>();
 
   readonly labelPositionButtons: SegmentPickerButton[] = [
     { id: 'relative', icon: 'ph-percent', title: 'Relative - a fraction of the path (0-1)' },
@@ -58,6 +64,17 @@ export class PropertiesComponent {
 
   onInputChange(value: string) {
     this.labelChange.emit(value);
+  }
+
+  /** Add is disabled once the list reaches the shared cap */
+  readonly maxDecisionOptions = MAX_DECISION_OPTIONS;
+
+  canAddDecisionOption = computed(
+    () => (this.decisionOptions()?.length ?? 0) < this.maxDecisionOptions,
+  );
+
+  onDecisionOptionRename(id: string, label: string) {
+    this.decisionOptionRename.emit({ id, label });
   }
 
   onRoutingChange(value: EdgeRoutingName) {

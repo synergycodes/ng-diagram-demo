@@ -30,6 +30,7 @@ export class ButtonComponent {
   active = input<boolean>(false);
   size = input<Size>('large');
   icon = input<string | null>(null);
+  noText = input<boolean>(false);
 
   clickAction = output<Event>();
 }

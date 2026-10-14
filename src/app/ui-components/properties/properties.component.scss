@@ -47,6 +47,38 @@
     cursor: pointer;
   }
 
+  &__option-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__option-row {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+
+    // The label input takes the row; the remove button keeps its intrinsic width
+    .properties__input {
+      flex: 1;
+      min-width: 0;
+    }
+
+    // Style encapsulation stops us reaching the <button> inside ngd-button, but
+    // making the host a flex container lets that button stretch to the row
+    // height, so it lines up with the input instead of sitting short and centred.
+    ngd-button {
+      display: flex;
+    }
+  }
+
+  &__option-empty {
+    color: var(--ngd-txt-secondary-default);
+    font-size: 13px;
+    font-style: italic;
+    line-height: 140%;
+  }
+
   &__checkbox-group {
     display: flex;
     flex-direction: column;

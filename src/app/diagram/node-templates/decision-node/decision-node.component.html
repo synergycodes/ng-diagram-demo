@@ -1,0 +1,26 @@
+<ng-diagram-node-rotate-adornment />
+<ng-diagram-node-resize-adornment>
+  <div class="decision-node" (contextmenu)="onRightClick($event)">
+    <div class="decision-node__header">
+      <div class="decision-node__icon">
+        <i [class]="nodeIcon()"></i>
+      </div>
+      <div>
+        <div class="decision-node__label">{{ nodeLabel() }}</div>
+        <div class="decision-node__description">{{ nodeDescription() }}</div>
+      </div>
+    </div>
+    <!-- Iterates data.options - one row per decision branch -->
+    <div class="decision-node__options">
+      @for (option of nodeOptions(); track option.id) {
+        <div class="decision-node__option">
+          {{ option.label }}
+          <ng-diagram-port [id]="option.id" type="source" side="right" />
+        </div>
+      } @empty {
+        <div class="decision-node__option decision-node__option--empty">No options</div>
+      }
+    </div>
+  </div>
+  <ng-diagram-port id="port-left" type="target" side="left" />
+</ng-diagram-node-resize-adornment>

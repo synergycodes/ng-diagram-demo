@@ -9,7 +9,12 @@ import {
   EdgeLabelPosition, // number (0-1 fraction) or 'Npx' (absolute; negative = from the target)
   SelectionGestureEndedEvent,
 } from 'ng-diagram';
-import { BaseNodeEdgeData } from '../../types';
+import { BaseNodeEdgeData, DecisionOption, MAX_DECISION_OPTIONS } from '../../types';
+import { NodeTemplateType } from '../node-templates/node-template.types';
+
+/** Node data shape the decision node reads - see decision-node.component.ts */
+type DecisionNodeData = BaseNodeEdgeData & { options?: DecisionOption[] };
+
 
 /**
  * PropertiesFacadeService
@@ -155,6 +160,19 @@ export class PropertiesFacadeService {
   });
 
   /**
+   * Computed signal for the branches on the selected decision node
+   *
+   * Returns null for any other selection, which hides the list in the panel
+   * (the same pattern the routing and snapping fields use).
+   */
+  decisionOptions = computed<DecisionOption[] | null>(() => {
+    const selection = this.selectionService.selection();
+    const node = selection.nodes[0] as Node<DecisionNodeData> | undefined;
+    if (!node || node.type !== NodeTemplateType.Decision) return null;
+    return node.data.options ?? [];
+  });
+
+  /**
    * Update the label of the currently selected node or edge
    *
    * This demonstrates:
@@ -174,6 +192,104 @@ export class PropertiesFacadeService {
     if (edge) {
       this.modelService.updateEdgeData(edge.id, { ...edge.data, label });
     }
+  }
+
+  /**
+   * The selected node, but only when it is a decision node
+   */
+  private selectedDecisionNode(): Node<DecisionNodeData> | null {
+    const { nodes } = this.selectionService.selection();
+    const node = nodes[0] as Node<DecisionNodeData> | undefined;
+    if (!node || node.type !== NodeTemplateType.Decision) return null;
+    return node;
+  }
+
+  /**
+   * Append a branch to the selected decision node
+   *
+   * Capped at MAX_DECISION_OPTIONS; the panel disables its button at the same
+   * limit, so hitting this guard means the two drifted apart.
+   */
+  addDecisionOption() {
+    const node = this.selectedDecisionNode();
+    if (!node) return;
+
+    const current = node.data.options ?? [];
+    if (current.length >= MAX_DECISION_OPTIONS) return;
+
+    const index = this.nextOptionIndex(new Set(current.map((option) => option.id)));
+    this.modelService.updateNodeData(node.id, {
+      ...node.data,
+      options: [...current, { id: `option-${index}`, label: `Option ${index}` }],
+    });
+  }
+
+  /**
+   * Rename one branch of the selected decision node
+   *
+   * Only the label changes - the id stays put because it is the port id that
+   * any already-drawn edge refers to.
+   */
+  renameDecisionOption(id: string, label: string) {
+    const node = this.selectedDecisionNode();
+    if (!node) return;
+
+    const current = node.data.options ?? [];
+    if (!current.some((option) => option.id === id)) return;
+
+    this.modelService.updateNodeData(node.id, {
+      ...node.data,
+      options: current.map((option) => (option.id === id ? { ...option, label } : option)),
+    });
+  }
+
+  /**
+   * Remove one branch from the selected decision node
+   *
+   * Because each option renders its own port, dropping an option would leave
+   * any edge drawn from that port pointing at a port that no longer exists.
+   * The edge removal and the option update are committed together in a single
+   * transaction, so the model is never observed in that state.
+   *
+   * This demonstrates:
+   * - NgDiagramModelService.getConnectedEdges() to find a node's edges
+   * - NgDiagramModelService.deleteEdges() to remove them
+   * - NgDiagramService.transaction() to apply both changes atomically
+   */
+  async removeDecisionOption(id: string) {
+    const node = this.selectedDecisionNode();
+    if (!node) return;
+
+    const current = node.data.options ?? [];
+    if (!current.some((option) => option.id === id)) return;
+
+    // Edges drawn from the removed option's port would dangle - collect them for removal
+    const staleEdgeIds = this.modelService
+      .getConnectedEdges(node.id)
+      .filter((edge) => edge.source === node.id && edge.sourcePort === id)
+      .map((edge) => edge.id);
+
+    // One atomic commit - the model is never seen with an edge whose port has gone
+    await this.diagramService.transaction(() => {
+      if (staleEdgeIds.length > 0) {
+        this.modelService.deleteEdges(staleEdgeIds);
+      }
+
+      this.modelService.updateNodeData(node.id, {
+        ...node.data,
+        options: current.filter((option) => option.id !== id),
+      });
+    });
+  }
+
+  /**
+   * Lowest index whose generated id is not already taken.
+   * Ids must stay unique - they are used as port ids and as @for track keys.
+   */
+  private nextOptionIndex(usedIds: Set<string>): number {
+    let index = usedIds.size + 1;
+    while (usedIds.has(`option-${index}`)) index++;
+    return index;
   }
 
   /**

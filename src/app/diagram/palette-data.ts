@@ -50,6 +50,20 @@ export const paletteModel: NgDiagramPaletteItem<PaletteData>[] = [
     },
   },
   {
+    type: NodeTemplateType.Decision,
+    data: {
+      label: 'Decision',
+      description: 'Branch on a condition',
+      icon: 'ph-git-branch',
+      // Rendered as one row per entry by the decision node template
+      options: [
+        { id: 'approved', label: 'Approved' },
+        { id: 'rejected', label: 'Rejected' },
+        { id: 'review', label: 'Needs review' },
+      ],
+    },
+  },
+  {
     type: NodeTemplateType.Group,
     data: {
       label: 'Group',
