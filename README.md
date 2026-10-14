@@ -54,7 +54,7 @@ Shared TypeScript interfaces used across the application.
 Both features are on by default (`linking.defaultRelinkable` and `danglingEdges` in `src/app/diagram/services/diagram.config.ts`). The two toggles next to the background buttons in the navbar switch them off and on, so you can compare them with the default behavior.
 
 - **Relinking** - select an edge and drag the handle at either end onto another port. Drop it back where it was, or press <kbd>Esc</kbd>, to leave the edge unchanged. In the properties panel, **Relinkable ends** overrides the default for the selected edge: both ends, source only, target only, or locked.
-- **Dangling edges** - edges with a free end, drawn dashed. The diagram loads with one (the **dangling** edge from the decision node). You get more when you:
+- **Dangling edges** - edges with a free end, drawn dashed. You get one when you:
   - drop a new edge or a relink handle on empty canvas,
   - delete a node: its edges stay, anchored where its ports were,
   - click **Detach** next to an end in the properties panel,
@@ -73,7 +73,7 @@ npm install
 npm start
 ```
 
-Open [http://localhost:4200](http://localhost:4200) — a small diagram loads with every node template side by side: the library's default node, the two custom templates, and a group with a child. Try dragging new nodes in from the left palette, right-clicking a node for the clipboard context menu, and ticking **Lock vertical movement** on a selected node - a custom middleware then pins its Y position while you drag. Select an edge and drag one of its end handles to relink it, or drop it on empty canvas to leave it dangling. `npm run build` compiles to `dist/`.
+Open [http://localhost:4200](http://localhost:4200) — a small diagram loads with every node template: the three custom templates (trigger, task status, decision) and a group whose child is the library's default node. Try dragging new nodes in from the left palette, right-clicking a node for the clipboard context menu, and ticking **Lock vertical movement** on a selected node - a custom middleware then pins its Y position while you drag. Select an edge and drag one of its end handles to relink it, or drop it on empty canvas to leave it dangling. `npm run build` compiles to `dist/`.
 
 Working with an AI coding tool? Copy [`mcp.json`](mcp.json) to `.mcp.json` (or your tool's MCP config) to add the ngDiagram docs MCP server — searchable ngDiagram documentation and API reference right in the session. The file carries the Windows command; the macOS/Linux variant is noted inside.
 

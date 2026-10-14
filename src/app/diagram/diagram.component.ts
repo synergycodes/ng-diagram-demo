@@ -225,25 +225,20 @@ export class DiagramComponent {
         autoSize: false,
         size: { width: 241, height: 190 },
       },
-      // No 'type' - rendered by ng-diagram's built-in default node template
-      {
-        id: 'default-1',
-        data: { label: 'Default node' },
-        position: { x: 1020, y: 98 },
-        autoSize: false,
-        size: { width: 150, height: 50 },
-      },
       {
         id: 'group-1',
         type: NodeTemplateType.Group,
         isGroup: true,
         data: { label: 'Group' },
-        position: { x: 520, y: 460 },
+        position: { x: 1000, y: 1 },
       },
+      // No 'type' - rendered by ng-diagram's built-in default node template
       {
         id: 'default-2',
         data: { label: 'In a group' },
-        position: { x: 580, y: 540 },
+        // Centered in the group's 300x158 content area (below the 42px header),
+        // with its left port level with the Task Status output port
+        position: { x: 1075, y: 97 },
         groupId: 'group-1',
         autoSize: false,
         size: { width: 150, height: 50 },
@@ -282,24 +277,11 @@ export class DiagramComponent {
         type: 'custom-edge',
         data: { label: 'branch' },
       },
-      // Dangling edge (since 1.4) - the target end is free: no node, no port,
-      // anchored at targetPosition (flow coordinates). Select it and drag the
-      // handle at its free end onto a port to connect it.
-      {
-        id: 'edge-dangling',
-        source: 'decision-1',
-        sourcePort: 'review',
-        target: '', // free end - always '' (never null or undefined)
-        targetPosition: { x: 1020, y: 420 },
-        targetArrowhead: 'ng-diagram-arrow',
-        type: 'custom-edge',
-        data: { label: 'dangling' },
-      },
       // No 'type' - ng-diagram's built-in default edge
       {
         id: 'edge-2',
         source: 'custom-1',
-        target: 'default-1',
+        target: 'default-2',
         sourcePort: 'port-right',
         targetPort: 'port-left',
         targetArrowhead: 'ng-diagram-arrow',
