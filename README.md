@@ -4,7 +4,7 @@
 
 **Live demo:** [synergycodes.github.io/ng-diagram-demo](https://synergycodes.github.io/ng-diagram-demo/)
 
-![ngDiagram feature demo — a palette with default and custom nodes, a bezier edge with a movable label, a group, and the properties panel with routing and label-position controls](docs/assets/demo.png)
+![ngDiagram feature demo — a palette with default and custom nodes, bezier edges with labels, a collapsible group, a selected dashed dangling edge with relink handles, and the properties panel with its relinkable and dangling ends](docs/assets/demo.png)
 
 A showcase of [ngDiagram](https://www.ngdiagram.dev/) — an Angular library for creating interactive diagrams. One app wires up the library's main features side by side: custom node and edge templates, a drag-and-drop palette, grouping with collapsible groups, a clipboard context menu, snapping, rotation, a custom middleware, and edge relinking with dangling edges.
 
