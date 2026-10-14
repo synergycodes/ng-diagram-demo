@@ -6,7 +6,7 @@
 
 ![ngDiagram feature demo — a palette with default and custom nodes, bezier edges with labels, a collapsible group, a selected dashed dangling edge with relink handles, and the properties panel with its relinkable and dangling ends](docs/assets/demo.png)
 
-A showcase of [ngDiagram](https://www.ngdiagram.dev/) — an Angular library for creating interactive diagrams. One app wires up the library's main features side by side: custom node and edge templates, a drag-and-drop palette, grouping with collapsible groups, a clipboard context menu, snapping, rotation, a custom middleware, and edge relinking with dangling edges.
+A showcase of [ngDiagram](https://www.ngdiagram.dev/) — an Angular library for creating interactive diagrams. One app wires up the library's main features side by side: custom node and edge templates, a drag-and-drop palette, grouping, a clipboard context menu, snapping, rotation, a custom middleware, and edge relinking with dangling edges. On top of them, the demo builds collapsible groups.
 
 ## Project Structure
 
@@ -57,7 +57,7 @@ Select an edge and drag the handle at either end onto another port to relink it.
 
 ## Collapsible Groups
 
-Click the arrow in a group's header to collapse it to the header bar; edges to the nodes inside move to the group's ports until it expands. Implemented in `group-collapse.service.ts`, following the library's [expand/collapse groups example](https://www.ngdiagram.dev/docs/examples/expand-collapse-groups).
+Click the arrow in a group's header to collapse it to the header bar; edges to the nodes inside move to the group's ports until it expands. ngDiagram has no collapse feature of its own: `group-collapse.service.ts` builds it from the library's `hidden` node flag, following the [expand/collapse groups example](https://www.ngdiagram.dev/docs/examples/expand-collapse-groups) in the ngDiagram docs.
 
 ## Getting Started
 
