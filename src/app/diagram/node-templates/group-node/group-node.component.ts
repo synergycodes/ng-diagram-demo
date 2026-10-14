@@ -3,14 +3,16 @@ import {
   GroupNode, // Special node type for groups (extends Node with children property)
   NgDiagramGroupHighlightedDirective, // Directive for highlighting drop zones
   NgDiagramGroupNodeTemplate, // Interface for group node templates
+  NgDiagramModelService,
   NgDiagramNodeResizeAdornmentComponent,
   NgDiagramNodeSelectedDirective,
   NgDiagramPortComponent,
   NgDiagramSelectionService,
   NgDiagramViewportService,
 } from 'ng-diagram';
-import { BaseNodeEdgeData } from '../../../types';
+import { GroupNodeData } from '../../../types';
 import { ContextMenuService } from '../../../ui-components/context-menu/context-menu.service';
+import { GroupCollapseService } from '../../services/group-collapse.service';
 
 /**
  * GroupNodeComponent - Container node that can hold other nodes
@@ -28,6 +30,7 @@ import { ContextMenuService } from '../../../ui-components/context-menu/context-
  * - Visual highlighting when dragging nodes over (drop zone feedback)
  * - Children move with the group
  * - Can be nested (groups within groups)
+ * - Can be collapsed to its header bar (since 1.4 - see GroupCollapseService)
  *
  * Key Differences from Regular Nodes:
  * 1. Implements NgDiagramGroupNodeTemplate instead of NgDiagramNodeTemplate
@@ -51,17 +54,19 @@ import { ContextMenuService } from '../../../ui-components/context-menu/context-
     '[class.ng-diagram-port-hoverable-over-node]': 'true',
   },
 })
-export class GroupNodeComponent implements NgDiagramGroupNodeTemplate<BaseNodeEdgeData> {
+export class GroupNodeComponent implements NgDiagramGroupNodeTemplate<GroupNodeData> {
   private readonly contextMenuService = inject(ContextMenuService);
   private readonly viewportService = inject(NgDiagramViewportService);
   private readonly selectionService = inject(NgDiagramSelectionService);
+  private readonly modelService = inject(NgDiagramModelService);
+  private readonly groupCollapse = inject(GroupCollapseService);
 
   /**
    * Group node input - receives GroupNode instead of Node
    * GroupNode extends Node with additional property:
    * - highlighted: boolean - true when dragging nodes over the group
    */
-  node = input.required<GroupNode<BaseNodeEdgeData>>();
+  node = input.required<GroupNode<GroupNodeData>>();
 
   /** Group title from node data */
   groupTitle = computed(() => this.node().data?.label ?? 'Group');
@@ -72,6 +77,19 @@ export class GroupNodeComponent implements NgDiagramGroupNodeTemplate<BaseNodeEd
    * NgDiagramGroupHighlightedDirective can apply CSS class automatically
    */
   highlighted = computed(() => this.node().highlighted ?? false);
+
+  /** Collapsed groups show only the header, with the number of hidden nodes */
+  collapsed = computed(() => this.node().data.collapsed ?? false);
+  childCount = computed(() => {
+    // countChildren() reads the model, not a signal - reading nodes() makes this
+    // recompute on every model change
+    this.modelService.nodes();
+    return this.groupCollapse.countChildren(this.node().id);
+  });
+
+  toggleCollapse() {
+    this.groupCollapse.toggle(this.node());
+  }
 
   onRightClick(event: MouseEvent) {
     event.preventDefault();

@@ -69,6 +69,7 @@ import { ContextMenuService } from '../ui-components/context-menu/context-menu.s
 import { PropertiesFacadeService } from './services/properties-facade.service';
 import { DebugEventsService } from './services/debug-events.service';
 import { ContextMenuFacadeService } from './services/context-menu-facade.service';
+import { GroupCollapseService } from './services/group-collapse.service';
 import { createDiagramConfig } from './services/diagram.config';
 
 // Middlewares - Plugin system for intercepting diagram state changes
@@ -91,6 +92,7 @@ import { horizontalLockMiddleware } from './middlewares/horizontal-lock.middlewa
     PropertiesFacadeService,
     DebugEventsService,
     ContextMenuFacadeService,
+    GroupCollapseService, // Used by the group node template
     provideNgDiagram(), // REQUIRED: Must include ng-diagram provider!
   ],
   templateUrl: './diagram.component.html',

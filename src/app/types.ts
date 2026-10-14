@@ -1,4 +1,4 @@
-import { EdgeLabelPosition } from 'ng-diagram';
+import { EdgeEnd, EdgeLabelPosition } from 'ng-diagram';
 
 export type Size = 'xlarge' | 'large' | 'medium' | 'small' | 'xsmall';
 
@@ -39,6 +39,27 @@ export const MAX_DECISION_OPTIONS = 10;
  * 'both' = true, 'none' = false, 'source' / 'target' = only that end.
  */
 export type EdgeRelinkableOption = 'default' | 'both' | 'source' | 'target' | 'none';
+
+/**
+ * One end of an edge that a collapsed group points at itself, recorded so that
+ * exactly this end can be restored when the group expands.
+ */
+export interface ReroutedEdgeEnd {
+  edgeId: string;
+  end: EdgeEnd;
+  /** Node and port the end was connected to before the group collapsed */
+  nodeId: string;
+  portId?: string;
+}
+
+/** Data of a group node - the collapse state and what expanding restores */
+export interface GroupNodeData extends BaseNodeEdgeData {
+  collapsed?: boolean;
+  /** Size and autoSize of the group before it collapsed */
+  expandedSize?: { width: number; height: number };
+  expandedAutoSize?: boolean;
+  reroutedEdgeEnds?: ReroutedEdgeEnd[];
+}
 
 /** Which ends of an edge are free (not connected to a node) */
 export interface EdgeFreeEnds {

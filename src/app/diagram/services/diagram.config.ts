@@ -1,5 +1,6 @@
 import { NgDiagramConfig, Node, Edge } from 'ng-diagram';
-import { BaseNodeEdgeData } from '../../types';
+import { BaseNodeEdgeData, GroupNodeData } from '../../types';
+import { COLLAPSED_GROUP_SIZE } from './group-collapse.service';
 
 /**
  * Create ng-diagram configuration
@@ -72,15 +73,25 @@ export function createDiagramConfig(
     // Controls minimum node sizes based on node type
     resize: {
       // Callback: What is the minimum size for this node?
-      // Uses a map of node types to min sizes, with a default fallback
-      getMinNodeSize: (node: Node) =>
-        minNodeSizes.get(node.type ?? '') ?? { width: 100, height: 50 },
+      // Uses a map of node types to min sizes, with a default fallback.
+      // It is also the min-width/min-height of every node with an explicit size, so a
+      // collapsed group gets its collapsed size here - see GroupCollapseService.
+      getMinNodeSize: (node: Node<Partial<GroupNodeData>>) =>
+        node.data.collapsed
+          ? COLLAPSED_GROUP_SIZE
+          : (minNodeSizes.get(node.type ?? '') ?? { width: 100, height: 50 }),
 
       // Keep group members contained: shrinking a group stops at the bounds
       // of its children (with resize snapping, at the nearest snap value that
       // still contains them). The library default is true (members may end up
       // outside the group).
       allowResizeBelowChildrenBounds: false,
+    },
+
+    // Grouping Configuration
+    // A collapsed group shows only its header - it takes no new members until expanded
+    grouping: {
+      canGroup: (_node: Node, group: Node<Partial<GroupNodeData>>) => !group.data.collapsed,
     },
 
     // Z-Index Configuration
