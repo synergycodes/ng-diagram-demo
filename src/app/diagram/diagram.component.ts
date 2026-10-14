@@ -325,13 +325,14 @@ export class DiagramComponent {
     /**
      * Relinking and dangling edges can be switched at runtime too -
      * updateConfig() deep-merges the partial config into the current one.
+     * danglingEdges.enabled is the master switch: with it off, detachOnNodeDelete
+     * has no effect, so it does not need to be toggled as well.
      */
     effect(() => {
       if (this.diagramService.isInitialized()) {
-        const danglingEdges = this.danglingEdgesEnabled();
         this.diagramService.updateConfig({
           linking: { defaultRelinkable: this.relinkingEnabled() },
-          danglingEdges: { enabled: danglingEdges, detachOnNodeDelete: danglingEdges },
+          danglingEdges: { enabled: this.danglingEdgesEnabled() },
         });
       }
     });
