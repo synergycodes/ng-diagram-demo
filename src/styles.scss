@@ -64,7 +64,7 @@ body {
    (#27282b) is almost invisible on the dark canvas. Fixed in the next ng-diagram
    release, which makes this override unnecessary. */
 html[data-theme='dark'] {
-  --ngd-default-edge-stroke-hover: #6f7480;
+  --ngd-default-edge-stroke-hover: #959aa5;
 }
 
 html,
